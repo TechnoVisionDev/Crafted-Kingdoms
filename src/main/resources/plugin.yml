@@ -1,0 +1,20 @@
+name: Civilization
+version: 1.0.0
+main: com.technovision.civilization.CivilizationPlugin
+api-version: 1.20
+depend: [WorldEdit, WorldGuard, Vault]
+commands:
+  civ:
+    description: Manage your civilization
+    usage: /civ
+    aliases: [civilization]
+  town:
+    description: Manage your town
+    usage: /town
+    aliases: [t]
+  accept:
+    description: Accept a question sent to you
+    usage: /accept
+  deny:
+    description: Deny a question sent to you
+    usage: /deny

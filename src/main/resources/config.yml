@@ -1,0 +1,9 @@
+# +------------------------------------------------------+ #
+# |                 Civilization (Config)                | #
+# +------------------------------------------------------+ #
+# If you have problems, join the help support channel:
+# https://discord.gg/gFwVVTE
+# -----------------------------------------------------------
+mongodb:
+  database: ''
+  uri: ''
