@@ -4,6 +4,7 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.commands.CommandBase;
 import com.technovision.craftedkingdoms.data.objects.Group;
+import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
@@ -29,23 +30,25 @@ public class GroupCommand extends CommandBase {
 
         // Implemented
         commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
+        commands.put("invite", "[group] [player] - Invite a player to join a group.");
 
         // Not Yet Implemented
         /**
-        commands.put("invite", "<group> <player> - Invite a player to your group.");
-        commands.put("join", "<group> <password> - Join a password protected group.");
+        commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
         commands.put("rescind", "[player] - Cancel a player's invite to your group.");
-        commands.put("leave", "Leave a group that you are currently in.");
-        commands.put("delete", "Delete a group that you created.");
+        commands.put("leave", "[group] - Leave a group that you are currently in.");
+        commands.put("delete", "[group] - Delete a group that you created.");
         commands.put("invites", "List all groups that have invited you.");
-        commands.put("remove", "[player] - Remove a player from your group.");
-        commands.put("info", "Display information about your group.");
-        commands.put("set", "Set a display name and bio for a group");
-        commands.put("promote", "[player] [rank] - Promote or demote a player to a new rank.");
-        commands.put("list", "List all groups that you are in.");
-        commands.put("link", "[parentGroup] [subGroup] - Link two groups together.");
-        commands.put("unlink", "[parentGroup] [subGroup] - Unlink two groups from each other.");
-        commands.put("merge", "[group1] [group2] - Merges group2 into group1.");
+        commands.put("remove", "[group] [player] - Remove a player from your group.");
+        commands.put("info", "[group] Display information about a group.");
+        commands.put("set", "Set a display name and bio for a group.");
+        commands.put("perms", "Manage permissions for ranks in a group.");
+        commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
+        commands.put("list", "List all groups that you are currently in.");
+        commands.put("link", "[group] [subgroup] - Link two groups together.");
+        commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
+        commands.put("merge", "[group] [merge-group] - Merges group2 into group1.");
+        commands.put("transfer", "[group] [player] - Transfer ownership of a group.");
         */
     }
 
@@ -89,6 +92,44 @@ public class GroupCommand extends CommandBase {
         MessageUtils.sendHeading(player, "You Created a Group!");
         MessageUtils.send(player, createGroupMessage(group));
         EffectUtils.launchfirework(EffectUtils.greenFirework, player.getLocation());
+    }
+
+    public void invite_cmd() throws CKException {
+        // Get group name from args
+        if (args.length < 2) {
+            throw new CKException("You must specify a group name!");
+        }
+        Group group = CKGlobal.getGroup(args[1]);
+        if (group == null) {
+            throw new CKException("The group " + ChatColor.YELLOW + args[1] + ChatColor.RED + " doesn't exist!");
+        }
+        if (group.isPublic()) {
+            throw new CKException("You can only invite members to a private group!");
+        }
+
+        // Check if sender can invite
+        Resident senderRes = getResident();
+        if (!senderRes.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+
+        // TODO: Check if sender has group perms to invite players
+
+        // Get resident to invite from args
+        if (args.length < 3) {
+            throw new CKException("You must specify a player to invite");
+        }
+        Resident res = getResidentFromArgs(2);
+        if (res == null) {
+            throw new CKException("The group " + ChatColor.YELLOW + group.getName() + ChatColor.RED + " doesn't exist!");
+        }
+        if (res.hasInvite(group.getName())) {
+            throw new CKException("Your group has already invited that player to join!");
+        }
+
+        // Invite player
+        res.invite(group.getName());
+        MessageUtils.send(getPlayer(), ChatColor.GRAY + "You sent an invite to " + ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY + " to join " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
     }
 
     private String[] createGroupMessage(Group group) {

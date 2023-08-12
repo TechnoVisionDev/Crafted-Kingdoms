@@ -3,8 +3,11 @@ package com.technovision.craftedkingdoms.data.objects;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -17,6 +20,7 @@ public class Resident {
     private String playerName;
     private boolean groupChat;
     private Set<String> groups;
+    private Set<String> invites;
 
     public Resident() { }
 
@@ -25,15 +29,47 @@ public class Resident {
         this.playerName = player.getName();
         this.groupChat = false;
         this.groups = new HashSet<>();
+        this.invites = new HashSet<>();
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups) {
+    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
         this.groups = groups;
+        this.invites = invites;
     }
 
+    /**
+     * Adds a group to this resident's list of invites.
+     * @param groupName the name of the group.
+     */
+    public void invite(String groupName) {
+        invites.add(groupName);
+        Bson update = Updates.push("invites", groupName);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+
+        // Send message to player if they are online
+        Player player = Bukkit.getPlayer(playerID);
+        if (player != null) {
+            MessageUtils.send(player, ChatColor.GRAY + "You received an invite to join the group " + ChatColor.YELLOW + groupName + ChatColor.GRAY + ".");
+            MessageUtils.send(player, ChatColor.GRAY + "Use the " + ChatColor.YELLOW + "/group join" + ChatColor.GRAY + " command to join!");
+        }
+    }
+
+    /**
+     * Checks if player has an invitation to a group.
+     * @param groupName the name of the group to check for an invitation.
+     * @return true if player has invite from group, otherwise false.
+     */
+    public boolean hasInvite(String groupName) {
+        return invites.contains(groupName);
+    }
+
+    /**
+     * Adds a group to this resident's list of active groups.
+     * @param groupName the name of the group.
+     */
     public void joinGroup(String groupName) {
         groups.add(groupName);
         Bson update = Updates.push("group", groupName);
@@ -73,7 +109,11 @@ public class Resident {
         return groups;
     }
 
-    /** Getters */
+    public Set<String> getInvites() {
+        return invites;
+    }
+
+    /** Setters */
 
     public void setPlayerID(UUID playerID) {
         this.playerID = playerID;
@@ -89,5 +129,9 @@ public class Resident {
 
     public void setGroups(Set<String> groups) {
         this.groups = groups;
+    }
+
+    public void setInvites(Set<String> invites) {
+        this.invites = invites;
     }
 }

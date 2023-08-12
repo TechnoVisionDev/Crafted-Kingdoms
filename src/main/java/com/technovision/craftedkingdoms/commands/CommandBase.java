@@ -1,6 +1,8 @@
 package com.technovision.craftedkingdoms.commands;
 
+import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.ChatColor;
@@ -135,5 +137,44 @@ public abstract class CommandBase implements CommandExecutor {
 
             MessageUtils.send(sender, ChatColor.GOLD+command+" "+c+ChatColor.GRAY+" "+info);
         }
+    }
+
+    protected String[] stripArgs(String[] someArgs, int amount) {
+        if (amount >= someArgs.length) {
+            return new String[0];
+        }
+        String[] argsLeft = new String[someArgs.length - amount];
+        for (int i = 0; i < argsLeft.length; i++) {
+            argsLeft[i] = someArgs[i+amount];
+        }
+        return argsLeft;
+    }
+
+    protected String combineArgs(String[] someArgs) {
+        String combined = "";
+        for (String str : someArgs) {
+            combined += str + " ";
+        }
+        combined = combined.trim();
+        return combined;
+    }
+
+    public Resident getResident() {
+        if (!(sender instanceof Player player)) return null;
+        return CKGlobal.getResident(player);
+    }
+
+    protected Resident getResidentFromArgs(int index) throws CKException {
+        if (args.length < (index+1)) {
+            throw new CKException("You must enter a player's name.");
+        }
+        String name = args[index].toLowerCase();
+        name = name.replace("%", "(\\w*)");
+
+        Resident res = CKGlobal.getResident(name);
+        if (res == null) {
+            throw new CKException("The player you specified doesn't exist.");
+        }
+        return res;
     }
 }

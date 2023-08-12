@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.objects.*;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -39,6 +40,10 @@ public class CKGlobal {
         return group;
     }
 
+    public static Group getGroup(String groupName) {
+        return GROUPS.get(groupName.toLowerCase());
+    }
+
     public static void addGroup(Group group) {
         GROUPS.put(group.getName().toLowerCase(), group);
     }
@@ -51,14 +56,31 @@ public class CKGlobal {
         return GROUPS.containsKey(name.toLowerCase());
     }
 
-    /** Resident Methods */
+    /** Player & Resident Methods */
 
-    public static UUID getIDByName(String name) {
-        Player player = Bukkit.getPlayerExact(name);
-        if (player != null) {
-            return player.getUniqueId();
+    /**
+     * Gets the UUID of a player that is either online or offline.
+     * @param playerName the name of the player to search for.
+     * @return the UUID of the player, null if player doesn't exist.
+     */
+    public static UUID getPlayerID(String playerName) {
+        UUID id = getOnlinePlayerID(playerName);
+        if (id != null) return id;
+        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+            if (offlinePlayer.getName() != null && offlinePlayer.getName().equalsIgnoreCase(playerName)) {
+                return offlinePlayer.getUniqueId();
+            }
         }
-        player = Bukkit.getPlayer(name);
+        return null;
+    }
+
+    /**
+     * Gets the UUID of a player that is online
+     * @param playerName the name of the player to search for.
+     * @return the UUID of the player, null if player is offline or doesn't exist.
+     */
+    public static UUID getOnlinePlayerID(String playerName) {
+        Player player = Bukkit.getPlayerExact(playerName);
         if (player != null) {
             return player.getUniqueId();
         }
@@ -73,8 +95,8 @@ public class CKGlobal {
         return res;
     }
 
-    public static Resident getResident(String name) {
-        UUID id = getIDByName(name);
+    public static Resident getResident(String playerName) {
+        UUID id = getPlayerID(playerName);
         if (id == null) return null;
         return RESIDENTS.get(id);
     }
