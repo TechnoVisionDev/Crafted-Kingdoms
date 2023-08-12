@@ -1,5 +1,7 @@
 package com.technovision.craftedkingdoms.util;
 
+import com.technovision.craftedkingdoms.exceptions.CKException;
+
 public class StringUtils {
 
     public static boolean isAlpha(String s) {
@@ -12,6 +14,19 @@ public class StringUtils {
             }
         }
         return true;
+    }
+
+    public static String toSafeString(String text, int maxChars, String context) throws CKException {
+        text = text.replace(" ", "_");
+        text = text.replace("\"", "");
+        text = text.replace("\'", "");
+        if (text.length() > maxChars) {
+            throw new CKException(context + " must be under "+maxChars+" characters.");
+        }
+        if (!StringUtils.isAlpha(text)) {
+            throw new CKException(context + " can only contain letters [A-Z].");
+        }
+        return text;
     }
 
 }

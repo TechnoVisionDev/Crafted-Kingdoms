@@ -130,8 +130,8 @@ public abstract class CommandBase implements CommandExecutor {
 
             info = info.replace("[", ChatColor.YELLOW+"[");
             info = info.replace("]", "]"+ChatColor.GRAY);
-            info = info.replace("(", ChatColor.YELLOW+"(");
-            info = info.replace(")", ")"+ChatColor.GRAY);
+            info = info.replace("<", ChatColor.YELLOW+"<");
+            info = info.replace(">", ">"+ChatColor.GRAY);
 
             MessageUtils.send(sender, ChatColor.GOLD+command+" "+c+ChatColor.GRAY+" "+info);
         }

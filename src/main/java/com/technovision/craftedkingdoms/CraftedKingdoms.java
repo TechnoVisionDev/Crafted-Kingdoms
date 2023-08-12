@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.events.PearlEvents;
+import com.technovision.craftedkingdoms.events.PlayerEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -22,7 +23,19 @@ public class CraftedKingdoms extends JavaPlugin {
         // Load config
         plugin = this;
         loadConfig();
-        initDatabase();
+
+        // Initialize database
+        try {
+            Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
+            mongoLogger.setLevel(Level.SEVERE);
+            String databaseName = getConfig().getString("mongodb.database");
+            String uri = getConfig().getString("mongodb.uri");
+            database = new Database(databaseName, uri);
+        } catch (Exception e) {
+            logger.severe(String.format("[%s] - Disabled (Unable to connect to MongoDB database)", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         // Initialize managers
         CKGlobal = new CKGlobal();
@@ -41,23 +54,11 @@ public class CraftedKingdoms extends JavaPlugin {
 
     private void registerEventHandlers() {
         getServer().getPluginManager().registerEvents(new PearlEvents(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
     }
 
     private void registerCommands() {
         this.getCommand("group").setExecutor(new GroupCommand(this));
-    }
-
-    private void initDatabase() {
-        try {
-            Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
-            mongoLogger.setLevel(Level.SEVERE);
-            String databaseName = getConfig().getString("mongodb.database");
-            String uri = getConfig().getString("mongodb.uri");
-            database = new Database(databaseName, uri);
-        } catch (Exception e) {
-            logger.severe(String.format("[%s] - Disabled (Unable to connect to MongoDB database)", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-        }
     }
 
     public void loadConfig() {

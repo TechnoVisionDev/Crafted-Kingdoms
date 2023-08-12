@@ -26,8 +26,13 @@ public class CKGlobal {
 
     /** Group Methods */
 
-    public static Group createGroup(String name, Player owner) {
-        Group group = new Group(name, owner);
+    public static Group createGroup(String name, Player owner, boolean isPublic, String password) {
+        Group group;
+        if (password != null) {
+            group = new Group(name, owner, isPublic, password);
+        } else {
+            group = new Group(name, owner, isPublic);
+        }
         addGroup(group);
         Database.GROUPS.insertOne(group);
         getResident(owner).joinGroup(name);
@@ -47,14 +52,6 @@ public class CKGlobal {
     }
 
     /** Resident Methods */
-
-    public static boolean isInGroup(Player player) {
-        String groupName = getResident(player).getGroup();
-        if (groupName != null) {
-            return isGroup(groupName);
-        }
-        return false;
-    }
 
     public static UUID getIDByName(String name) {
         Player player = Bukkit.getPlayerExact(name);

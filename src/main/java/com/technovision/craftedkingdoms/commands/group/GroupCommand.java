@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms.commands.group;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.commands.CommandBase;
+import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
@@ -27,51 +28,91 @@ public class GroupCommand extends CommandBase {
         displayName = "Group";
 
         // Implemented
-        commands.put("create", "[name] - Create a new group.");
+        commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
 
         // Not Yet Implemented
+        /**
+        commands.put("invite", "<group> <player> - Invite a player to your group.");
+        commands.put("join", "<group> <password> - Join a password protected group.");
+        commands.put("rescind", "[player] - Cancel a player's invite to your group.");
+        commands.put("leave", "Leave a group that you are currently in.");
+        commands.put("delete", "Delete a group that you created.");
+        commands.put("invites", "List all groups that have invited you.");
+        commands.put("remove", "[player] - Remove a player from your group.");
+        commands.put("info", "Display information about your group.");
+        commands.put("set", "Set a display name and bio for a group");
+        commands.put("promote", "[player] [rank] - Promote or demote a player to a new rank.");
+        commands.put("list", "List all groups that you are in.");
+        commands.put("link", "[parentGroup] [subGroup] - Link two groups together.");
+        commands.put("unlink", "[parentGroup] [subGroup] - Unlink two groups from each other.");
+        commands.put("merge", "[group1] [group2] - Merges group2 into group1.");
+        */
     }
 
     public void create_cmd() throws CKException {
         // Get group name from args
-        if (args.length < (1)) {
+        if (args.length < 2) {
             throw new CKException("You must enter a name for your group.");
         }
-        String name = args[1];
-        name = name.replace(" ", "_");
-        name = name.replace("\"", "");
-        name = name.replace("\'", "");
+        String name = StringUtils.toSafeString(args[1], 30, "Your group name");
 
-        // Error checking
+        // Check if group name is taken
         Player player = getPlayer();
-        if (CKGlobal.isInGroup(player)) {
-            throw new CKException("You must leave your current group first.");
-        }
-        if (name.length() > 30) {
-            throw new CKException("Your group name must be under 30 characters.");
-        }
-        if (!StringUtils.isAlpha(name)) {
-            throw new CKException("Your group name can only contain letters [A-Z].");
-        }
         if (CKGlobal.isGroup(name)) {
             throw new CKException("A group named "+ChatColor.YELLOW+args[1]+ChatColor.RED+" already exists!");
         }
-        CKGlobal.createGroup(name, player);
+
+        // Get group type from args if specified
+        boolean isPublic = false;
+        if (args.length >= 3) {
+            if (args[2].equalsIgnoreCase("public")) {
+                isPublic = true;
+            } else if (!args[2].equalsIgnoreCase("private")) {
+                throw new CKException("The group type specified is invalid. Use 'public' or 'private'.");
+            }
+        }
+
+        // Get group password from args if specified
+        String password = null;
+        if (args.length >= 4) {
+            if (isPublic) {
+                throw new CKException("Only private groups can add a password!");
+            }
+            password = StringUtils.toSafeString(args[3], 30, "Your group password");
+        }
+
+        // Create group locally and in database
+        Group group = CKGlobal.createGroup(name, player, isPublic, password);
 
         // Send success message & firework
         MessageUtils.send(player, " ");
         MessageUtils.sendHeading(player, "You Created a Group!");
+        MessageUtils.send(player, createGroupMessage(group));
+        EffectUtils.launchfirework(EffectUtils.greenFirework, player.getLocation());
+    }
+
+    private String[] createGroupMessage(Group group) {
         String[] msg = {
-                ChatColor.GREEN + "You can manage your group by using",
-                ChatColor.GREEN + "the /group command in chat! ",
+                ChatColor.GREEN + "You created a " + ChatColor.YELLOW + (group.isPublic() ? "public" : "private") + ChatColor.GREEN + " group named " + ChatColor.YELLOW + group.getName() + ChatColor.GREEN + ".",
+                ChatColor.GREEN + "Players must enter a password to join this group.",
                 " ",
                 ChatColor.GRAY + "Use " + ChatColor.YELLOW + "/group" + ChatColor.GRAY + " to manage your group.",
-                ChatColor.GRAY + "Use " + ChatColor.YELLOW + "/group invite" + ChatColor.GRAY + " to invite players.",
-                ChatColor.GRAY + "Use " + ChatColor.YELLOW + "/group set" + ChatColor.GRAY + " to set a display name.",
+                ChatColor.GRAY + "Use " + ChatColor.YELLOW + "/group invite" + ChatColor.GRAY + " to invite other players.",
+                ChatColor.GRAY + "Use " + ChatColor.YELLOW + "/group set" + ChatColor.GRAY + " to set a display name and bio.",
                 " "
         };
-        MessageUtils.send(player, msg);
-        EffectUtils.firework(EffectUtils.greenFirework, player.getLocation().add(0, -1, 0));
+        // If password is null, compact the array to exclude the empty password line
+        if (group.getPassword() == null) {
+            msg = new String[] {
+                    msg[0], // Group creation message
+                    msg[2], // Blank line
+                    msg[3], // /group message
+                    msg[4], // /group invite message
+                    msg[5], // /group set message
+                    msg[6]  // Blank line
+            };
+        }
+        return msg;
     }
 
     @Override

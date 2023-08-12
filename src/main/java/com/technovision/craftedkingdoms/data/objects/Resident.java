@@ -3,10 +3,12 @@ package com.technovision.craftedkingdoms.data.objects;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.data.Database;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
 import org.bukkit.entity.Player;
 
-import javax.xml.crypto.Data;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Resident {
@@ -14,7 +16,7 @@ public class Resident {
     private UUID playerID;
     private String playerName;
     private boolean groupChat;
-    private String group;
+    private Set<String> groups;
 
     public Resident() { }
 
@@ -22,20 +24,35 @@ public class Resident {
         this.playerID = player.getUniqueId();
         this.playerName = player.getName();
         this.groupChat = false;
-        this.group = null;
+        this.groups = new HashSet<>();
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, String group) {
+    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
-        this.group = group;
+        this.groups = groups;
     }
 
     public void joinGroup(String groupName) {
-        setGroup(groupName);
-        Bson update = Updates.set("group", groupName);
+        groups.add(groupName);
+        Bson update = Updates.push("group", groupName);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
+
+    @BsonIgnore
+    public boolean isInGroup() {
+        return !groups.isEmpty();
+    }
+
+    @BsonIgnore
+    public boolean isInGroup(String groupName) {
+        for (String group : groups) {
+            if (group.equalsIgnoreCase(groupName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Getters */
@@ -52,8 +69,8 @@ public class Resident {
         return groupChat;
     }
 
-    public String getGroup() {
-        return group;
+    public Set<String> getGroups() {
+        return groups;
     }
 
     /** Getters */
@@ -70,7 +87,7 @@ public class Resident {
         this.groupChat = groupChat;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroups(Set<String> groups) {
+        this.groups = groups;
     }
 }

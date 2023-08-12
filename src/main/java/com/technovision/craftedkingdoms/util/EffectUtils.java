@@ -13,7 +13,7 @@ public class EffectUtils {
     public static final FireworkEffect greenFirework = FireworkEffect.builder().flicker(false).trail(true).with(FireworkEffect.Type.BALL).withColor(Color.LIME).withFade(Color.GREEN).build();
     public static final FireworkEffect redFirework = FireworkEffect.builder().flicker(false).trail(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).withFade(Color.WHITE).build();
 
-    public static void firework(FireworkEffect fe, Location loc) {
+    public static void launchfirework(FireworkEffect fe, Location loc) {
         Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
         FireworkMeta fwm = fw.getFireworkMeta();
         fwm.addEffect(fe);
