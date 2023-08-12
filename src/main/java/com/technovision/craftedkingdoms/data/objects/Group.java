@@ -2,6 +2,7 @@ package com.technovision.craftedkingdoms.data.objects;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
 import org.bson.conversions.Bson;
 import org.bukkit.Material;
@@ -93,7 +94,14 @@ public class Group {
     public void fortifyBlock(Block block, Material material) {
         FortifiedBlock fortifiedBlock = new FortifiedBlock(name, block, material);
         fortifiedBlocks.add(fortifiedBlock);
+        CKGlobal.addFortifiedBlock(fortifiedBlock);
         Bson update = Updates.push("fortifiedBlocks", fortifiedBlock);
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    public void removeFortifiedBlock(FortifiedBlock block) {
+        fortifiedBlocks.remove(block);
+        Bson update = Updates.pull("fortifiedBlocks", block);
         Database.GROUPS.updateOne(Filters.eq("name", name), update);
     }
 

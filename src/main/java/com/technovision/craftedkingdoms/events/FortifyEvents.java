@@ -1,16 +1,19 @@
 package com.technovision.craftedkingdoms.events;
 
 import com.technovision.craftedkingdoms.CKGlobal;
+import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +39,10 @@ public class FortifyEvents implements Listener {
         Player player = event.getPlayer();
         Group group = CKGlobal.getFortifyGroup(player);
         if (group == null) return;
+        if (!CKGlobal.getResident(player).isInGroup(group.getName())) {
+            MessageUtils.sendError(player, "You are no longer a member of the group you are fortifying for.");
+            return;
+        }
 
         // TODO: Check if player has perms to fortify for group
 
@@ -66,7 +73,33 @@ public class FortifyEvents implements Listener {
                 StringUtils.stringifyType(item.getType()),
                 ChatColor.GRAY
         ));
-
         item.setAmount(item.getAmount()-1);
+    }
+
+    /**
+     * Checks if a block is fortified when broken by a player.
+     * @param event fires when a player breaks a block.
+     */
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        Location loc = block.getLocation();
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(loc);
+        if (fortifiedBlock != null) {
+            fortifiedBlock.decrement();
+            if (fortifiedBlock.getFortifications() > 0) {
+                // cancel the event to prevent the block from actually breaking
+                event.setCancelled(true);
+                MessageUtils.send(event.getPlayer(), String.format("%sThat block is fortified by %s%s%s (%d breaks remaining).",
+                        ChatColor.GRAY, ChatColor.YELLOW,
+                        fortifiedBlock.getGroup(),
+                        ChatColor.GRAY,
+                        fortifiedBlock.getFortifications()
+                        ));
+            } else {
+                // remove from map and database when health reaches 0
+                CKGlobal.removeFortifiedBlock(loc);
+            }
+        }
     }
 }

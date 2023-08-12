@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.objects.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -13,12 +14,17 @@ public class CKGlobal {
 
     private static final HashMap<String, Group> GROUPS = new HashMap<>();
     private static final HashMap<UUID, Resident> RESIDENTS = new HashMap<>();
-    private static final HashMap<Player, String> FORTIFY_GROUP = new HashMap<>();
+    private static final HashMap<Player, String> FORTIFY_GROUPS = new HashMap<>();
+    private static final HashMap<Location, FortifiedBlock> FORTIFIED_BLOCKS = new HashMap<>();
+
 
     public CKGlobal() {
         // Get groups from database
         for (Group group : Database.GROUPS.find()) {
             addGroup(group);
+            for (FortifiedBlock block : group.getFortifiedBlocks()) {
+                addFortifiedBlock(block);
+            }
         }
         // Get residents from database
         for (Resident res : Database.RESIDENTS.find()) {
@@ -59,11 +65,24 @@ public class CKGlobal {
     }
 
     public static void addFortifyGroup(Player player, String groupName) {
-        FORTIFY_GROUP.put(player, groupName);
+        FORTIFY_GROUPS.put(player, groupName);
     }
 
     public static Group getFortifyGroup(Player player) {
-        return getGroup(FORTIFY_GROUP.get(player));
+        return getGroup(FORTIFY_GROUPS.get(player));
+    }
+
+    public static void addFortifiedBlock(FortifiedBlock block) {
+        FORTIFIED_BLOCKS.put(block.findLocation(), block);
+    }
+
+    public static FortifiedBlock getFortifiedBlock(Location location) {
+        return FORTIFIED_BLOCKS.get(location);
+    }
+
+    public static void removeFortifiedBlock(Location location) {
+        FortifiedBlock block = FORTIFIED_BLOCKS.remove(location);
+        getGroup(block.getGroup()).removeFortifiedBlock(block);
     }
 
     /** Player & Resident Methods */
