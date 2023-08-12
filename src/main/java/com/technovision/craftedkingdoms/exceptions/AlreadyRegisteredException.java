@@ -1,4 +1,4 @@
-package com.technovision.tribes.exceptions;
+package com.technovision.craftedkingdoms.exceptions;
 
 import java.io.Serial;
 

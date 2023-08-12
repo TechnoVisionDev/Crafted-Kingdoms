@@ -1,4 +1,4 @@
-package com.technovision.tribes.events;
+package com.technovision.craftedkingdoms.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

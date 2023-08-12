@@ -1,6 +1,6 @@
-package com.technovision.tribes.util;
+package com.technovision.craftedkingdoms.util;
 
-import com.technovision.tribes.data.objects.Tribe;
+import com.technovision.craftedkingdoms.data.objects.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -35,8 +35,8 @@ public class MessageUtils {
         send(sender, ChatColor.RED+line);
     }
 
-    public static void sendTribe(Tribe tribe, String message) {
-        for (UUID id : tribe.getMembers()) {
+    public static void sendTribe(Group group, String message) {
+        for (UUID id : group.getMembers()) {
             Player player = Bukkit.getPlayer(id);
             if (player != null) {
                 send(player, message);

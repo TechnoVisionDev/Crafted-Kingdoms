@@ -1,4 +1,4 @@
-package com.technovision.tribes.data.objects;
+package com.technovision.craftedkingdoms.data.objects;
 
 /**
  * POJO object which stores chunk coordinates.

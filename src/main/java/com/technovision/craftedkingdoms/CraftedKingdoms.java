@@ -1,21 +1,21 @@
-package com.technovision.tribes;
+package com.technovision.craftedkingdoms;
 
-import com.technovision.tribes.commands.tribe.TribeCommand;
-import com.technovision.tribes.data.Database;
-import com.technovision.tribes.events.PearlEvents;
+import com.technovision.craftedkingdoms.commands.group.GroupCommand;
+import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.events.PearlEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TribesPlugin extends JavaPlugin {
+public class CraftedKingdoms extends JavaPlugin {
 
     public static JavaPlugin plugin;
-    public static final String namespace = "tribes";
+    public static final String namespace = "craftedkingdoms";
     public static final Logger logger = Logger.getLogger("Minecraft");
 
     public static Database database;
-    public static TribesGlobal tribesGlobal;
+    public static CKGlobal CKGlobal;
 
     @Override
     public void onEnable() {
@@ -25,7 +25,7 @@ public class TribesPlugin extends JavaPlugin {
         initDatabase();
 
         // Initialize managers
-        tribesGlobal = new TribesGlobal();
+        CKGlobal = new CKGlobal();
 
         // Register events and commands
         registerEventHandlers();
@@ -44,7 +44,7 @@ public class TribesPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("tribe").setExecutor(new TribeCommand(this));
+        this.getCommand("group").setExecutor(new GroupCommand(this));
     }
 
     private void initDatabase() {

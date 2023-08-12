@@ -1,4 +1,4 @@
-package com.technovision.tribes.data.objects;
+package com.technovision.craftedkingdoms.data.objects;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;

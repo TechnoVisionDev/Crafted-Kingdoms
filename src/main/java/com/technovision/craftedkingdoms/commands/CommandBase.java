@@ -1,8 +1,8 @@
-package com.technovision.tribes.commands;
+package com.technovision.craftedkingdoms.commands;
 
-import com.technovision.tribes.TribesPlugin;
-import com.technovision.tribes.exceptions.TribesException;
-import com.technovision.tribes.util.MessageUtils;
+import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.exceptions.CKException;
+import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,29 +23,29 @@ public abstract class CommandBase implements CommandExecutor {
     protected String command;
     protected String displayName;
     protected boolean sendUnknownToDefault = false;
-    protected TribesPlugin plugin;
+    protected CraftedKingdoms plugin;
 
-    public CommandBase(TribesPlugin plugin) {
+    public CommandBase(CraftedKingdoms plugin) {
         this.plugin = plugin;
     }
 
-    public Player getPlayer() throws TribesException {
+    public Player getPlayer() throws CKException {
         if (sender instanceof Player) {
             return (Player)sender;
         }
-        throw new TribesException("Only players can run that command!");
+        throw new CKException("Only players can run that command!");
     }
 
     public abstract void init();
 
     /* Called when no arguments are passed. */
-    public abstract void doDefaultAction() throws TribesException;
+    public abstract void doDefaultAction() throws CKException;
 
     /* Called on syntax error. */
     public abstract void showHelp();
 
     /* Called before command is executed to check permissions. */
-    public abstract void permissionCheck() throws TribesException;
+    public abstract void permissionCheck() throws CKException;
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -65,7 +65,7 @@ public abstract class CommandBase implements CommandExecutor {
             try {
                 doDefaultAction();
                 return true;
-            } catch (TribesException e) {
+            } catch (CKException e) {
                 MessageUtils.sendError(sender, e.getMessage());
             }
             return false;
@@ -87,7 +87,7 @@ public abstract class CommandBase implements CommandExecutor {
                         e.printStackTrace();
                         MessageUtils.sendError(sender, "Internal Command Error.");
                     } catch (InvocationTargetException e) {
-                        if (e.getCause() instanceof TribesException) {
+                        if (e.getCause() instanceof CKException) {
                             MessageUtils.sendError(sender, e.getCause().getMessage());
                         } else {
                             MessageUtils.sendError(sender, "Internal Command Error.");
@@ -98,7 +98,7 @@ public abstract class CommandBase implements CommandExecutor {
                     if (sendUnknownToDefault) {
                         try {
                             doDefaultAction();
-                        } catch (TribesException e1) {
+                        } catch (CKException e1) {
                             MessageUtils.sendError(sender, e.getMessage());
                         }
                         return false;
@@ -113,7 +113,7 @@ public abstract class CommandBase implements CommandExecutor {
             try {
                 doDefaultAction();
                 return true;
-            } catch (TribesException e) {
+            } catch (CKException e) {
                 MessageUtils.sendError(sender, e.getMessage());
             }
             return false;

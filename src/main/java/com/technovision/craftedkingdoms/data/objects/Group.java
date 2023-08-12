@@ -1,4 +1,4 @@
-package com.technovision.tribes.data.objects;
+package com.technovision.craftedkingdoms.data.objects;
 
 import org.bukkit.entity.Player;
 
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Tribe {
+public class Group {
 
     private String name;
     private String displayName;
@@ -16,10 +16,10 @@ public class Tribe {
     private Set<UUID> members;
     private Set<BlockCoord> protectedBlocks;
 
-    public Tribe() { }
+    public Group() { }
 
-    public Tribe(String name, Player owner) {
-        this.name = name.toLowerCase();
+    public Group(String name, Player owner) {
+        this.name = name;
         this.displayName = name;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
@@ -28,7 +28,7 @@ public class Tribe {
         this.protectedBlocks = new HashSet<>();
     }
 
-    public Tribe(String name, String displayName, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<BlockCoord> protectedBlocks) {
+    public Group(String name, String displayName, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<BlockCoord> protectedBlocks) {
         this.name = name;
         this.displayName = displayName;
         this.ownerID = ownerID;

@@ -1,4 +1,4 @@
-package com.technovision.tribes.util;
+package com.technovision.craftedkingdoms.util;
 
 public class StringUtils {
 

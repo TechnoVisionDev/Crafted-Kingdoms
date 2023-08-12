@@ -1,4 +1,4 @@
-package com.technovision.tribes.data.enums;
+package com.technovision.craftedkingdoms.data.enums;
 
 import org.bukkit.Material;
 

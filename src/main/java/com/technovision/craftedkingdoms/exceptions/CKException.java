@@ -1,13 +1,13 @@
-package com.technovision.tribes.exceptions;
+package com.technovision.craftedkingdoms.exceptions;
 
 import java.io.Serial;
 
-public class TribesException extends Exception {
+public class CKException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 4124107018314337603L;
 
-    public TribesException(String message) {
+    public CKException(String message) {
         super(message);
     }
 }
