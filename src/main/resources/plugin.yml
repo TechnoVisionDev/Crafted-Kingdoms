@@ -4,6 +4,10 @@ main: com.technovision.craftedkingdoms.CraftedKingdoms
 api-version: 1.20
 commands:
   group:
-    description: Manage your group
+    description: Manage your groups
     usage: /group
     aliases: [g]
+  fortify:
+    description: Protect blocks for your groups
+    usage: /fortify
+    aliases: [f]

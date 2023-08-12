@@ -1,6 +1,9 @@
 package com.technovision.craftedkingdoms.util;
 
 import com.technovision.craftedkingdoms.exceptions.CKException;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class StringUtils {
 
@@ -27,6 +30,22 @@ public class StringUtils {
             throw new CKException(context + " can only contain letters [A-Z].");
         }
         return text;
+    }
+
+    public static String stringifyType(Material type) {
+        String materialName = type.toString().replace('_', ' ');
+        return capitalizeEachWord(materialName);
+    }
+
+    private static String capitalizeEachWord(String str) {
+        String[] words = str.split(" ");
+        StringBuilder capitalizedString = new StringBuilder();
+        for (String word : words) {
+            String first = word.substring(0, 1).toUpperCase();
+            String afterFirst = word.substring(1).toLowerCase();
+            capitalizedString.append(first).append(afterFirst).append(" ");
+        }
+        return capitalizedString.toString().trim();  // Remove the last space
     }
 
 }

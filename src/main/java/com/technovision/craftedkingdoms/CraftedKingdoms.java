@@ -1,7 +1,9 @@
 package com.technovision.craftedkingdoms;
 
+import com.technovision.craftedkingdoms.commands.group.FortifyCommand;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.events.FortifyEvents;
 import com.technovision.craftedkingdoms.events.PearlEvents;
 import com.technovision.craftedkingdoms.events.PlayerEvents;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,10 +57,12 @@ public class CraftedKingdoms extends JavaPlugin {
     private void registerEventHandlers() {
         getServer().getPluginManager().registerEvents(new PearlEvents(), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        getServer().getPluginManager().registerEvents(new FortifyEvents(), this);
     }
 
     private void registerCommands() {
         this.getCommand("group").setExecutor(new GroupCommand(this));
+        this.getCommand("fortify").setExecutor(new FortifyCommand(this));
     }
 
     public void loadConfig() {

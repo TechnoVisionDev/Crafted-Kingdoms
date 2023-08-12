@@ -1,5 +1,11 @@
 package com.technovision.craftedkingdoms.data.objects;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import com.technovision.craftedkingdoms.data.Database;
+import org.bson.conversions.Bson;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.Date;
@@ -17,7 +23,7 @@ public class Group {
     private Set<UUID> moderators;
     private Set<UUID> members;
     private Set<String> subGroups;
-    private Set<BlockCoord> protectedBlocks;
+    private Set<FortifiedBlock> fortifiedBlocks;
     private boolean isPublic;
     private String password;
     private Date dateCreated;
@@ -33,7 +39,7 @@ public class Group {
         this.moderators = new HashSet<>();
         this.members = new HashSet<>();
         this.subGroups = new HashSet<>();
-        this.protectedBlocks = new HashSet<>();
+        this.fortifiedBlocks = new HashSet<>();
         this.isPublic = false;
         this.password = null;
         this.dateCreated = new Date();
@@ -48,7 +54,7 @@ public class Group {
         this.moderators = new HashSet<>();
         this.members = new HashSet<>();
         this.subGroups = new HashSet<>();
-        this.protectedBlocks = new HashSet<>();
+        this.fortifiedBlocks = new HashSet<>();
         this.isPublic = isPublic;
         this.password = null;
         this.dateCreated = new Date();
@@ -63,13 +69,13 @@ public class Group {
         this.moderators = new HashSet<>();
         this.members = new HashSet<>();
         this.subGroups = new HashSet<>();
-        this.protectedBlocks = new HashSet<>();
+        this.fortifiedBlocks = new HashSet<>();
         this.isPublic = isPublic;
         this.password = password;
         this.dateCreated = new Date();
     }
 
-    public Group(String name, String displayName, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<BlockCoord> protectedBlocks, boolean isPublic, String password, Date dateCreated) {
+    public Group(String name, String displayName, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated) {
         this.name = name;
         this.displayName = displayName;
         this.biography = biography;
@@ -78,10 +84,17 @@ public class Group {
         this.moderators = moderators;
         this.members = members;
         this.subGroups = subGroups;
-        this.protectedBlocks = protectedBlocks;
+        this.fortifiedBlocks = fortifiedBlocks;
         this.isPublic = isPublic;
         this.password = password;
         this.dateCreated = dateCreated;
+    }
+
+    public void fortifyBlock(Block block, Material material) {
+        FortifiedBlock fortifiedBlock = new FortifiedBlock(name, block, material);
+        fortifiedBlocks.add(fortifiedBlock);
+        Bson update = Updates.push("fortifiedBlocks", fortifiedBlock);
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
     }
 
     /** Getters */
@@ -118,8 +131,8 @@ public class Group {
         return subGroups;
     }
 
-    public Set<BlockCoord> getProtectedBlocks() {
-        return protectedBlocks;
+    public Set<FortifiedBlock> getFortifiedBlocks() {
+        return fortifiedBlocks;
     }
 
     public boolean isPublic() {
@@ -168,8 +181,8 @@ public class Group {
         this.subGroups = subGroups;
     }
 
-    public void setProtectedBlocks(Set<BlockCoord> protectedBlocks) {
-        this.protectedBlocks = protectedBlocks;
+    public void setFortifiedBlocks(Set<FortifiedBlock> fortifiedBlocks) {
+        this.fortifiedBlocks = fortifiedBlocks;
     }
 
     public void setPublic(boolean aPublic) {

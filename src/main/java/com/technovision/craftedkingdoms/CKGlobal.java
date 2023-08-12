@@ -13,6 +13,7 @@ public class CKGlobal {
 
     private static final HashMap<String, Group> GROUPS = new HashMap<>();
     private static final HashMap<UUID, Resident> RESIDENTS = new HashMap<>();
+    private static final HashMap<Player, String> FORTIFY_GROUP = new HashMap<>();
 
     public CKGlobal() {
         // Get groups from database
@@ -41,6 +42,7 @@ public class CKGlobal {
     }
 
     public static Group getGroup(String groupName) {
+        if (groupName == null) return null;
         return GROUPS.get(groupName.toLowerCase());
     }
 
@@ -54,6 +56,14 @@ public class CKGlobal {
 
     public static boolean isGroup(String name) {
         return GROUPS.containsKey(name.toLowerCase());
+    }
+
+    public static void addFortifyGroup(Player player, String groupName) {
+        FORTIFY_GROUP.put(player, groupName);
+    }
+
+    public static Group getFortifyGroup(Player player) {
+        return getGroup(FORTIFY_GROUP.get(player));
     }
 
     /** Player & Resident Methods */

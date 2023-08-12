@@ -72,7 +72,7 @@ public class Resident {
      */
     public void joinGroup(String groupName) {
         groups.add(groupName);
-        Bson update = Updates.push("group", groupName);
+        Bson update = Updates.push("groups", groupName);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 

@@ -95,7 +95,7 @@ public class GroupCommand extends CommandBase {
     }
 
     public void invite_cmd() throws CKException {
-        // Get group name from args
+        // Get group from args
         if (args.length < 2) {
             throw new CKException("You must specify a group name!");
         }
