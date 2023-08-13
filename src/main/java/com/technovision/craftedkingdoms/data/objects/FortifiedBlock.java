@@ -22,10 +22,10 @@ import java.util.Set;
  */
 public class FortifiedBlock {
 
-    public static final int STONE_FORTIFY = 3;
-    public static final int IRON_FORTIFY = 5;
-    public static final int DIAMOND_FORTIFY = 8;
-    public static final int NETHERITE_FORTIFY = 10;
+    public static final int STONE_FORTIFY = 25;
+    public static final int IRON_FORTIFY = 250;
+    public static final int DIAMOND_FORTIFY = 1500;
+    public static final int NETHERITE_FORTIFY = 2000;
 
     public static Map<Material, Integer> MATERIALS;
     static {
@@ -128,12 +128,7 @@ public class FortifiedBlock {
     }
 
     public int calculateReinforcements(Material material) {
-        return switch (material) {
-            case IRON_INGOT -> IRON_FORTIFY;
-            case DIAMOND -> DIAMOND_FORTIFY;
-            case NETHERITE_INGOT -> NETHERITE_FORTIFY;
-            default -> 0;
-        };
+        return MATERIALS.get(material);
     }
 
     @BsonIgnore
