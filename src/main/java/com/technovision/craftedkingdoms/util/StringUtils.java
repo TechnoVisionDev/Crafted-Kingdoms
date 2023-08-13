@@ -33,8 +33,17 @@ public class StringUtils {
     }
 
     public static String stringifyType(Material type) {
-        String materialName = type.toString().replace('_', ' ');
-        return capitalizeEachWord(materialName);
+        return stringifyType(type, false);
+    }
+
+    public static String stringifyType(Material type, boolean firstWordOnly) {
+        if (firstWordOnly) {
+            String firstWord = type.toString().split("_")[0].toLowerCase();
+            return capitalizeEachWord(firstWord);
+        } else {
+            String materialName = type.toString().replace('_', ' ');
+            return capitalizeEachWord(materialName);
+        }
     }
 
     private static String capitalizeEachWord(String str) {
@@ -47,5 +56,4 @@ public class StringUtils {
         }
         return capitalizedString.toString().trim();  // Remove the last space
     }
-
 }

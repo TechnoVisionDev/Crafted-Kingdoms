@@ -1,5 +1,7 @@
 package com.technovision.craftedkingdoms.data.objects;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
@@ -63,6 +65,11 @@ public class BlockCoord {
     }
 
     /** Getters */
+
+    @BsonIgnore
+    public Location asLocation() {
+        return new Location(Bukkit.getWorld(worldName), x, y, z);
+    }
 
     public String getWorldName() {
         return worldName;
