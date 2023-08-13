@@ -42,12 +42,12 @@ public class GroupCommand extends CommandBase {
         commands.put("invites", "List all groups that have invited you.");
         commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
+        commands.put("bio", "[group] [text] - Set a biography for a group (100 chars max).");
         commands.put("delete", "[group] - Delete a group you are currently in.");
         commands.put("info", "[group] - Display information about a group.");
 
         // Not Yet Implemented
         /**
-        commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
         commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
@@ -347,6 +347,22 @@ public class GroupCommand extends CommandBase {
         String groupName = group.getName();
         group.delete();
         MessageUtils.send(sender, ChatColor.GRAY + "You have deleted the group " + ChatColor.YELLOW + groupName);
+    }
+
+    public void bio_cmd() throws CKException {
+        // Get data from args
+        Group group = getGroupFromArgs(1);
+        if (args.length <= 2) {
+            throw new CKException("You must enter some text for your group's bio!");
+        }
+        String text = combineArgs(Arrays.copyOfRange(args, 2, args.length));
+        if (text.length() > 100) {
+            throw new CKException("Your group's bio cannot be greater than 100 characters!");
+        }
+
+        // Set bio and send message
+        group.addBiography(text);
+        MessageUtils.send(sender, ChatColor.GREEN + "Successfully set bio for group " + ChatColor.YELLOW + group.getName());
     }
 
     public void info_cmd() throws CKException {

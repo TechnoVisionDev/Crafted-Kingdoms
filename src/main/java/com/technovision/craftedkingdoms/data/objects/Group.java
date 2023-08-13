@@ -18,7 +18,6 @@ import java.util.*;
 public class Group {
 
     private String name;
-    private String displayName;
     private String biography;
     private UUID ownerID;
     private Set<UUID> admins;
@@ -35,7 +34,6 @@ public class Group {
 
     public Group(String name, Player owner) {
         this.name = name;
-        this.displayName = name;
         this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
@@ -51,7 +49,6 @@ public class Group {
 
     public Group(String name, Player owner, boolean isPublic) {
         this.name = name;
-        this.displayName = name;
         this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
@@ -67,7 +64,6 @@ public class Group {
 
     public Group(String name, Player owner, boolean isPublic, String password) {
         this.name = name;
-        this.displayName = name;
         this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
@@ -81,9 +77,8 @@ public class Group {
         fillDefaultPermissions();
     }
 
-    public Group(String name, String displayName, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated, Map<String, Set<String>> rankPermissions) {
+    public Group(String name, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated, Map<String, Set<String>> rankPermissions) {
         this.name = name;
-        this.displayName = displayName;
         this.biography = biography;
         this.ownerID = ownerID;
         this.admins = admins;
@@ -226,6 +221,16 @@ public class Group {
     }
 
     /**
+     * Updates the biography for this group.
+     * @param biography the biography to set.
+     */
+    public void addBiography(String biography) {
+        setBiography(biography);
+        Bson update = Updates.set("biography", biography);
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    /**
      * Counts the total number of residents in this group.
      * @return the number of residents in this group.
      */
@@ -269,10 +274,6 @@ public class Group {
 
     public String getName() {
         return name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 
     public String getBiography() {
@@ -323,10 +324,6 @@ public class Group {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public void setBiography(String biography) {
