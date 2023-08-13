@@ -35,7 +35,11 @@ public class MessageUtils {
         send(sender, ChatColor.RED+line);
     }
 
-    public static void sendTribe(Group group, String message) {
+    public static void sendGroup(Group group, String message) {
+        Player owner = Bukkit.getPlayer(group.getOwnerID());
+        if (owner != null) {
+            send(owner, message);
+        }
         for (UUID id : group.getMembers()) {
             Player player = Bukkit.getPlayer(id);
             if (player != null) {

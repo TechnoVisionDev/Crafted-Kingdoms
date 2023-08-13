@@ -113,6 +113,17 @@ public class Group {
     }
 
     /**
+     * Adds a player as a member of this group.
+     * @param resident the resident form of the player
+     */
+    public void addMember(Resident resident) {
+        this.members.add(resident.getPlayerID());
+        Bson update = Updates.push("members", resident.getPlayerID());
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+        resident.joinGroup(name);
+    }
+
+    /**
      * Adds a permission to this group's player rank.
      * @param rank the rank to add the perm to.
      * @param perm the permission to add.
