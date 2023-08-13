@@ -37,6 +37,7 @@ public class GroupCommand extends CommandBase {
         commands.put("invite", "[group] [player] - Invite a player to join a group.");
         commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
         commands.put("list", "<player> - List all groups that you or another player are in.");
+        commands.put("invites", "List all groups that have invited you.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
 
         // Not Yet Implemented
@@ -44,9 +45,8 @@ public class GroupCommand extends CommandBase {
         commands.put("rescind", "[player] - Cancel a player's invite to your group.");
         commands.put("leave", "[group] - Leave a group that you are currently in.");
         commands.put("delete", "[group] - Delete a group you are currently in.");
-        commands.put("invites", "List all groups that have invited you.");
         commands.put("remove", "[group] [player] - Remove a player from your group.");
-        commands.put("info", "[group] Display information about a group.");
+        commands.put("info", "[group] - Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
@@ -217,6 +217,31 @@ public class GroupCommand extends CommandBase {
         Player player = getPlayer();
         if (isMe) { MessageUtils.sendHeading(player, "Your Groups"); }
         else { MessageUtils.sendHeading(player, res.getPlayerName() + "'s Groups"); }
+        MessageUtils.send(player, groupList.toArray(new String[0]));
+    }
+
+    public void invites_cmd() throws CKException {
+        Resident res = getResident();
+
+        // Get list of valid invites
+        List<String> groupList = new ArrayList<>();
+        for (String name : res.getInvites()) {
+            Group group = CKGlobal.getGroup(name);
+            if (group != null) {
+                String groupString = String.format("%s%s%s",
+                        ChatColor.YELLOW,
+                        group.getName(),
+                        ChatColor.GRAY,
+                        getRankAsString(group, res.getPlayerID()),
+                        ChatColor.YELLOW
+                );
+                groupList.add(groupString);
+            }
+        }
+
+        // Send invites to player
+        Player player = getPlayer();
+        MessageUtils.sendHeading(player, "Your Invites");
         MessageUtils.send(player, groupList.toArray(new String[0]));
     }
 
