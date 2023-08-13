@@ -6,6 +6,7 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -95,6 +96,9 @@ public class Group {
         this.rankPermissions = rankPermissions;
     }
 
+    /**
+     * Creates a map of player ranks to a set of default permissions.
+     */
     private void fillDefaultPermissions() {
         this.rankPermissions = new HashMap<>();
         Set<String> perms;
@@ -108,6 +112,33 @@ public class Group {
         }
     }
 
+    /**
+     * Adds a permission to this group's player rank.
+     * @param rank the rank to add the perm to.
+     * @param perm the permission to add.
+     */
+    public void addPermissionToRank(Ranks rank, Permissions perm) {
+        this.rankPermissions.get(rank.toString()).add(perm.toString());
+        Bson update = Updates.addToSet("rankPermissions." + rank, perm.toString());
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    /**
+     * Checks if a rank has a permission set for this group.
+     * @param rank the rank to check.
+     * @param perm the permission to check for.
+     * @return true if rank has permission, otherwise false.
+     */
+    public boolean hasPermission(Ranks rank, Permissions perm) {
+        if (rank == Ranks.OWNER) return true;
+        return rankPermissions.get(rank.toString()).contains(perm.toString());
+    }
+
+    /**
+     * Add a block to the list of fortified blocks.
+     * @param block the block to fortify
+     * @param material the material used to fortify
+     */
     public void fortifyBlock(Block block, Material material) {
         FortifiedBlock fortifiedBlock = new FortifiedBlock(name, block, material);
         fortifiedBlocks.add(fortifiedBlock);
@@ -116,10 +147,34 @@ public class Group {
         Database.GROUPS.updateOne(Filters.eq("name", name), update);
     }
 
+    /**
+     * Remove a block from the list of fortified blocks.
+     * @param block the block to remove.
+     */
     public void removeFortifiedBlock(FortifiedBlock block) {
         fortifiedBlocks.remove(block);
         Bson update = Updates.pull("fortifiedBlocks", block);
         Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    @BsonIgnore
+    public boolean isMember(UUID playerID) {
+        return members.contains(playerID);
+    }
+
+    @BsonIgnore
+    public boolean isModerator(UUID playerID) {
+        return moderators.contains(playerID);
+    }
+
+    @BsonIgnore
+    public boolean isAdmin(UUID playerID) {
+        return admins.contains(playerID);
+    }
+
+    @BsonIgnore
+    public boolean isOwner(UUID playerID) {
+        return ownerID.equals(playerID);
     }
 
     /** Getters */

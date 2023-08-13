@@ -2,6 +2,8 @@ package com.technovision.craftedkingdoms.commands;
 
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.data.enums.Ranks;
+import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.MessageUtils;
@@ -123,6 +125,28 @@ public abstract class CommandBase implements CommandExecutor {
 
         MessageUtils.sendError(sender, "Unknown command "+args[0]);
         return true;
+    }
+
+    public Group getGroupFromArgs(int index) throws CKException {
+        if (args.length < index+1) {
+            throw new CKException("You must specify a group name!");
+        }
+        Group group = CKGlobal.getGroup(args[index]);
+        if (group == null) {
+            throw new CKException("The group " + ChatColor.YELLOW + args[index] + ChatColor.RED + " doesn't exist!");
+        }
+        return group;
+    }
+
+    public Ranks getRankFromArgs(int index) throws CKException {
+        if (args.length < index+1) {
+            throw new CKException("You must specify a player rank!");
+        }
+        try {
+            return Ranks.valueOf(args[index].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new CKException("The rank " + ChatColor.YELLOW + args[index] + ChatColor.RED + " doesn't exist!");
+        }
     }
 
     public void showBasicHelp() {

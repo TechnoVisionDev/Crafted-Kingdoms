@@ -1,8 +1,11 @@
 package com.technovision.craftedkingdoms.events;
 
 import com.technovision.craftedkingdoms.CKGlobal;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
+import com.technovision.craftedkingdoms.data.objects.Resident;
+import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.ChatColor;
@@ -39,12 +42,16 @@ public class FortifyEvents implements Listener {
         Player player = event.getPlayer();
         Group group = CKGlobal.getFortifyGroup(player);
         if (group == null) return;
-        if (!CKGlobal.getResident(player).isInGroup(group.getName())) {
+
+        //Check if player has perms to fortify for group
+        Resident res = CKGlobal.getResident(player);
+        if (!res.isInGroup(group.getName())) {
             MessageUtils.sendError(player, "You are no longer a member of the group you are fortifying for.");
             return;
         }
-
-        // TODO: Check if player has perms to fortify for group
+        if (!res.hasPermission(group, Permissions.BLOCKS)) {
+            MessageUtils.sendError(player, "You need the "+ChatColor.YELLOW+"BLOCKS"+ChatColor.RED+" permission to fortify blocks.");
+        }
 
         // TODO: Check if block is already fortified
 

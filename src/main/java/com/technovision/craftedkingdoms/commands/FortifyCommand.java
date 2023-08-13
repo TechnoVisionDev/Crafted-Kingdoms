@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms.commands;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.commands.CommandBase;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
@@ -48,13 +49,14 @@ public class FortifyCommand extends CommandBase {
             throw new CKException("The group " + ChatColor.YELLOW + args[1] + ChatColor.RED + " doesn't exist!");
         }
 
-        // Check that sender is in group
+        // Check that player has perms to protect land for this group
         Resident senderRes = getResident();
         if (!senderRes.isInGroup(group.getName())) {
             throw new CKException("You are not a member of that group!");
         }
-
-        // TODO: Check that player has perms to protect land for this group
+        if (!senderRes.hasPermission(group, Permissions.BLOCKS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"BLOCKS"+ChatColor.RED+" permission to fortify blocks.");
+        }
 
         // Enable fortify mode
         Player player = getPlayer();

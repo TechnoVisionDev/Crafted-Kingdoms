@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms.commands.group;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.commands.CommandBase;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
@@ -96,13 +97,7 @@ public class GroupCommand extends CommandBase {
 
     public void invite_cmd() throws CKException {
         // Get group from args
-        if (args.length < 2) {
-            throw new CKException("You must specify a group name!");
-        }
-        Group group = CKGlobal.getGroup(args[1]);
-        if (group == null) {
-            throw new CKException("The group " + ChatColor.YELLOW + args[1] + ChatColor.RED + " doesn't exist!");
-        }
+        Group group = getGroupFromArgs(1);
         if (group.isPublic()) {
             throw new CKException("You can only invite members to a private group!");
         }
@@ -112,8 +107,9 @@ public class GroupCommand extends CommandBase {
         if (!senderRes.isInGroup(group.getName())) {
             throw new CKException("You are not a member of that group!");
         }
-
-        // TODO: Check if sender has group perms to invite players
+        if (!senderRes.hasPermission(group, Permissions.MEMBERS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"MEMBERS"+ChatColor.RED+" permission to invite players.");
+        }
 
         // Get resident to invite from args
         if (args.length < 3) {

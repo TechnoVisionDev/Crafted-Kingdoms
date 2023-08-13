@@ -3,6 +3,8 @@ package com.technovision.craftedkingdoms.data.objects;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.enums.Ranks;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
@@ -38,6 +40,22 @@ public class Resident {
         this.groupChat = groupChat;
         this.groups = groups;
         this.invites = invites;
+    }
+
+    public boolean hasPermission(Group group, Permissions perm) {
+        if (group.isOwner(playerID)) {
+            return true;
+        }
+        if (group.isMember(playerID)) {
+            return group.hasPermission(Ranks.MEMBER, perm);
+        }
+        if (group.isModerator(playerID)) {
+            return group.hasPermission(Ranks.MODERATOR, perm);
+        }
+        if (group.isAdmin(playerID)) {
+            return group.hasPermission(Ranks.ADMIN, perm);
+        }
+        return false;
     }
 
     /**
