@@ -43,15 +43,15 @@ public class GroupCommand extends CommandBase {
         commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
         commands.put("delete", "[group] - Delete a group you are currently in.");
+        commands.put("info", "[group] - Display information about a group.");
 
         // Not Yet Implemented
         /**
-        commands.put("info", "[group] - Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
         commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
-        commands.put("merge", "[group] [merge-group] - Merges group2 into group1.");
+        commands.put("merge", "[group] [merge-group] - Merges the first group into the second group.");
         commands.put("transfer", "[group] [player] - Transfer ownership of a group.");
         */
     }
@@ -347,6 +347,43 @@ public class GroupCommand extends CommandBase {
         String groupName = group.getName();
         group.delete();
         MessageUtils.send(sender, ChatColor.GRAY + "You have deleted the group " + ChatColor.YELLOW + groupName);
+    }
+
+    public void info_cmd() throws CKException {
+        // Get group and player data
+        Group group = getGroupFromArgs(1);
+        List<String> admins = new ArrayList<>();
+        for (UUID id : group.getAdmins()) {
+            admins.add(CKGlobal.getResident(id).getPlayerName());
+        }
+        List<String> moderators = new ArrayList<>();
+        for (UUID id : group.getModerators()) {
+            moderators.add(CKGlobal.getResident(id).getPlayerName());
+        }
+        List<String> members = new ArrayList<>();
+        for (UUID id : group.getMembers()) {
+            members.add(CKGlobal.getResident(id).getPlayerName());
+        }
+
+        // Create message
+        List<String> msgList = new ArrayList<>();
+        if (group.getBiography() != null) {
+            msgList.add(ChatColor.GRAY + group.getBiography());
+        }
+        // Add Owner
+        msgList.add("");
+        msgList.add("" + ChatColor.AQUA + ChatColor.BOLD + "Owner: " + ChatColor.GRAY + CKGlobal.getResident(group.getOwnerID()).getPlayerName());
+        // Add Admins
+        msgList.add("" + ChatColor.AQUA + ChatColor.BOLD + "Admins: " + ChatColor.GRAY + (admins.isEmpty() ? "None" : String.join(", ", admins)));
+        // Add Moderators
+        msgList.add("" + ChatColor.AQUA + ChatColor.BOLD + "Moderators: " + ChatColor.GRAY + (moderators.isEmpty() ? "None" : String.join(", ", moderators)));
+        // Add Members
+        msgList.add("" + ChatColor.AQUA + ChatColor.BOLD + "Members: " + ChatColor.GRAY + (members.isEmpty() ? "None" : String.join(", ", members)));
+        String[] msg = msgList.toArray(new String[0]);
+
+        // Send message
+        MessageUtils.sendHeading(sender, group.getName());
+        MessageUtils.send(sender, msg);
     }
 
     private void joinGroup(Group group, Resident res) {

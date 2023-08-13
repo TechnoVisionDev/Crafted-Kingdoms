@@ -36,7 +36,7 @@ public class Group {
     public Group(String name, Player owner) {
         this.name = name;
         this.displayName = name;
-        this.biography = "";
+        this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
         this.moderators = new HashSet<>();
@@ -52,7 +52,7 @@ public class Group {
     public Group(String name, Player owner, boolean isPublic) {
         this.name = name;
         this.displayName = name;
-        this.biography = "";
+        this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
         this.moderators = new HashSet<>();
@@ -68,7 +68,7 @@ public class Group {
     public Group(String name, Player owner, boolean isPublic, String password) {
         this.name = name;
         this.displayName = name;
-        this.biography = "";
+        this.biography = null;
         this.ownerID = owner.getUniqueId();
         this.admins = new HashSet<>();
         this.moderators = new HashSet<>();
