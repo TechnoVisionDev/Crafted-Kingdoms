@@ -31,6 +31,7 @@ public class GroupCommand extends CommandBase {
         // Implemented
         commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
         commands.put("invite", "[group] [player] - Invite a player to join a group.");
+        commands.put("perms", "Manage permissions for player ranks in a group.");
 
         // Not Yet Implemented
         /**
@@ -42,7 +43,6 @@ public class GroupCommand extends CommandBase {
         commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("info", "[group] Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
-        commands.put("perms", "Manage permissions for ranks in a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
         commands.put("list", "List all groups that you are currently in.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
@@ -130,6 +130,11 @@ public class GroupCommand extends CommandBase {
         // Invite player
         res.invite(group.getName());
         MessageUtils.send(getPlayer(), ChatColor.GRAY + "You sent an invite to " + ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY + " to join " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
+    }
+
+    public void perms_cmd() throws CKException {
+        GroupPermsCommand cmd = new GroupPermsCommand(plugin);
+        cmd.onCommand(sender, null, "perms", this.stripArgs(args, 1));
     }
 
     private String[] createGroupMessage(Group group) {

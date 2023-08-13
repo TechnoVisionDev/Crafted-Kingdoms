@@ -1,6 +1,6 @@
 package com.technovision.craftedkingdoms;
 
-import com.technovision.craftedkingdoms.commands.group.FortifyCommand;
+import com.technovision.craftedkingdoms.commands.FortifyCommand;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.events.FortifyEvents;

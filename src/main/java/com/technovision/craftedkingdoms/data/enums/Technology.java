@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Enums containing data for each researchable technology.
  *
- * @author TechnoVision.
+ * @author TechnoVision
  */
 public enum Technology {
     // Ancient Era (1)

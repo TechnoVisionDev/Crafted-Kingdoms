@@ -4,15 +4,14 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.enums.Ranks;
 import org.bson.conversions.Bson;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Group {
 
@@ -28,6 +27,7 @@ public class Group {
     private boolean isPublic;
     private String password;
     private Date dateCreated;
+    private Map<String, Set<String>> rankPermissions;
 
     public Group() { }
 
@@ -44,6 +44,7 @@ public class Group {
         this.isPublic = false;
         this.password = null;
         this.dateCreated = new Date();
+        fillDefaultPermissions();
     }
 
     public Group(String name, Player owner, boolean isPublic) {
@@ -59,6 +60,7 @@ public class Group {
         this.isPublic = isPublic;
         this.password = null;
         this.dateCreated = new Date();
+        fillDefaultPermissions();
     }
 
     public Group(String name, Player owner, boolean isPublic, String password) {
@@ -74,9 +76,10 @@ public class Group {
         this.isPublic = isPublic;
         this.password = password;
         this.dateCreated = new Date();
+        fillDefaultPermissions();
     }
 
-    public Group(String name, String displayName, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated) {
+    public Group(String name, String displayName, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated, Map<String, Set<String>> rankPermissions) {
         this.name = name;
         this.displayName = displayName;
         this.biography = biography;
@@ -89,6 +92,20 @@ public class Group {
         this.isPublic = isPublic;
         this.password = password;
         this.dateCreated = dateCreated;
+        this.rankPermissions = rankPermissions;
+    }
+
+    private void fillDefaultPermissions() {
+        this.rankPermissions = new HashMap<>();
+        Set<String> perms;
+        for (Ranks rank : Ranks.values()) {
+            if (rank == Ranks.OWNER) continue;
+            perms = new HashSet<>();
+            for (Permissions perm : rank.getPermissions()) {
+                perms.add(perm.toString());
+            }
+            this.rankPermissions.put(rank.toString(), perms);
+        }
     }
 
     public void fortifyBlock(Block block, Material material) {
@@ -155,6 +172,10 @@ public class Group {
         return dateCreated;
     }
 
+    public Map<String, Set<String>> getRankPermissions() {
+        return rankPermissions;
+    }
+
     /** Setters */
 
     public void setName(String name) {
@@ -203,5 +224,9 @@ public class Group {
 
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public void setRankPermissions(Map<String, Set<String>> rankPermissions) {
+        this.rankPermissions = rankPermissions;
     }
 }

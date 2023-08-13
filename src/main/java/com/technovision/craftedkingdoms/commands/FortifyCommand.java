@@ -1,4 +1,4 @@
-package com.technovision.craftedkingdoms.commands.group;
+package com.technovision.craftedkingdoms.commands;
 
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
