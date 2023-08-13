@@ -35,6 +35,7 @@ public class GroupCommand extends CommandBase {
         // Implemented
         commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
         commands.put("invite", "[group] [player] - Invite a player to join a group.");
+        commands.put("rescind", "[group] [player] - Cancel a player's invite to your group.");
         commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
         commands.put("list", "<player> - List all groups that you or another player are in.");
         commands.put("invites", "List all groups that have invited you.");
@@ -42,7 +43,6 @@ public class GroupCommand extends CommandBase {
 
         // Not Yet Implemented
         /**
-        commands.put("rescind", "[player] - Cancel a player's invite to your group.");
         commands.put("leave", "[group] - Leave a group that you are currently in.");
         commands.put("delete", "[group] - Delete a group you are currently in.");
         commands.put("remove", "[group] [player] - Remove a player from your group.");
@@ -117,15 +117,12 @@ public class GroupCommand extends CommandBase {
         }
 
         // Get resident to invite from args
-        if (args.length < 3) {
-            throw new CKException("You must specify a player to invite");
-        }
         Resident res = getResidentFromArgs(2);
-        if (res == null) {
-            throw new CKException("The group " + ChatColor.YELLOW + group.getName() + ChatColor.RED + " doesn't exist!");
-        }
         if (res.hasInvite(group.getName())) {
             throw new CKException("Your group has already invited that player to join!");
+        }
+        if (res.isInGroup(group.getName())) {
+            throw new CKException("That player is already in your group!");
         }
 
         // Invite player
@@ -138,13 +135,41 @@ public class GroupCommand extends CommandBase {
         MessageUtils.send(getPlayer(), ChatColor.GRAY + "You sent an invite to " + ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY + " to join " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
     }
 
-    public void rescind_cmd() {
-        /**
-        Player player = Bukkit.getPlayer(playerID);
-        if (player != null) {
-            MessageUtils.send(player, ChatColor.YELLOW + groupName + ChatColor.GRAY + " has rescinded their invite to you.");
+    public void rescind_cmd() throws CKException {
+        // Get group from args
+        Group group = getGroupFromArgs(1);
+        if (group.isPublic()) {
+            throw new CKException("That group is public and thus does not use invites!");
         }
-         */
+
+        // Check if sender can rescind invites
+        Resident senderRes = getResident();
+        if (!senderRes.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (!senderRes.hasPermission(group, Permissions.MEMBERS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"MEMBERS"+ChatColor.RED+" permission to rescind invites.");
+        }
+
+        // Get resident to rescind invite from args
+        if (args.length < 3) {
+            throw new CKException("You must specify a player!");
+        }
+        Resident res = getResidentFromArgs(2);
+        if (res.isInGroup(group.getName())) {
+            throw new CKException("That player is already in your group!");
+        }
+        if (!res.hasInvite(group.getName())) {
+            throw new CKException("That player doesn't have an invite!");
+        }
+        res.uninvite(group.getName());
+
+        // Send messages
+        Player player = Bukkit.getPlayer(res.getPlayerID());
+        if (player != null) {
+            MessageUtils.send(player, ChatColor.YELLOW + group.getName() + ChatColor.GRAY + " has rescinded their invite to you.");
+        }
+        MessageUtils.send(getPlayer(), ChatColor.GRAY + "You rescinded an invite to " + ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY + " from " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
     }
 
     public void join_cmd() throws CKException {

@@ -190,14 +190,14 @@ public abstract class CommandBase implements CommandExecutor {
 
     protected Resident getResidentFromArgs(int index) throws CKException {
         if (args.length < (index+1)) {
-            throw new CKException("You must enter a player's name.");
+            throw new CKException("You must enter a player's name!");
         }
         String name = args[index].toLowerCase();
         name = name.replace("%", "(\\w*)");
 
         Resident res = CKGlobal.getResident(name);
         if (res == null) {
-            throw new CKException("The player you specified doesn't exist.");
+            throw new CKException("The player you specified doesn't exist!");
         }
         return res;
     }
