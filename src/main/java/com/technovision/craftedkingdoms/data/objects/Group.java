@@ -124,6 +124,17 @@ public class Group {
     }
 
     /**
+     * Removes a permission from this group's player rank.
+     * @param rank the rank to remove the perm from.
+     * @param perm the permission to remove.
+     */
+    public void removePermissionFromRank(Ranks rank, Permissions perm) {
+        this.rankPermissions.get(rank.toString()).remove(perm.toString());
+        Bson update = Updates.pull("rankPermissions." + rank, perm.toString());
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    /**
      * Checks if a rank has a permission set for this group.
      * @param rank the rank to check.
      * @param perm the permission to check for.

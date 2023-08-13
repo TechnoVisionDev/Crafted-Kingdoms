@@ -31,6 +31,8 @@ public class GroupPermsCommand extends CommandBase {
 
         // Not implemented
         /**
+        commands.put("list", "List all permissions.");
+        commands.put("inspect", "[group] [rank] - View the permissions a group's rank has.");
         commands.put("reset", "[group] - Resets a group's permissions to default.");
         */
     }
@@ -51,7 +53,7 @@ public class GroupPermsCommand extends CommandBase {
 
         // Check if rank already has perm
         if (group.getRankPermissions().get(rank.toString()).contains(perm.toString())) {
-            throw new CKException("The "+ChatColor.YELLOW+rank+ChatColor.RED+" rank already has that permission!");
+            throw new CKException("The "+ChatColor.YELLOW+rank.getName()+ChatColor.RED+" rank already has that permission!");
         }
 
         // Add perm to rank
@@ -71,7 +73,38 @@ public class GroupPermsCommand extends CommandBase {
     }
 
     public void remove_cmd() throws CKException {
+        Group group = getGroupFromArgs(1);
+        Ranks rank = getRankFromArgs(2);
+        Permissions perm = getPermFromArgs(3);
 
+        // Check that player has permission to modify perms
+        Resident res = getResident();
+        if (!res.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (!res.hasPermission(group, Permissions.PERMS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"PERMS"+ChatColor.RED+" permission to modify ranks.");
+        }
+
+        // Check if rank already has perm
+        if (!group.getRankPermissions().get(rank.toString()).contains(perm.toString())) {
+            throw new CKException("The "+ChatColor.YELLOW+rank.getName()+ChatColor.RED+" rank does not have that permission!");
+        }
+
+        // Add perm to rank
+        group.removePermissionFromRank(rank, perm);
+        MessageUtils.sendSuccess(getPlayer(), String.format("Removed the %s%s%s perm from the %s%s%s rank in %s%s%s.",
+                        ChatColor.YELLOW,
+                        perm,
+                        ChatColor.GREEN,
+                        ChatColor.YELLOW,
+                        rank.getName(),
+                        ChatColor.GREEN,
+                        ChatColor.YELLOW,
+                        group.getName(),
+                        ChatColor.GREEN
+                )
+        );
     }
 
     public Permissions getPermFromArgs(int index) throws CKException {
