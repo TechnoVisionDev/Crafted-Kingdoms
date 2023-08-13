@@ -10,6 +10,7 @@ import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -127,41 +128,62 @@ public class GroupCommand extends CommandBase {
 
         // Invite player
         res.invite(group.getName());
+        Player invitedPlayer = Bukkit.getPlayer(res.getPlayerID());
+        if (invitedPlayer != null) {
+            MessageUtils.send(invitedPlayer, ChatColor.GRAY + "You received an invite to join the group " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
+            MessageUtils.send(invitedPlayer, ChatColor.GRAY + "Use the " + ChatColor.YELLOW + "/group join" + ChatColor.GRAY + " command to join!");
+        }
         MessageUtils.send(getPlayer(), ChatColor.GRAY + "You sent an invite to " + ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY + " to join " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + ".");
     }
 
+    public void rescind_cmd() {
+        /**
+        Player player = Bukkit.getPlayer(playerID);
+        if (player != null) {
+            MessageUtils.send(player, ChatColor.YELLOW + groupName + ChatColor.GRAY + " has rescinded their invite to you.");
+        }
+         */
+    }
+
     public void join_cmd() throws CKException {
-        // Get group from args
         Group group = getGroupFromArgs(1);
         Resident res = getResident();
         if (group.isMember(res.getPlayerID())) {
             throw new CKException("You are already a member of that group!");
         }
 
-        // Join with password from args if included
-        if (args.length >= 3) {
-            String password = args[2];
-            if (group.isPublic()) {
-                throw new CKException("Only private groups use passwords!");
-            }
-            if (group.getPassword().equals(password)) {
-                MessageUtils.sendGroup(group, String.format("%s%s%s has joined the group %s%s",
-                        ChatColor.YELLOW,
-                        res.getPlayerName(),
-                        ChatColor.GRAY,
-                        ChatColor.YELLOW,
-                        group.getName()
-                ));
-                group.addMember(res);
-                MessageUtils.sendSuccess(sender, "You have joined the group " + ChatColor.YELLOW + group.getName());
+        // Check for password-protected groups
+        if (group.getPassword() != null) {
+            // If password provided, check its correctness
+            if (args.length >= 3 && group.getPassword().equals(args[2])) {
+                joinGroup(group, res);
                 return;
+            }
+            // If password not provided, but user has an invite
+            else if (res.hasInvite(group.getName())) {
+                joinGroup(group, res);
+                return;
+            }
+            // If neither correct password nor invite
+            else {
+                throw new CKException("The password you entered is not correct or you haven't been invited!");
             }
         }
 
-        // Join with invite
-        if (!res.hasInvite(group.getName())) {
-            throw new CKException("You have not been invited to join that group!");
+        // For non-password protected groups: Check if public or has invite
+        if (group.isPublic() || res.hasInvite(group.getName())) {
+            joinGroup(group, res);
+            return;
         }
+        throw new CKException("You have not been invited to join that group!");
+    }
+
+    public void perms_cmd() throws CKException {
+        GroupPermsCommand cmd = new GroupPermsCommand(plugin);
+        cmd.onCommand(sender, null, "perms", this.stripArgs(args, 1));
+    }
+
+    private void joinGroup(Group group, Resident res) {
         MessageUtils.sendGroup(group, String.format("%s%s%s has joined the group %s%s",
                 ChatColor.YELLOW,
                 res.getPlayerName(),
@@ -170,12 +192,8 @@ public class GroupCommand extends CommandBase {
                 group.getName()
         ));
         group.addMember(res);
+        res.uninvite(group.getName());
         MessageUtils.sendSuccess(sender, "You have joined the group " + ChatColor.YELLOW + group.getName());
-    }
-
-    public void perms_cmd() throws CKException {
-        GroupPermsCommand cmd = new GroupPermsCommand(plugin);
-        cmd.onCommand(sender, null, "perms", this.stripArgs(args, 1));
     }
 
     private String[] createGroupMessage(Group group) {

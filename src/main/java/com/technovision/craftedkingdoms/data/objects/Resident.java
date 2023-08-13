@@ -5,11 +5,8 @@ import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
-import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -66,13 +63,16 @@ public class Resident {
         invites.add(groupName);
         Bson update = Updates.push("invites", groupName);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
 
-        // Send message to player if they are online
-        Player player = Bukkit.getPlayer(playerID);
-        if (player != null) {
-            MessageUtils.send(player, ChatColor.GRAY + "You received an invite to join the group " + ChatColor.YELLOW + groupName + ChatColor.GRAY + ".");
-            MessageUtils.send(player, ChatColor.GRAY + "Use the " + ChatColor.YELLOW + "/group join" + ChatColor.GRAY + " command to join!");
-        }
+    /**
+     * Removes a group from this resident's list of invites.
+     * @param groupName the name of the group.
+     */
+    public void uninvite(String groupName) {
+        invites.remove(groupName);
+        Bson update = Updates.pull("invites", groupName);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
     /**
