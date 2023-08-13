@@ -42,10 +42,10 @@ public class GroupCommand extends CommandBase {
         commands.put("invites", "List all groups that have invited you.");
         commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
+        commands.put("delete", "[group] - Delete a group you are currently in.");
 
         // Not Yet Implemented
         /**
-        commands.put("delete", "[group] - Delete a group you are currently in.");
         commands.put("info", "[group] - Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
@@ -175,7 +175,7 @@ public class GroupCommand extends CommandBase {
     public void join_cmd() throws CKException {
         Group group = getGroupFromArgs(1);
         Resident res = getResident();
-        if (group.isMember(res.getPlayerID())) {
+        if (group.isResident(res.getPlayerID())) {
             throw new CKException("You are already a member of that group!");
         }
 
@@ -290,12 +290,15 @@ public class GroupCommand extends CommandBase {
                 groupList.add(groupString);
             }
         }
+        if (groupList.isEmpty()) {
+            MessageUtils.send(sender, ChatColor.GRAY+"You are not in any groups!");
+            return;
+        }
 
         // Send groups to player
-        Player player = getPlayer();
-        if (isMe) { MessageUtils.sendHeading(player, "Your Groups"); }
-        else { MessageUtils.sendHeading(player, res.getPlayerName() + "'s Groups"); }
-        MessageUtils.send(player, groupList.toArray(new String[0]));
+        if (isMe) { MessageUtils.sendHeading(sender, "Your Groups"); }
+        else { MessageUtils.sendHeading(sender, res.getPlayerName() + "'s Groups"); }
+        MessageUtils.send(sender, groupList.toArray(new String[0]));
     }
 
     public void invites_cmd() throws CKException {
@@ -316,6 +319,10 @@ public class GroupCommand extends CommandBase {
                 groupList.add(groupString);
             }
         }
+        if (groupList.isEmpty()) {
+            MessageUtils.send(sender, ChatColor.GRAY+"You do not have any group invites yet!");
+            return;
+        }
 
         // Send invites to player
         Player player = getPlayer();
@@ -326,6 +333,20 @@ public class GroupCommand extends CommandBase {
     public void perms_cmd() {
         GroupPermsCommand cmd = new GroupPermsCommand(plugin);
         cmd.onCommand(sender, null, "perms", this.stripArgs(args, 1));
+    }
+
+    public void delete_cmd() throws CKException {
+        // Get data from args
+        Group group = getGroupFromArgs(1);
+        Resident res = getResident();
+        if (!group.isOwner(res.getPlayerID())) {
+            throw new CKException("You must be the owner to delete a group!");
+        }
+
+        // Delete group and send message
+        String groupName = group.getName();
+        group.delete();
+        MessageUtils.send(sender, ChatColor.GRAY + "You have deleted the group " + ChatColor.YELLOW + groupName);
     }
 
     private void joinGroup(Group group, Resident res) {

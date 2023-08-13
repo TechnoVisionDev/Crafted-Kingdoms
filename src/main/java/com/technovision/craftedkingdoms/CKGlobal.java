@@ -116,6 +116,12 @@ public class CKGlobal {
         return null;
     }
 
+    public static Resident getResident(String playerName) {
+        UUID id = getPlayerID(playerName);
+        if (id == null) return null;
+        return RESIDENTS.get(id);
+    }
+
     public static Resident getResident(Player player) {
         Resident res = RESIDENTS.get(player.getUniqueId());
         if (res == null) {
@@ -124,10 +130,12 @@ public class CKGlobal {
         return res;
     }
 
-    public static Resident getResident(String playerName) {
-        UUID id = getPlayerID(playerName);
-        if (id == null) return null;
-        return RESIDENTS.get(id);
+    public static Resident getResident(UUID id) {
+        Resident res = RESIDENTS.get(id);
+        if (res == null) {
+            res = createResident(Bukkit.getPlayer(id));
+        }
+        return res;
     }
 
     public static Resident createResident(Player player) {

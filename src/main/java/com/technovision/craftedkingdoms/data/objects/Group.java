@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 public class Group {
@@ -200,6 +201,28 @@ public class Group {
         fortifiedBlocks.remove(block);
         Bson update = Updates.pull("fortifiedBlocks", block);
         Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    /**
+     * Deletes the group.
+     */
+    public void delete() {
+        Resident res;
+        CKGlobal.getResident(ownerID).leaveGroup(name);
+        for (UUID id : members) {
+            res = CKGlobal.getResident(id);
+            res.leaveGroup(name);
+        }
+        for (UUID id : moderators) {
+            res = CKGlobal.getResident(id);
+            res.leaveGroup(name);
+        }
+        for (UUID id : admins) {
+            res = CKGlobal.getResident(id);
+            res.leaveGroup(name);
+        }
+        CKGlobal.removeGroup(name);
+        Database.GROUPS.deleteOne(Filters.eq("name", name));
     }
 
     /**
