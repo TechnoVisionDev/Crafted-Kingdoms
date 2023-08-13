@@ -37,15 +37,15 @@ public class GroupCommand extends CommandBase {
         commands.put("invite", "[group] [player] - Invite a player to join a group.");
         commands.put("rescind", "[group] [player] - Cancel a player's invite to your group.");
         commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
+        commands.put("leave", "[group] - Leave a group that you are currently in.");
         commands.put("list", "<player> - List all groups that you or another player are in.");
         commands.put("invites", "List all groups that have invited you.");
+        commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
 
         // Not Yet Implemented
         /**
-        commands.put("leave", "[group] - Leave a group that you are currently in.");
         commands.put("delete", "[group] - Delete a group you are currently in.");
-        commands.put("remove", "[group] [player] - Remove a player from your group.");
         commands.put("info", "[group] - Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
@@ -203,6 +203,59 @@ public class GroupCommand extends CommandBase {
             return;
         }
         throw new CKException("You have not been invited to join that group!");
+    }
+
+    public void leave_cmd() throws CKException {
+        // Get resident and group
+        Group group = getGroupFromArgs(1);
+        Resident res = getResident();
+        if (!group.isResident(res.getPlayerID())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (group.isOwner(res.getPlayerID())) {
+            throw new CKException("As the owner you must transfer ownership or delete the group to leave.");
+        }
+
+        // Remove player and send messages
+        group.removeMember(res);
+        MessageUtils.send(getPlayer(), ChatColor.GRAY + "You have left the group " + ChatColor.YELLOW + group.getName());
+        MessageUtils.sendGroup(group, ChatColor.YELLOW + res.getPlayerName() + ChatColor.GRAY+" has left the group " + ChatColor.YELLOW + group.getName());
+    }
+
+    public void remove_cmd() throws CKException {
+        // Get data from args and check if valid
+        Group group = getGroupFromArgs(1);
+        Resident resToRemove = getResidentFromArgs(2);
+        Resident senderRes = getResident();
+        if (!senderRes.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (!resToRemove.isInGroup(group.getName())) {
+            throw new CKException("That player is not in your group!");
+        }
+        if (senderRes.getPlayerID().equals(resToRemove.getPlayerID())) {
+            throw new CKException("You can't remove yourself! Use the /group leave command instead.");
+        }
+
+        // Check if sender has perms to remove
+        UUID id = resToRemove.getPlayerID();
+        if (group.isOwner(id)) {
+            throw new CKException("You cannot remove the owner of a group!");
+        }
+        if (group.isAdmin(id) && !senderRes.hasPermission(group, Permissions.ADMINS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"ADMINS"+ChatColor.RED+" permission to remove admins.");
+        }
+        if (group.isModerator(id) && !senderRes.hasPermission(group, Permissions.MODS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"MODS"+ChatColor.RED+" permission to remove moderators.");
+        }
+        if (group.isAdmin(id) && !senderRes.hasPermission(group, Permissions.MEMBERS)) {
+            throw new CKException("You need the "+ChatColor.YELLOW+"MEMBERS"+ChatColor.RED+" permission to remove members.");
+        }
+
+        // Remove player from group and send messages
+        group.removeMember(resToRemove);
+        MessageUtils.sendGroup(group, ChatColor.YELLOW + resToRemove.getPlayerName() + ChatColor.GRAY+" has been removed from " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + getPlayer().getName());
+        MessageUtils.send(resToRemove, "You have been removed from " + ChatColor.YELLOW + group.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + getPlayer().getName());
     }
 
     public void list_cmd() throws CKException {

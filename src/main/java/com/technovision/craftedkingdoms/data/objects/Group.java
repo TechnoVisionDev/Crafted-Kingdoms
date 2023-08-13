@@ -124,6 +124,29 @@ public class Group {
     }
 
     /**
+     * Removes a player from this group (assumes player is not owner).
+     * @param resident the resident form of the player
+     */
+    public void removeMember(Resident resident) {
+        UUID id = resident.getPlayerID();
+        List<Bson> updates = new ArrayList<>();
+        if (this.members.remove(id)) {
+            updates.add(Updates.pull("members", id));
+        }
+        else if (this.moderators.remove(id)) {
+            updates.add(Updates.pull("moderators", id));
+        }
+        else if (this.admins.remove(id)) {
+            updates.add(Updates.pull("admins", id));
+        }
+        if (!updates.isEmpty()) {
+            Bson combinedUpdates = Updates.combine(updates);
+            Database.GROUPS.updateOne(Filters.eq("name", name), combinedUpdates);
+        }
+        resident.leaveGroup(name);
+    }
+
+    /**
      * Adds a permission to this group's player rank.
      * @param rank the rank to add the perm to.
      * @param perm the permission to add.
@@ -177,6 +200,26 @@ public class Group {
         fortifiedBlocks.remove(block);
         Bson update = Updates.pull("fortifiedBlocks", block);
         Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    /**
+     * Counts the total number of residents in this group.
+     * @return the number of residents in this group.
+     */
+    public int countResidents() {
+        int count = 1;
+        count += members.size();
+        count += moderators.size();
+        count += admins.size();
+        return count;
+    }
+
+    @BsonIgnore
+    public boolean isResident(UUID playerID) {
+        if (isMember(playerID)) return true;
+        if (isModerator(playerID)) return true;
+        if (isAdmin(playerID)) return true;
+        return isOwner(playerID);
     }
 
     @BsonIgnore

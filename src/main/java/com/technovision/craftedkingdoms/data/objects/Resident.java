@@ -39,6 +39,12 @@ public class Resident {
         this.invites = invites;
     }
 
+    /**
+     * Checks if a resident's rank in the provided group has a given permission.
+     * @param group the group the resident is in.
+     * @param perm the permission to check for.
+     * @return True if resident has perm, otherwise false.
+     */
     public boolean hasPermission(Group group, Permissions perm) {
         if (group.isOwner(playerID)) {
             return true;
@@ -91,6 +97,16 @@ public class Resident {
     public void joinGroup(String groupName) {
         groups.add(groupName);
         Bson update = Updates.push("groups", groupName);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
+
+    /**
+     * Removes a group from this resident's list of active groups.
+     * @param groupName the name of the group.
+     */
+    public void leaveGroup(String groupName) {
+        groups.remove(groupName);
+        Bson update = Updates.pull("groups", groupName);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
