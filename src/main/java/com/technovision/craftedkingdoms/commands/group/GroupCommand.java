@@ -14,6 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.*;
+
 /**
  * Handles group commands.
  *
@@ -34,6 +36,7 @@ public class GroupCommand extends CommandBase {
         commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
         commands.put("invite", "[group] [player] - Invite a player to join a group.");
         commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
+        commands.put("list", "<player> - List all groups that you or another player are in.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
 
         // Not Yet Implemented
@@ -46,7 +49,6 @@ public class GroupCommand extends CommandBase {
         commands.put("info", "[group] Display information about a group.");
         commands.put("set", "Set a display name and bio for a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
-        commands.put("list", "List all groups that you are currently in.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
         commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
         commands.put("merge", "[group] [merge-group] - Merges group2 into group1.");
@@ -178,7 +180,47 @@ public class GroupCommand extends CommandBase {
         throw new CKException("You have not been invited to join that group!");
     }
 
-    public void perms_cmd() throws CKException {
+    public void list_cmd() throws CKException {
+        // Get resident (from args if specified)
+        Resident res;
+        boolean isMe;
+        if (args.length >= 2) {
+            String name = args[1].toLowerCase();
+            name = name.replace("%", "(\\w*)");
+            res = CKGlobal.getResident(name);
+            if (res == null) {
+                throw new CKException("The player you specified doesn't exist.");
+            }
+            isMe = false;
+        } else {
+            res = getResident();
+            isMe = true;
+        }
+
+        // Get list of valid groups
+        List<String> groupList = new ArrayList<>();
+        for (String name : res.getGroups()) {
+            Group group = CKGlobal.getGroup(name);
+            if (group != null) {
+                String groupString = String.format("%s%s%s - %s",
+                        ChatColor.YELLOW,
+                        group.getName(),
+                        ChatColor.GRAY,
+                        getRankAsString(group, res.getPlayerID()),
+                        ChatColor.YELLOW
+                );
+                groupList.add(groupString);
+            }
+        }
+
+        // Send groups to player
+        Player player = getPlayer();
+        if (isMe) { MessageUtils.sendHeading(player, "Your Groups"); }
+        else { MessageUtils.sendHeading(player, res.getPlayerName() + "'s Groups"); }
+        MessageUtils.send(player, groupList.toArray(new String[0]));
+    }
+
+    public void perms_cmd() {
         GroupPermsCommand cmd = new GroupPermsCommand(plugin);
         cmd.onCommand(sender, null, "perms", this.stripArgs(args, 1));
     }
@@ -218,6 +260,15 @@ public class GroupCommand extends CommandBase {
             };
         }
         return msg;
+    }
+
+    private String getRankAsString(Group group, UUID playerID) {
+        String rank = null;
+        if (group.isMember(playerID)) rank = "Member";
+        else if (group.isModerator(playerID)) rank = "Moderator";
+        else if (group.isAdmin(playerID)) rank = "Admin";
+        else if (group.isOwner(playerID)) rank = "Owner";
+        return rank;
     }
 
     @Override
