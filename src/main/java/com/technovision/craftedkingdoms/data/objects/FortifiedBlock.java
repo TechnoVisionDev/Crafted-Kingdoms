@@ -22,18 +22,34 @@ import java.util.Set;
  */
 public class FortifiedBlock {
 
-    public static final int STONE_FORTIFY = 25;
-    public static final int IRON_FORTIFY = 250;
-    public static final int DIAMOND_FORTIFY = 1500;
-    public static final int NETHERITE_FORTIFY = 2000;
+    // Overworld Reinforcement Materials
+    public static final int STONE = 25;
+    public static final int COPPER_INGOT = 50;
+    public static final int IRON_INGOT = 250;
+    public static final int DIAMOND = 1500;
+    public static final int NETHERITE_INGOT = 2000;
 
-    public static Map<Material, Integer> MATERIALS;
+    // Nether Reinforcement Materials
+    public static final int NETHER_BRICK = 50;
+    public static final int GOLD_INGOT = 300;
+    public static final int GILDED_BLACKSTONE = 2000;
+
+    public static Map<Material, Integer> OVERWORLD_MATERIALS;
     static {
-        MATERIALS = new HashMap<>();
-        MATERIALS.put(Material.STONE, STONE_FORTIFY);
-        MATERIALS.put(Material.IRON_INGOT, IRON_FORTIFY);
-        MATERIALS.put(Material.DIAMOND, DIAMOND_FORTIFY);
-        MATERIALS.put(Material.NETHERITE_INGOT, NETHERITE_FORTIFY);
+        OVERWORLD_MATERIALS = new HashMap<>();
+        OVERWORLD_MATERIALS.put(Material.STONE, STONE);
+        OVERWORLD_MATERIALS.put(Material.COPPER_INGOT, COPPER_INGOT);
+        OVERWORLD_MATERIALS.put(Material.IRON_INGOT, IRON_INGOT);
+        OVERWORLD_MATERIALS.put(Material.DIAMOND, DIAMOND);
+        OVERWORLD_MATERIALS.put(Material.NETHERITE_INGOT, NETHERITE_INGOT);
+    }
+
+    public static Map<Material, Integer> NETHER_MATERIALS;
+    static {
+        NETHER_MATERIALS = new HashMap<>();
+        NETHER_MATERIALS.put(Material.NETHER_BRICK, NETHER_BRICK);
+        NETHER_MATERIALS.put(Material.GOLD_INGOT, GOLD_INGOT);
+        NETHER_MATERIALS.put(Material.GILDED_BLACKSTONE, GILDED_BLACKSTONE);
     }
 
     public static Set<Material> INVALID_BLOCKS = Set.of(
@@ -97,13 +113,13 @@ public class FortifiedBlock {
 
     @BsonIgnore
     public static int getReinforcements(Material mat) {
-        if (!FortifiedBlock.MATERIALS.containsKey(mat)) return 0;
-        return FortifiedBlock.MATERIALS.get(mat);
+        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(mat)) return 0;
+        return FortifiedBlock.OVERWORLD_MATERIALS.get(mat);
     }
 
     public void upgradeMaterial(Material material) {
         this.material = material.toString();
-        this.reinforcements = MATERIALS.get(material);
+        this.reinforcements = OVERWORLD_MATERIALS.get(material);
         Database.GROUPS.updateOne(
                 Filters.and(
                         Filters.eq("name", group),
@@ -117,7 +133,7 @@ public class FortifiedBlock {
     }
 
     public void refillReinforcements() {
-        this.reinforcements = MATERIALS.get(Material.valueOf(material));
+        this.reinforcements = OVERWORLD_MATERIALS.get(Material.valueOf(material));
         Database.GROUPS.updateOne(
                 Filters.and(
                         Filters.eq("name", group),
@@ -128,12 +144,12 @@ public class FortifiedBlock {
     }
 
     public int calculateReinforcements(Material material) {
-        return MATERIALS.get(material);
+        return OVERWORLD_MATERIALS.get(material);
     }
 
     @BsonIgnore
     public int getMaxReinforcements() {
-        return FortifiedBlock.MATERIALS.get(Material.valueOf(getMaterial()));
+        return FortifiedBlock.OVERWORLD_MATERIALS.get(Material.valueOf(getMaterial()));
     }
 
     @BsonIgnore

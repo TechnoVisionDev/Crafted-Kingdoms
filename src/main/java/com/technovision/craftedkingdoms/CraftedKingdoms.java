@@ -3,10 +3,13 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.commands.FortifyCommand;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.events.DisableEvents;
 import com.technovision.craftedkingdoms.events.FortifyEvents;
 import com.technovision.craftedkingdoms.events.PearlEvents;
 import com.technovision.craftedkingdoms.events.PlayerEvents;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -66,6 +69,7 @@ public class CraftedKingdoms extends JavaPlugin {
     }
 
     private void registerEventHandlers() {
+        getServer().getPluginManager().registerEvents(new DisableEvents(), this);
         getServer().getPluginManager().registerEvents(new PearlEvents(), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
         getServer().getPluginManager().registerEvents(new FortifyEvents(), this);

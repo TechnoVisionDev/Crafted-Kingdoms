@@ -3,7 +3,6 @@ package com.technovision.craftedkingdoms.events;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
-import com.technovision.craftedkingdoms.data.objects.BlockCoord;
 import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
@@ -27,11 +26,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Handles events for fortifying blocks.
@@ -51,7 +47,7 @@ public class FortifyEvents implements Listener {
         Player player = event.getPlayer();
         ItemStack offHandItem = player.getInventory().getItemInOffHand();
         Material itemType = offHandItem.getType();
-        if (!FortifiedBlock.MATERIALS.containsKey(itemType)) return;
+        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(itemType)) return;
 
         Resident res = CKGlobal.getResident(player);
         Group group = CKGlobal.getFortifyGroup(player);
@@ -88,7 +84,7 @@ public class FortifyEvents implements Listener {
         Player player = event.getPlayer();
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         Material itemType = mainHandItem.getType();
-        if (!FortifiedBlock.MATERIALS.containsKey(itemType)) return;
+        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(itemType)) return;
 
         Resident res = CKGlobal.getResident(player);
         Group group = CKGlobal.getFortifyGroup(player);
