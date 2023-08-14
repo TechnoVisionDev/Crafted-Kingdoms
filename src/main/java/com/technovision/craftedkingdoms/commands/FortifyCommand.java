@@ -2,7 +2,6 @@ package com.technovision.craftedkingdoms.commands;
 
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
-import com.technovision.craftedkingdoms.commands.CommandBase;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
@@ -28,14 +27,13 @@ public class FortifyCommand extends CommandBase {
         displayName = "Fortify";
 
         // Implemented
-        commands.put("enable", "[group] - Automatically fortify blocks you place with the item in your offhand.");
+        commands.put("enable", "[group] - Enables fortify mode to reinforce blocks for a group.");
+        commands.put("disable", "Disables fortify mode.");
 
         // Not Yet Implemented
         /**
-        commands.put("setgroup", "[group] - Set the default group when fortifying");
-        commands.put("disable", "[group] - Blocks you place will no longer be automatically fortified.");
-        commands.put("tiers", "List the item tiers for fortifying blocks.");
-        commands.put("inspect", "Check if the block you are looking at is fortified.");
+        commands.put("materials", "List the materials for fortifying blocks.");
+        commands.put("inspect", "Toggle inspect mode");
         */
     }
 
@@ -62,6 +60,12 @@ public class FortifyCommand extends CommandBase {
         Player player = getPlayer();
         CKGlobal.addFortifyGroup(player, group.getName());
         MessageUtils.send(player, ChatColor.GRAY+"You have enabled fortify mode for the group "+ChatColor.YELLOW+group.getName()+ChatColor.GRAY+".");
+    }
+
+    public void disable_cmd() throws CKException {
+        Player player = getPlayer();
+        CKGlobal.removeFortifyGroup(player);
+        MessageUtils.send(player, ChatColor.GRAY+"You have disabled fortify mode.");
     }
 
     @Override

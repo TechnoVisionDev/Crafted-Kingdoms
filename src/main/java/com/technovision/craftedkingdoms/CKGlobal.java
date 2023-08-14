@@ -68,6 +68,10 @@ public class CKGlobal {
         FORTIFY_GROUPS.put(player, groupName);
     }
 
+    public static void removeFortifyGroup(Player player) {
+        FORTIFY_GROUPS.remove(player);
+    }
+
     public static Group getFortifyGroup(Player player) {
         return getGroup(FORTIFY_GROUPS.get(player));
     }
