@@ -8,6 +8,8 @@ package com.technovision.craftedkingdoms.data.enums;
 public enum Permissions {
     DOORS("Can open and close reinforced doors"),
     CHESTS("Can open and close reinforced chests"),
+    CONTAINERS("Can open and close reinforced containers"),
+    BEDS("Can sleep in reinforced beds"),
     BLOCKS("Can reinforce blocks to the group or bypass existing reinforced blocks"),
     ADMINS("Can add or remove admins"),
     MODS("Can add or remove mods"),

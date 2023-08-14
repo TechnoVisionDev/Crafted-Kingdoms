@@ -2,6 +2,7 @@ package com.technovision.craftedkingdoms.data.objects;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
@@ -59,6 +60,12 @@ public class Resident {
             return group.hasPermission(Ranks.ADMIN, perm);
         }
         return false;
+    }
+
+    public boolean hasPermission(String groupName, Permissions perm) {
+        Group group = CKGlobal.getGroup(groupName);
+        if (group == null) return false;
+        return hasPermission(group, perm);
     }
 
     /**

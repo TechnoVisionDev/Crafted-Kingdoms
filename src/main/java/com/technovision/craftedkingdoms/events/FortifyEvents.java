@@ -12,8 +12,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.block.*;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Grindstone;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -22,6 +24,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -110,6 +115,16 @@ public class FortifyEvents implements Listener {
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
         if (fortifiedBlock == null) return;
 
+        // Check if fortified block is from your group
+        Resident res = CKGlobal.getResident(event.getPlayer());
+        if (res.getGroups().contains(fortifiedBlock.getGroup())) {
+            if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.BLOCKS)) {
+                removeNametag(block.getLocation());
+                fortifiedBlock.delete();
+                return;
+            }
+        }
+
         // Remove one reinforcement from block
         fortifiedBlock.decrement();
         if (fortifiedBlock.getReinforcements() <= 0) {
@@ -125,6 +140,128 @@ public class FortifyEvents implements Listener {
         if (fb != null) {
             updateNametag(adjustedLocation, fb);
         }
+    }
+
+    /**
+     * Prevents player from opening reinforced container or chest without necessary perms.
+     * @param event Fires when a player opens a chest or container.
+     */
+    @EventHandler
+    public void onContainerOpen(InventoryOpenEvent event) {
+        if (!(event.getPlayer() instanceof Player player)) return;
+        if (event.getInventory().getType() == InventoryType.PLAYER) return;
+
+        // Check if block is fortified
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getInventory().getLocation());
+        if (fortifiedBlock == null) return;
+        String groupName = fortifiedBlock.getGroup();
+
+        Resident res = CKGlobal.getResident(player);
+        if (res.getGroups().contains(groupName)) {
+
+            // Check if player has perms to open chest
+            InventoryType type = event.getInventory().getType();
+            if (type == InventoryType.CHEST || type == InventoryType.ENDER_CHEST) {
+                if (res.hasPermission(groupName, Permissions.CHESTS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
+                event.setCancelled(true);
+                MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CHESTS, groupName, "chests"));
+                return;
+            }
+            // Check if player has perms to open containers
+            if (res.hasPermission(groupName, Permissions.CONTAINERS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
+            event.setCancelled(true);
+            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CONTAINERS, groupName, "containers"));
+            return;
+        }
+        MessageUtils.send(player, String.format("%sThat container is fortified with %s%s%s by %s%s%s.",
+                ChatColor.GRAY, ChatColor.YELLOW,
+                StringUtils.stringifyType(Material.valueOf(fortifiedBlock.getMaterial()), true),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                fortifiedBlock.getGroup(), ChatColor.GRAY
+        ));
+    }
+
+    /**
+     * Prevents player from opening doors without necessary perms.
+     * @param event Fires when a player opens a door, trapdoor, plate, or button.
+     */
+    @EventHandler
+    public void onSpecialBlocksInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.PHYSICAL && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        Block clickedBlock = event.getClickedBlock();
+        if (clickedBlock == null) return;
+
+        Material type = clickedBlock.getType();
+        boolean isSpecialBlock = type.name().endsWith("_DOOR") || type.name().endsWith("_TRAPDOOR") || type.name().endsWith("_BUTTON") || type.name().endsWith("_PLATE") || type.name().endsWith("_BED");
+        if (!isSpecialBlock) return;
+
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(clickedBlock.getLocation());
+        if (fortifiedBlock == null) return;
+
+        String groupName = fortifiedBlock.getGroup();
+        Resident res = CKGlobal.getResident(event.getPlayer());
+        if (!res.getGroups().contains(groupName)) {
+            event.getPlayer().sendMessage(String.format("%sThat block is fortified with %s%s%s by %s%s%s.",
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    StringUtils.stringifyType(Material.valueOf(fortifiedBlock.getMaterial()), true),
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    groupName, ChatColor.GRAY));
+            return;
+        }
+
+        Permissions requiredPermission;
+        String errorMessage;
+        if (type.name().endsWith("_BED")) {
+            requiredPermission = Permissions.BEDS;
+            errorMessage = "beds";
+        } else {
+            requiredPermission = Permissions.DOORS;
+            errorMessage = "doors";
+        }
+
+        if (res.hasPermission(groupName, requiredPermission) || res.hasPermission(groupName, Permissions.BLOCKS)) return;
+
+        event.setCancelled(true);
+        MessageUtils.send(event.getPlayer(), getPermsNeededString(requiredPermission, groupName, errorMessage));
+    }
+
+    /**
+     * Prevents player from sleeping in a bed without necessary perms.
+     * @param event Fires when a player attempts to sleep in a bed.
+     */
+    @EventHandler
+    public void onPlayerSleep(PlayerBedEnterEvent event) {
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getBed().getLocation());
+        if (fortifiedBlock == null) return;
+        String groupName = fortifiedBlock.getGroup();
+
+        // Check if player has perms to sleep in bed
+        Resident res = CKGlobal.getResident(event.getPlayer());
+        if (res.getGroups().contains(groupName)) {
+            if (res.hasPermission(groupName, Permissions.BEDS) || res.hasPermission(fortifiedBlock.getGroup(), Permissions.BLOCKS)) {
+                return;
+            }
+            event.setCancelled(true);
+            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.BEDS, groupName, "beds"));
+            return;
+        }
+        MessageUtils.send(event.getPlayer(), String.format("%sThat bed is fortified with %s%s%s by %s%s%s.",
+                ChatColor.GRAY, ChatColor.YELLOW,
+                StringUtils.stringifyType(Material.valueOf(fortifiedBlock.getMaterial()), true),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                groupName, ChatColor.GRAY
+        ));
+    }
+
+    private String getPermsNeededString(Permissions perm, String groupName, String block) {
+        return String.format("%sYou need the %s%s%s permission in %s%s%s to use "+block+".",
+                ChatColor.GRAY, ChatColor.YELLOW,
+                perm,
+                ChatColor.GRAY, ChatColor.YELLOW,
+                groupName,
+                ChatColor.GRAY
+        );
     }
 
     public BlockFace getPlayerFacing(Player player) {
