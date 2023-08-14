@@ -6,6 +6,7 @@ import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
+import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.Bukkit;
@@ -385,6 +386,7 @@ public class FortifyEvents implements Listener {
                         ChatColor.GRAY);
                 item.setAmount(item.getAmount() - 1);
                 alreadyFortifiedBlock.upgradeMaterial(itemType);
+                EffectUtils.spawnEnderParticles(block);
                 MessageUtils.send(player, msg);
             }
             else if (reinforcementsFromHand == maxReinforcements) {
@@ -392,6 +394,7 @@ public class FortifyEvents implements Listener {
                     // Refill reinforcements to max of current material type
                     item.setAmount(item.getAmount() - 1);
                     alreadyFortifiedBlock.refillReinforcements();
+                    EffectUtils.spawnEnderParticles(block);
                     MessageUtils.send(player, ChatColor.GRAY + "You have refilled this block's reinforcements to its max.");
                 } else {
                     // Block is already at max reinforcements for that type
@@ -416,8 +419,7 @@ public class FortifyEvents implements Listener {
         if (res.isInspectMode()) {
             MessageUtils.send(player, fortifyMessage(block, itemType));
         }
-
-        // TODO: Add particles
+        EffectUtils.spawnEnderParticles(block);
     }
 
     private String fortifyMessage(Block block, Material material) {

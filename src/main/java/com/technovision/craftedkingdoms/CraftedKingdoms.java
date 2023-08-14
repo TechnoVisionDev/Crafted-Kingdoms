@@ -60,7 +60,7 @@ public class CraftedKingdoms extends JavaPlugin {
         // Remove any remaining armor stand nametags
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntitiesByClass(ArmorStand.class)) {
-                if (entity.hasMetadata("fortifyTag")) {
+                if (entity.hasMetadata("fortifyTag") || entity.hasMetadata("particles")) {
                     entity.remove();
                 }
             }

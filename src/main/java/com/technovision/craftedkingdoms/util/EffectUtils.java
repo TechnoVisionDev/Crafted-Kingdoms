@@ -1,8 +1,9 @@
 package com.technovision.craftedkingdoms.util;
 
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
+import com.technovision.craftedkingdoms.CraftedKingdoms;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -19,5 +20,10 @@ public class EffectUtils {
         fwm.addEffect(fe);
         fwm.setPower(1);
         fw.setFireworkMeta(fwm);
+    }
+
+    public static void spawnEnderParticles(Block block) {
+        Location blockCenter = block.getLocation().add(0.5, 0.5, 0.5);
+        block.getWorld().spawnParticle(Particle.PORTAL, blockCenter, 100, 0.5, 0.5, 0.5, 0);
     }
 }
