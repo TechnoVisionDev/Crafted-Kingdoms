@@ -21,6 +21,8 @@ public class Resident {
     private boolean groupChat;
     private Set<String> groups;
     private Set<String> invites;
+    private boolean isPearled;
+    private boolean inspectMode;
 
     public Resident() { }
 
@@ -30,14 +32,18 @@ public class Resident {
         this.groupChat = false;
         this.groups = new HashSet<>();
         this.invites = new HashSet<>();
+        this.isPearled = false;
+        this.inspectMode = false;
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites) {
+    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, boolean isPearled, boolean inspectMode) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
         this.groups = groups;
         this.invites = invites;
+        this.isPearled = isPearled;
+        this.inspectMode = inspectMode;
     }
 
     /**
@@ -98,6 +104,15 @@ public class Resident {
     }
 
     /**
+     * Toggles the inspect mode for this resident.
+     */
+    public void toggleInspectMode() {
+        inspectMode = !this.inspectMode;
+        Bson update = Updates.pull("inspectMode", inspectMode);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
+
+    /**
      * Adds a group to this resident's list of active groups.
      * @param groupName the name of the group.
      */
@@ -154,6 +169,14 @@ public class Resident {
         return invites;
     }
 
+    public boolean isPearled() {
+        return isPearled;
+    }
+
+    public boolean isInspectMode() {
+        return inspectMode;
+    }
+
     /** Setters */
 
     public void setPlayerID(UUID playerID) {
@@ -174,5 +197,13 @@ public class Resident {
 
     public void setInvites(Set<String> invites) {
         this.invites = invites;
+    }
+
+    public void setPearled(boolean pearled) {
+        isPearled = pearled;
+    }
+
+    public void setInspectMode(boolean inspectMode) {
+        this.inspectMode = inspectMode;
     }
 }

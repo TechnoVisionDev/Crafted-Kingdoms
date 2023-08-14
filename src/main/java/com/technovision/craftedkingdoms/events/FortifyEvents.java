@@ -13,9 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.*;
-import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.block.data.type.Grindstone;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -63,7 +60,7 @@ public class FortifyEvents implements Listener {
             return;
         }
 
-        fortifyBlock(player, group, offHandItem, event.getBlockPlaced());
+        fortifyBlock(res, player, group, offHandItem, event.getBlockPlaced());
     }
 
     /**
@@ -74,6 +71,12 @@ public class FortifyEvents implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         // Spawn nametag with block reinforcement data if necessary
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            // Check if player has inspect mode on
+            Player player = event.getPlayer();
+            Resident res = CKGlobal.getResident(player);
+            if (!res.isInspectMode()) return;
+
+            // Update nametag if needed
             BlockFace face = getPlayerFacing(event.getPlayer());
             Location adjustedLocation = adjustLocationForFace(event.getClickedBlock().getLocation(), face);
             FortifiedBlock fb = CKGlobal.getFortifiedBlock(event.getClickedBlock().getLocation());
@@ -86,12 +89,15 @@ public class FortifyEvents implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
 
+        // Check if player has inspect mode on
         Player player = event.getPlayer();
+        Resident res = CKGlobal.getResident(player);
+        if (!res.isInspectMode()) return;
+
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         Material itemType = mainHandItem.getType();
         if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(itemType)) return;
 
-        Resident res = CKGlobal.getResident(player);
         Group group = CKGlobal.getFortifyGroup(player);
         if (!isValidFortifyGroup(player, res, group)) return;
         if (!canPlayerFortify(player, res, group)) return;
@@ -164,13 +170,13 @@ public class FortifyEvents implements Listener {
             if (type == InventoryType.CHEST || type == InventoryType.ENDER_CHEST) {
                 if (res.hasPermission(groupName, Permissions.CHESTS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
                 event.setCancelled(true);
-                MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CHESTS, groupName, "chests"));
+                MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CHESTS, groupName));
                 return;
             }
             // Check if player has perms to open containers
             if (res.hasPermission(groupName, Permissions.CONTAINERS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
             event.setCancelled(true);
-            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CONTAINERS, groupName, "containers"));
+            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CONTAINERS, groupName));
             return;
         }
         MessageUtils.send(player, String.format("%sThat container is fortified with %s%s%s by %s%s%s.",
@@ -211,19 +217,15 @@ public class FortifyEvents implements Listener {
         }
 
         Permissions requiredPermission;
-        String errorMessage;
         if (type.name().endsWith("_BED")) {
             requiredPermission = Permissions.BEDS;
-            errorMessage = "beds";
         } else {
             requiredPermission = Permissions.DOORS;
-            errorMessage = "doors";
         }
-
         if (res.hasPermission(groupName, requiredPermission) || res.hasPermission(groupName, Permissions.BLOCKS)) return;
 
         event.setCancelled(true);
-        MessageUtils.send(event.getPlayer(), getPermsNeededString(requiredPermission, groupName, errorMessage));
+        MessageUtils.send(event.getPlayer(), getPermsNeededString(requiredPermission, groupName));
     }
 
     /**
@@ -243,7 +245,7 @@ public class FortifyEvents implements Listener {
                 return;
             }
             event.setCancelled(true);
-            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.BEDS, groupName, "beds"));
+            MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.BEDS, groupName));
             return;
         }
         MessageUtils.send(event.getPlayer(), String.format("%sThat bed is fortified with %s%s%s by %s%s%s.",
@@ -254,8 +256,8 @@ public class FortifyEvents implements Listener {
         ));
     }
 
-    private String getPermsNeededString(Permissions perm, String groupName, String block) {
-        return String.format("%sYou need the %s%s%s permission in %s%s%s to use "+block+".",
+    private String getPermsNeededString(Permissions perm, String groupName) {
+        return String.format("%sYou need the %s%s%s permission in %s%s%s to use that!",
                 ChatColor.GRAY, ChatColor.YELLOW,
                 perm,
                 ChatColor.GRAY, ChatColor.YELLOW,
@@ -401,15 +403,21 @@ public class FortifyEvents implements Listener {
                 MessageUtils.sendError(player, "That block is already reinforced with " + ChatColor.YELLOW + stringAlreadyFortified);
             }
         } else {
-            fortifyBlock(player, group, item, block);
+            Resident res = CKGlobal.getResident(player);
+            fortifyBlock(res, player, group, item, block);
         }
     }
 
-    private void fortifyBlock(Player player, Group group, ItemStack item, Block block) {
+    private void fortifyBlock(Resident res, Player player, Group group, ItemStack item, Block block) {
         Material itemType = item.getType();
         item.setAmount(item.getAmount() - 1);
         group.fortifyBlock(block, itemType);
-        MessageUtils.send(player, fortifyMessage(block, itemType));
+
+        if (res.isInspectMode()) {
+            MessageUtils.send(player, fortifyMessage(block, itemType));
+        }
+
+        // TODO: Add particles
     }
 
     private String fortifyMessage(Block block, Material material) {

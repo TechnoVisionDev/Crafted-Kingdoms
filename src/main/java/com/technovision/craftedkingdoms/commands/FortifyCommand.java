@@ -27,13 +27,13 @@ public class FortifyCommand extends CommandBase {
         displayName = "Fortify";
 
         // Implemented
-        commands.put("enable", "[group] - Enables fortify mode to reinforce blocks for a group.");
+        commands.put("enable", "[group] - Enables fortify mode to reinforce blocks.");
         commands.put("disable", "Disables fortify mode.");
+        commands.put("inspect", "Toggle inspect mode");
 
         // Not Yet Implemented
         /**
-        commands.put("materials", "List the materials for fortifying blocks.");
-        commands.put("inspect", "Toggle inspect mode");
+        commands.put("materials", "Show the materials for fortifying blocks.");
         */
     }
 
@@ -66,6 +66,18 @@ public class FortifyCommand extends CommandBase {
         Player player = getPlayer();
         CKGlobal.removeFortifyGroup(player);
         MessageUtils.send(player, ChatColor.GRAY+"You have disabled fortify mode.");
+    }
+
+    public void inspect_cmd() throws CKException {
+        Resident res = getResident();
+        res.toggleInspectMode();
+        String mode;
+        if (res.isInspectMode()) {
+            mode = "enabled";
+        } else {
+            mode = "disabled";
+        }
+        MessageUtils.send(getPlayer(), ChatColor.GRAY+"You have "+ ChatColor.GREEN + mode + ChatColor.GRAY + " inspect mode for fortified blocks.");
     }
 
     @Override
