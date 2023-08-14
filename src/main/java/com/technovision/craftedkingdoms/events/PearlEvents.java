@@ -22,9 +22,7 @@ import java.util.UUID;
  */
 public class PearlEvents implements Listener {
 
-    private final Set<UUID> playersToTeleportToEnd = new HashSet<>();
-
-    public PearlEvents() { }
+    private final Set<UUID> pearledPlayers = new HashSet<>();
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -44,7 +42,7 @@ public class PearlEvents implements Listener {
                     item.setAmount(item.getAmount() - 1);
                 }
                 // Flag player for teleporting on respawn
-                playersToTeleportToEnd.add(killedPlayer.getUniqueId());
+                pearledPlayers.add(killedPlayer.getUniqueId());
                 break;
             }
         }
@@ -55,17 +53,17 @@ public class PearlEvents implements Listener {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
 
-        if (playersToTeleportToEnd.contains(playerUUID)) {
-            World endWorld = Bukkit.getWorld("world_the_end");
-            if (endWorld != null) {
-                Location endSpawn = endWorld.getSpawnLocation();
-                event.setRespawnLocation(endSpawn);
+        if (pearledPlayers.contains(playerUUID)) {
+            World nether = Bukkit.getWorld("world_nether");
+            if (nether != null) {
+                Location netherSpawn = nether.getSpawnLocation();
+                event.setRespawnLocation(netherSpawn);
             } else {
-                player.sendMessage("Failed to teleport to the End. Check the world name.");
+                player.sendMessage("Failed to teleport to the Nether. Contact an admin!");
             }
 
             // Remove UUID from the set
-            playersToTeleportToEnd.remove(playerUUID);
+            pearledPlayers.remove(playerUUID);
         }
     }
 }
