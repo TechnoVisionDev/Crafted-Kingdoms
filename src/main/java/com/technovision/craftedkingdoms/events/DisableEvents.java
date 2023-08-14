@@ -117,9 +117,9 @@ public class DisableEvents implements Listener {
         if (event.getEntity() instanceof EnderPearl) {
             EnderPearl pearl = (EnderPearl) event.getEntity();
 
-            // Reduce the velocity by 75%
+            // Reduce the velocity by 60%
             Vector velocity = pearl.getVelocity();
-            pearl.setVelocity(velocity.multiply(0.75));
+            pearl.setVelocity(velocity.multiply(0.40));
         }
     }
 
