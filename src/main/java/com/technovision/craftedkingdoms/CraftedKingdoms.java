@@ -6,6 +6,9 @@ import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.events.FortifyEvents;
 import com.technovision.craftedkingdoms.events.PearlEvents;
 import com.technovision.craftedkingdoms.events.PlayerEvents;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -51,6 +54,14 @@ public class CraftedKingdoms extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Remove any remaining armor stand nametags
+        for (World world : getServer().getWorlds()) {
+            for (Entity entity : world.getEntitiesByClass(ArmorStand.class)) {
+                if (entity.hasMetadata("fortifyTag")) {
+                    entity.remove();
+                }
+            }
+        }
         logger.info(String.format("[%s] - Successfully disabled!", getDescription().getName()));
     }
 
