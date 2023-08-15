@@ -9,10 +9,7 @@ import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -50,13 +47,13 @@ public class FortifyEvents implements Listener {
         Player player = event.getPlayer();
         ItemStack offHandItem = player.getInventory().getItemInOffHand();
         Material itemType = offHandItem.getType();
-        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(itemType)) return;
+        if (!isValidMaterial(itemType, player.getWorld())) return;
 
         Resident res = CKGlobal.getResident(player);
         Group group = CKGlobal.getFortifyGroup(player);
         if (!isValidFortifyGroup(player, res, group)) return;
         if (!canPlayerFortify(player, res, group)) return;
-        if (!FortifiedBlock.isValidBlock(event.getBlockPlaced())) {
+        if (!FortifiedBlock.isReinforceable(event.getBlockPlaced())) {
             MessageUtils.sendError(player, "That block cannot be reinforced!");
             return;
         }
@@ -97,18 +94,31 @@ public class FortifyEvents implements Listener {
 
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         Material itemType = mainHandItem.getType();
-        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(itemType)) return;
+        if (!isValidMaterial(itemType, player.getWorld())) return;
 
         Group group = CKGlobal.getFortifyGroup(player);
         if (!isValidFortifyGroup(player, res, group)) return;
         if (!canPlayerFortify(player, res, group)) return;
-        if (!FortifiedBlock.isValidBlock(event.getClickedBlock())) {
+        if (!FortifiedBlock.isReinforceable(event.getClickedBlock())) {
             MessageUtils.sendError(player, "That block cannot be reinforced!");
             return;
         }
 
         event.setCancelled(true);
         handleBlockInteraction(player, group, mainHandItem, event.getClickedBlock());
+    }
+
+    public boolean isValidMaterial(Material type, World world) {
+        if (world == Bukkit.getWorld("world")) {
+            if (FortifiedBlock.OVERWORLD_MATERIALS.containsKey(type)){
+                return true;
+            }
+        } else if (world == Bukkit.getWorld("world_nether")) {
+            if (FortifiedBlock.NETHER_MATERIALS.containsKey(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -373,7 +383,7 @@ public class FortifyEvents implements Listener {
                 return;
             }
             int maxReinforcements = alreadyFortifiedBlock.getMaxReinforcements();
-            int reinforcementsFromHand = FortifiedBlock.getReinforcements(itemType);
+            int reinforcementsFromHand = FortifiedBlock.getReinforcements(itemType, player.getWorld());
             String stringAlreadyFortified = StringUtils.stringifyType(Material.valueOf(alreadyFortifiedBlock.getMaterial()), true);
 
             if (reinforcementsFromHand > maxReinforcements) {

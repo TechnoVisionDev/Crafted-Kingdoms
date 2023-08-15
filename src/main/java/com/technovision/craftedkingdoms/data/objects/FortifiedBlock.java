@@ -9,6 +9,7 @@ import org.bson.conversions.Bson;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.HashMap;
@@ -107,14 +108,18 @@ public class FortifiedBlock {
     }
 
     @BsonIgnore
-    public static boolean isValidBlock(Block block) {
+    public static boolean isReinforceable(Block block) {
         return !INVALID_BLOCKS.contains(block.getType());
     }
 
     @BsonIgnore
-    public static int getReinforcements(Material mat) {
-        if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(mat)) return 0;
-        return FortifiedBlock.OVERWORLD_MATERIALS.get(mat);
+    public static int getReinforcements(Material mat, World world) {
+        if (world == Bukkit.getWorld("world")) {
+            if (!FortifiedBlock.OVERWORLD_MATERIALS.containsKey(mat)) return 0;
+            return FortifiedBlock.OVERWORLD_MATERIALS.get(mat);
+        }
+        if (!FortifiedBlock.NETHER_MATERIALS.containsKey(mat)) return 0;
+        return FortifiedBlock.NETHER_MATERIALS.get(mat);
     }
 
     public void upgradeMaterial(Material material) {
@@ -144,12 +149,18 @@ public class FortifiedBlock {
     }
 
     public int calculateReinforcements(Material material) {
-        return OVERWORLD_MATERIALS.get(material);
+        if (blockCoord.getWorldName().equalsIgnoreCase("world")) {
+            return OVERWORLD_MATERIALS.get(material);
+        }
+        return NETHER_MATERIALS.get(material);
     }
 
     @BsonIgnore
     public int getMaxReinforcements() {
-        return FortifiedBlock.OVERWORLD_MATERIALS.get(Material.valueOf(getMaterial()));
+        if (blockCoord.getWorldName().equalsIgnoreCase("world")) {
+            return FortifiedBlock.OVERWORLD_MATERIALS.get(Material.valueOf(getMaterial()));
+        }
+        return FortifiedBlock.NETHER_MATERIALS.get(Material.valueOf(getMaterial()));
     }
 
     @BsonIgnore
