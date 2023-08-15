@@ -3,12 +3,24 @@ package com.technovision.craftedkingdoms.commands;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import com.technovision.craftedkingdoms.util.MessageUtils;
+import com.technovision.craftedkingdoms.util.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Handles fortify commands to protect blocks.
@@ -30,11 +42,7 @@ public class FortifyCommand extends CommandBase {
         commands.put("enable", "[group] - Enables fortify mode to reinforce blocks.");
         commands.put("disable", "Disables fortify mode.");
         commands.put("inspect", "Toggle inspect mode");
-
-        // Not Yet Implemented
-        /**
-        commands.put("materials", "Show the materials for fortifying blocks.");
-        */
+        commands.put("materials", "Show the materials used for fortifying blocks.");
     }
 
     public void enable_cmd() throws CKException {
@@ -78,6 +86,54 @@ public class FortifyCommand extends CommandBase {
             mode = "disabled";
         }
         MessageUtils.send(getPlayer(), ChatColor.GRAY+"You have "+ ChatColor.GREEN + mode + ChatColor.GRAY + " inspect mode for fortified blocks.");
+    }
+
+    public void materials_cmd() throws CKException {
+        Player player = getPlayer();
+        Inventory inventory = Bukkit.createInventory(null, 27, "Fortify Materials");
+
+        // Sort the OVERWORLD_MATERIALS entries from lowest to highest
+        List<Map.Entry<Material, Integer>> sortedOverworldMaterials = FortifiedBlock.OVERWORLD_MATERIALS.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toList());
+
+        // Populate the first row with the sorted items, colored names, and lore with unique numbers
+        int slot = 0;
+        for (Map.Entry<Material, Integer> entry : sortedOverworldMaterials) {
+            ItemStack item = new ItemStack(entry.getKey(), 1);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(ChatColor.AQUA + StringUtils.stringifyType(entry.getKey()));
+            meta.setLore(Arrays.asList(
+                            ChatColor.GREEN + "Health: " + entry.getValue(),
+                            ChatColor.GRAY + "Return Chance: 100%",
+                            ChatColor.GREEN + "Overworld Only"
+            ));
+            item.setItemMeta(meta);
+            inventory.setItem(slot++, item);
+        }
+
+        // Sort the NETHER_MATERIALS entries from lowest to highest
+        List<Map.Entry<Material, Integer>> sortedNetherMaterials = FortifiedBlock.NETHER_MATERIALS.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toList());
+
+        // Populate the third row with the sorted items, colored names, and lore with unique numbers
+        slot = 18; // Start from the first slot of the third row
+        for (Map.Entry<Material, Integer> entry : sortedNetherMaterials) {
+            ItemStack item = new ItemStack(entry.getKey(), 1);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(ChatColor.AQUA + StringUtils.stringifyType(entry.getKey()));
+            meta.setLore(Arrays.asList(
+                    ChatColor.GREEN + "Health: " + entry.getValue(),
+                    ChatColor.GRAY + "Return Chance: 100%",
+                    ChatColor.RED + "Nether Only"
+            ));
+            item.setItemMeta(meta);
+            inventory.setItem(slot++, item);
+        }
+        player.openInventory(inventory);
     }
 
     @Override
