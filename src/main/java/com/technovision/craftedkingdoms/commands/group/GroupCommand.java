@@ -12,6 +12,8 @@ import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -22,6 +24,8 @@ import java.util.*;
  * @author TechnoVision
  */
 public class GroupCommand extends CommandBase {
+
+    private static final List<String> PERMISSIONS = Arrays.stream(Permissions.values()).map(Permissions::name).toList();
 
     public GroupCommand(CraftedKingdoms plugin) {
         super(plugin);
@@ -446,6 +450,63 @@ public class GroupCommand extends CommandBase {
         else if (group.isAdmin(playerID)) rank = "Admin";
         else if (group.isOwner(playerID)) rank = "Owner";
         return rank;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            // If the user has only typed '/group', suggest the next part of the command
+            List<String> suggestions = new ArrayList<>(commands.keySet());
+            suggestions.add("perms");
+            return suggestions;
+        } else if (args.length == 2) {
+            // If the user has typed '/group [something]', suggest group names for appropriate commands
+            if ("perms".equalsIgnoreCase(args[0])) {
+                return List.of("add", "remove", "list", "inspect", "reset");
+            }
+            switch (args[0].toLowerCase()) {
+                case "invite", "rescind", "join", "leave", "remove", "bio", "delete", "info", "promote", "link", "unlink", "merge", "transfer" -> {
+                    return CKGlobal.getResident((Player) sender).getGroups().stream().toList();
+                }
+            }
+        } else if (args.length == 3) {
+            // If the user has typed '/group [command] [something]', suggest player names or group names for appropriate commands
+            if ("perms".equalsIgnoreCase(args[0])) {
+                return CKGlobal.getResident((Player) sender).getGroups().stream().toList();
+            }
+            switch (args[0].toLowerCase()) {
+                case "invite", "rescind", "remove", "transfer" -> {
+                    return filterPlayerNames(args[2]);
+                }
+                case "link", "unlink", "merge" -> {
+                    return CKGlobal.getResident((Player) sender).getGroups().stream().toList();
+                }
+            }
+        } else if (args.length == 4) {
+            // If the user has typed '/group promote [group] [player]' or '/group perms [group] [rank]', suggest ranks or permissions
+            if ("promote".equalsIgnoreCase(args[0])) {
+                return List.of("Member", "Moderator", "Admin");
+            } else if ("perms".equalsIgnoreCase(args[0])) {
+                return List.of("Member", "Moderator", "Admin");
+            }
+        } else if (args.length == 5) {
+            // If the user has typed '/group perms [group] [rank] [something]', suggest permissions
+            if ("perms".equalsIgnoreCase(args[0]) && ("add".equalsIgnoreCase(args[1]) || "remove".equalsIgnoreCase(args[1]))) {
+                return PERMISSIONS;
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> filterPlayerNames(String typedName) {
+        String typedLower = typedName.toLowerCase();
+        List<String> suggestions = new ArrayList<>();
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            if (player.getName().toLowerCase().startsWith(typedLower)) {
+                suggestions.add(player.getName());
+            }
+        }
+        return suggestions;
     }
 
     @Override

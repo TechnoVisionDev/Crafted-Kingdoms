@@ -41,6 +41,9 @@ public class GroupPermsCommand extends CommandBase {
         Group group = getGroupFromArgs(1);
         Ranks rank = getRankFromArgs(2);
         Permissions perm = getPermFromArgs(3);
+        if (rank == Ranks.OWNER) {
+            throw new CKException("You cannot add perms to the owner rank! They have all perms!");
+        }
 
         // Check that player has permission to modify perms
         Resident res = getResident();
@@ -76,6 +79,9 @@ public class GroupPermsCommand extends CommandBase {
         Group group = getGroupFromArgs(1);
         Ranks rank = getRankFromArgs(2);
         Permissions perm = getPermFromArgs(3);
+        if (rank == Ranks.OWNER) {
+            throw new CKException("You cannot add perms to the owner rank! They have all perms!");
+        }
 
         // Check that player has permission to modify perms
         Resident res = getResident();

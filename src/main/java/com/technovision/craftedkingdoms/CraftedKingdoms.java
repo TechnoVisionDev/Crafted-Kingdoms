@@ -76,8 +76,14 @@ public class CraftedKingdoms extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("group").setExecutor(new GroupCommand(this));
-        this.getCommand("fortify").setExecutor(new FortifyCommand(this));
+        GroupCommand groupCommand = new GroupCommand(this);
+        FortifyCommand fortifyCommand = new FortifyCommand(this);
+
+        this.getCommand("group").setExecutor(groupCommand);
+        this.getCommand("fortify").setExecutor(fortifyCommand);
+
+        this.getCommand("group").setTabCompleter(groupCommand);
+        this.getCommand("fortify").setTabCompleter(fortifyCommand);
     }
 
     public void loadConfig() {

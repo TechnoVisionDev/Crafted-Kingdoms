@@ -11,13 +11,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public abstract class CommandBase implements CommandExecutor {
+public abstract class CommandBase implements CommandExecutor, TabCompleter {
 
     protected HashMap<String, String> commands = new HashMap<>();
 
@@ -31,6 +36,7 @@ public abstract class CommandBase implements CommandExecutor {
 
     public CommandBase(CraftedKingdoms plugin) {
         this.plugin = plugin;
+        init();
     }
 
     public Player getPlayer() throws CKException {
@@ -52,9 +58,19 @@ public abstract class CommandBase implements CommandExecutor {
     public abstract void permissionCheck() throws CKException;
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        init();
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            completions.addAll(commands.keySet());
+        }
+        // Filter the list to include only entries that start with the current argument
+        return completions.stream()
+                .filter(str -> str.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         this.args = args;
         this.sender = sender;
 
@@ -184,7 +200,9 @@ public abstract class CommandBase implements CommandExecutor {
     }
 
     public Resident getResident() {
-        if (!(sender instanceof Player player)) return null;
+        if (!(sender instanceof Player player)) {
+            return null;
+        }
         return CKGlobal.getResident(player);
     }
 

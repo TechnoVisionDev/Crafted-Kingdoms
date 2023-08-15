@@ -12,14 +12,14 @@ import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -134,6 +134,16 @@ public class FortifyCommand extends CommandBase {
             inventory.setItem(slot++, item);
         }
         player.openInventory(inventory);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        List<String> completions = super.onTabComplete(sender, cmd, alias, args);
+        if (args.length == 2 && args[0].equalsIgnoreCase("enable")) {
+            Set<String> groupNames = CKGlobal.getResident((Player) sender).getGroups();
+            return groupNames.stream().filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+        }
+        return completions;
     }
 
     @Override
