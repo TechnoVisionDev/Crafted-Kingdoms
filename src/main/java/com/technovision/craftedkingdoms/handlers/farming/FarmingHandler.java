@@ -13,9 +13,12 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -99,6 +102,38 @@ public class FarmingHandler implements Listener {
         }
     }
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block brokenBlock = event.getBlock();
+        Material brokenBlockType = brokenBlock.getType();
+        if (brokenBlockType != Material.MELON && brokenBlockType != Material.PUMPKIN) return;
+
+        // Check adjacent blocks for a stem
+        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
+            Block adjacentBlock = brokenBlock.getRelative(face);
+            Material adjacentBlockType = adjacentBlock.getType();
+
+            // Check if the adjacent block is a stem
+            if (adjacentBlockType != Material.ATTACHED_MELON_STEM && adjacentBlockType != Material.ATTACHED_PUMPKIN_STEM) continue;
+
+            System.out.println("Checking adjacent block... " + adjacentBlockType.toString());
+
+            // Check the direction of the stem
+            BlockData blockData = adjacentBlock.getBlockData();
+            if (blockData instanceof Directional directional) {
+
+                System.out.println("Got directional data");
+
+                if (directional.getFacing().getOppositeFace() == face) {
+                    System.out.println("Adding stem back as crop");
+                    Crop crop = new Crop(adjacentBlock.getLocation(), adjacentBlockType);
+                    PLANTED_CROPS.put(adjacentBlock.getLocation(), crop);
+                    return;
+                }
+            }
+        }
+    }
+
     /**
      * Grows any plants with persistence when a chunk loads.
      * @param event Fires when a chunk is loaded.
@@ -113,14 +148,22 @@ public class FarmingHandler implements Listener {
             Location location = entry.getKey();
             Crop crop = entry.getValue();
 
-            if (chunk.equals(location.getChunk())) {
-                FarmingHandler.growCrop(crop);
-                Material cropMaterial = Material.valueOf(crop.getMaterial());
-                if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
-                    crop.setTimePlanted(new Date());
-                    FarmingHandler.PLANTED_CROPS.put(crop.getBlockCoord().asLocation(), crop);
-                } else {
-                    iterator.remove();
+            if (FarmingHandler.isReadyToGrow(crop)) {
+                if (chunk.equals(location.getChunk())) {
+                    FarmingHandler.growCrop(crop);
+                    Material cropMaterial = Material.valueOf(crop.getMaterial());
+                    if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
+                        crop.setTimePlanted(new Date());
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    } else if (cropMaterial == Material.PUMPKIN_STEM) {
+                        crop = new Crop(location, Material.PUMPKIN_STEM);
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    } else if (cropMaterial == Material.MELON_STEM) {
+                        crop = new Crop(location, Material.MELON_STEM);
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    } else {
+                        iterator.remove();
+                    }
                 }
             }
         }
@@ -152,24 +195,32 @@ public class FarmingHandler implements Listener {
         Material cropType = block.getType();
 
         if (block.getBlockData() instanceof Ageable ageable) {
-            ageable.setAge(ageable.getMaximumAge());
-            block.setBlockData(ageable);
-
             // Check if the block is a mature Melon or Pumpkin stem
             if ((cropType == Material.MELON_STEM || cropType == Material.PUMPKIN_STEM) && ageable.getAge() == ageable.getMaximumAge()) {
                 // Find a suitable location adjacent to the stem to place the Melon or Pumpkin block
                 for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
                     Block adjacentBlock = block.getRelative(face);
                     if (adjacentBlock.getType() == Material.AIR) {
-                        // Set the adjacent block to Melon or Pumpkin, depending on the stem type
+                        // Grow fruit and turn stem to attached
                         if (cropType == Material.MELON_STEM) {
                             adjacentBlock.setType(Material.MELON);
-                        } else if (cropType == Material.PUMPKIN_STEM) {
+                            block.setType(Material.ATTACHED_MELON_STEM);
+                        } else {
                             adjacentBlock.setType(Material.PUMPKIN);
+                            block.setType(Material.ATTACHED_PUMPKIN_STEM);
+                        }
+                        // Set direction for stem
+                        BlockData blockData = block.getBlockData();
+                        if (blockData instanceof Directional directional) {
+                            directional.setFacing(face);
+                            block.setBlockData(directional);
                         }
                         break;
                     }
                 }
+            } else {
+                ageable.setAge(ageable.getMaximumAge());
+                block.setBlockData(ageable);
             }
         }
         if (cropType == Material.CACTUS || cropType == Material.SUGAR_CANE) {

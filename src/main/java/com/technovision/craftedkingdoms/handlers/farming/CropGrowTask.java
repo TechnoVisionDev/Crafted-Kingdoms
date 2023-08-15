@@ -31,8 +31,17 @@ class CropGrowTask implements Runnable {
                     Material cropMaterial = Material.valueOf(crop.getMaterial());
                     if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
                         crop.setTimePlanted(new Date());
-                        FarmingHandler.PLANTED_CROPS.put(crop.getBlockCoord().asLocation(), crop);
-                    } else {
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    }
+                    else if (cropMaterial == Material.PUMPKIN_STEM) {
+                        crop = new Crop(location, Material.PUMPKIN_STEM);
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    }
+                    else if (cropMaterial == Material.MELON_STEM) {
+                        crop = new Crop(location, Material.MELON_STEM);
+                        FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    }
+                    else {
                         iterator.remove();
                     }
                 }

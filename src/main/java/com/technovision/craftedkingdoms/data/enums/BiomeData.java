@@ -31,6 +31,8 @@ public class BiomeData {
         SEED_TO_CROP.put(Material.PUMPKIN_SEEDS, Material.PUMPKIN_STEM);
         SEED_TO_CROP.put(Material.MELON_STEM, Material.MELON);
         SEED_TO_CROP.put(Material.PUMPKIN_STEM, Material.PUMPKIN);
+        SEED_TO_CROP.put(Material.ATTACHED_MELON_STEM, Material.MELON);
+        SEED_TO_CROP.put(Material.ATTACHED_PUMPKIN_STEM, Material.PUMPKIN);
         SEED_TO_CROP.put(Material.BEETROOT_SEEDS, Material.BEETROOTS);
         SEED_TO_CROP.put(Material.CACTUS, Material.CACTUS);
         SEED_TO_CROP.put(Material.SUGAR_CANE, Material.SUGAR_CANE);
