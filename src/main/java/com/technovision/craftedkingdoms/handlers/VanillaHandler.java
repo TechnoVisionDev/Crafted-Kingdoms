@@ -1,4 +1,4 @@
-package com.technovision.craftedkingdoms.events;
+package com.technovision.craftedkingdoms.handlers;
 
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.util.MessageUtils;
@@ -25,7 +25,7 @@ import org.bukkit.util.Vector;
  *
  * @author TechnoVision
  */
-public class DisableEvents implements Listener {
+public class VanillaHandler implements Listener {
 
     /**
      * Makes the overworld and nether ratio 1:1 for portal travel.

@@ -3,13 +3,9 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.commands.FortifyCommand;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
-import com.technovision.craftedkingdoms.events.DisableEvents;
-import com.technovision.craftedkingdoms.events.FortifyEvents;
-import com.technovision.craftedkingdoms.events.PearlEvents;
-import com.technovision.craftedkingdoms.events.PlayerEvents;
-import org.bukkit.Bukkit;
+import com.technovision.craftedkingdoms.handlers.*;
+import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
 import org.bukkit.World;
-import org.bukkit.WorldBorder;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -57,6 +53,9 @@ public class CraftedKingdoms extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Save planted crops
+        FarmingHandler.saveCropsToDatabase();
+
         // Remove any remaining armor stand nametags
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntitiesByClass(ArmorStand.class)) {
@@ -65,14 +64,16 @@ public class CraftedKingdoms extends JavaPlugin {
                 }
             }
         }
+
         logger.info(String.format("[%s] - Successfully disabled!", getDescription().getName()));
     }
 
     private void registerEventHandlers() {
-        getServer().getPluginManager().registerEvents(new DisableEvents(), this);
-        getServer().getPluginManager().registerEvents(new PearlEvents(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
-        getServer().getPluginManager().registerEvents(new FortifyEvents(), this);
+        getServer().getPluginManager().registerEvents(new VanillaHandler(), this);
+        getServer().getPluginManager().registerEvents(new PrisonPearlHandler(), this);
+        getServer().getPluginManager().registerEvents(new ResidentHandler(), this);
+        getServer().getPluginManager().registerEvents(new FortifyHandler(), this);
+        getServer().getPluginManager().registerEvents(new FarmingHandler(), this);
     }
 
     private void registerCommands() {

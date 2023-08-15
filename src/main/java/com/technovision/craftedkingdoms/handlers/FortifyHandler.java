@@ -1,11 +1,13 @@
-package com.technovision.craftedkingdoms.events;
+package com.technovision.craftedkingdoms.handlers;
 
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
+import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
@@ -15,6 +17,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -34,13 +37,13 @@ import java.util.Collection;
  *
  * @author TechnoVision
  */
-public class FortifyEvents implements Listener {
+public class FortifyHandler implements Listener {
 
     /**
      * Auto fortify placed blocks if material is in offhand slot.
      * @param event fires when a player places a block with main hand.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
@@ -65,7 +68,7 @@ public class FortifyEvents implements Listener {
      * Fortify a block by right-clicking with item in main hand.
      * @param event fires when a player interacts.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
         // Spawn nametag with block reinforcement data if necessary
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -125,12 +128,17 @@ public class FortifyEvents implements Listener {
      * Checks if a block is fortified when broken by a player.
      * @param event fires when a player breaks a block.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         // Check if block is fortified
         Block block = event.getBlock();
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
-        if (fortifiedBlock == null) return;
+        if (fortifiedBlock == null) {
+            if (BiomeData.isCrop(block.getType())) {
+                FarmingHandler.removeCrop(block.getLocation());
+            }
+            return;
+        }
 
         // Check if fortified block is from your group
         Resident res = CKGlobal.getResident(event.getPlayer());
@@ -145,6 +153,9 @@ public class FortifyEvents implements Listener {
         // Remove one reinforcement from block
         fortifiedBlock.decrement();
         if (fortifiedBlock.getReinforcements() <= 0) {
+            if (BiomeData.isCrop(block.getType())) {
+                FarmingHandler.removeCrop(block.getLocation());
+            }
             removeNametag(block.getLocation());
             return;
         }
@@ -163,7 +174,7 @@ public class FortifyEvents implements Listener {
      * Prevents player from opening reinforced container or chest without necessary perms.
      * @param event Fires when a player opens a chest or container.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onContainerOpen(InventoryOpenEvent event) {
         if (!(event.getPlayer() instanceof Player player)) return;
         if (event.getInventory().getType() == InventoryType.PLAYER) return;
@@ -202,7 +213,7 @@ public class FortifyEvents implements Listener {
      * Prevents player from opening doors without necessary perms.
      * @param event Fires when a player opens a door, trapdoor, plate, or button.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onSpecialBlocksInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.PHYSICAL && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
@@ -243,7 +254,7 @@ public class FortifyEvents implements Listener {
      * Prevents player from sleeping in a bed without necessary perms.
      * @param event Fires when a player attempts to sleep in a bed.
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerSleep(PlayerBedEnterEvent event) {
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getBed().getLocation());
         if (fortifiedBlock == null) return;

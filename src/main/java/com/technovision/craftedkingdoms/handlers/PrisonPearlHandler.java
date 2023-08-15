@@ -1,4 +1,4 @@
-package com.technovision.craftedkingdoms.events;
+package com.technovision.craftedkingdoms.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,7 +20,7 @@ import java.util.UUID;
  *
  * @author TechnoVision
  */
-public class PearlEvents implements Listener {
+public class PrisonPearlHandler implements Listener {
 
     private final Set<UUID> pearledPlayers = new HashSet<>();
 

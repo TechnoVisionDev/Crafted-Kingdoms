@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
+import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -32,6 +33,7 @@ public class Database {
     /** Collections */
     public static @NotNull MongoCollection<Group> GROUPS;
     public static @NotNull MongoCollection<Resident> RESIDENTS;
+    public static @NotNull MongoCollection<Crop> CROPS;
 
     /**
      * Connect to database using MongoDB URI and
@@ -54,6 +56,7 @@ public class Database {
         // Initialize collections if they don't exist.
         GROUPS = database.getCollection("groups", Group.class);
         RESIDENTS = database.getCollection("residents", Resident.class);
+        CROPS = database.getCollection("crops", Crop.class);
 
         // Create collection indexes if they don't exist.
         Bson nameIndex = Indexes.descending("name");
