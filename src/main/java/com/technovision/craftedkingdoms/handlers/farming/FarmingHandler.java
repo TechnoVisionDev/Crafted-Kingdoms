@@ -14,10 +14,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -37,17 +35,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FarmingHandler implements Listener {
 
     public static final Map<Location, Crop> PLANTED_CROPS = new ConcurrentHashMap<>();
-    public static final Map<Location, Crop> PERSISTENT_CROPS = new ConcurrentHashMap<>();
 
     public FarmingHandler() {
         // Get crops from database
         for (Crop crop : Database.CROPS.find()) {
             Location cropLocation = crop.getBlockCoord().asLocation();
-            if (isReadyToGrow(crop)) {
-                PERSISTENT_CROPS.put(cropLocation, crop);
-            } else {
-                PLANTED_CROPS.put(cropLocation, crop);
-            }
+            PLANTED_CROPS.put(cropLocation, crop);
         }
         Database.CROPS.deleteMany(new Document());
 
@@ -113,7 +106,7 @@ public class FarmingHandler implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
-        Iterator<Map.Entry<Location, Crop>> iterator = FarmingHandler.PERSISTENT_CROPS.entrySet().iterator();
+        Iterator<Map.Entry<Location, Crop>> iterator = FarmingHandler.PLANTED_CROPS.entrySet().iterator();
 
         while (iterator.hasNext()) {
             Map.Entry<Location, Crop> entry = iterator.next();
@@ -147,10 +140,7 @@ public class FarmingHandler implements Listener {
     }
 
     public static void removeCrop(Location location) {
-        if (FarmingHandler.PLANTED_CROPS.containsKey(location)) {
-            FarmingHandler.PLANTED_CROPS.remove(location);
-        }
-        else FarmingHandler.PERSISTENT_CROPS.remove(location);
+        FarmingHandler.PLANTED_CROPS.remove(location);
     }
 
     /**
@@ -199,9 +189,6 @@ public class FarmingHandler implements Listener {
      */
     public static void saveCropsToDatabase() {
         for (Crop crop : PLANTED_CROPS.values()) {
-            Database.CROPS.insertOne(crop);
-        }
-        for (Crop crop : PERSISTENT_CROPS.values()) {
             Database.CROPS.insertOne(crop);
         }
     }

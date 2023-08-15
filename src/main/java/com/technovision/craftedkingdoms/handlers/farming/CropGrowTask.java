@@ -35,8 +35,6 @@ class CropGrowTask implements Runnable {
                     } else {
                         iterator.remove();
                     }
-                } else {
-                    FarmingHandler.PERSISTENT_CROPS.put(location, crop);
                 }
             }
         }
