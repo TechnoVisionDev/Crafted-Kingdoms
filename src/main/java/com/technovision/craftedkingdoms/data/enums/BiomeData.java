@@ -36,6 +36,8 @@ public class BiomeData {
         BLOCKED_CROPS.add(Material.CAVE_VINES);
         BLOCKED_CROPS.add(Material.KELP);
         BLOCKED_CROPS.add(Material.SEA_PICKLE);
+        BLOCKED_CROPS.add(Material.RED_MUSHROOM);
+        BLOCKED_CROPS.add(Material.BROWN_MUSHROOM);
     }
 
     /** Maps the material of a seed to the material of it's crop in block form */

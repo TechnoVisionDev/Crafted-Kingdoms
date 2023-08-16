@@ -13,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -24,7 +25,9 @@ import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +42,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TechnoVision
  */
 public class FarmingHandler implements Listener {
+
+    private final Map<UUID, Long> COOLDOWNS = new HashMap<>();
+    private final long COOLDOWN_TIME_MS = 500; // 0.5 seconds
 
     public static final Map<Location, Crop> PLANTED_CROPS = new ConcurrentHashMap<>();
 
@@ -120,12 +126,38 @@ public class FarmingHandler implements Listener {
     }
 
     /**
-     * Cancels vanilla growth mechanics.
+     * Cancels vanilla growth mechanics (except for vines).
      * @param event Fires when crop is supposed to grow.
      */
     @EventHandler
     public void onCropGrow(BlockGrowEvent event) {
-        event.setCancelled(true);
+        if (event.getNewState().getType() != Material.VINE) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Right-clicking an animal with a stick will tell you the breeding chance.
+     * @param event Fires when player right clicks animal with a stick.
+     */
+    @EventHandler
+    public void onAnimalRightClick(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        UUID playerUUID = player.getUniqueId();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getType() == Material.STICK && event.getRightClicked() instanceof Animals) {
+            // Check if the player is in the cooldown map and if the cooldown has expired
+            if (COOLDOWNS.containsKey(playerUUID) && System.currentTimeMillis() - COOLDOWNS.get(playerUUID) < COOLDOWN_TIME_MS) {
+                return;
+            }
+            EntityType type = event.getRightClicked().getType();
+            double breedingChance = BiomeData.getBreedingChance(player.getLocation().getBlock().getBiome(), type);
+
+            // Send message and cooldown player
+            player.sendMessage(ChatColor.GOLD + "That animal has a " + (breedingChance * 100) + "% breeding rate in this biome.");
+            COOLDOWNS.put(playerUUID, System.currentTimeMillis());
+        }
     }
 
     /**
@@ -154,17 +186,23 @@ public class FarmingHandler implements Listener {
                 MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will grow here within " + growthTime + " hours");
             }
         }
-
         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            // Plant crop
             ItemStack itemInHand = event.getItem();
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock == null || itemInHand == null) return;
 
+            // Check crop stats
+            if (itemInHand.getType() == Material.STICK) {
+                Crop crop = PLANTED_CROPS.get(clickedBlock.getLocation());
+                if (crop == null) return;
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + "This crop will be ready to harvest in " + getTimeRemaining(crop));
+                return;
+            }
+
+            // Plant new crop
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
                 if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE) {
-                    System.out.println("PLANTING CROP!" + itemType);
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
                     PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
                 }
@@ -284,6 +322,31 @@ public class FarmingHandler implements Listener {
         long currentTime = System.currentTimeMillis();
         double growthTime = BiomeData.getGrowthTime(crop);
         return currentTime - crop.getTimePlanted().getTime() >= growthTime;
+    }
+
+    /**
+     * Gets the time remaining for a crop to grow.
+     * @param crop the crop to check.
+     * @return String of hours and minutes remaining to grow.
+     */
+    public static String getTimeRemaining(Crop crop) {
+        long currentTime = System.currentTimeMillis();
+        double growthTime = BiomeData.getGrowthTime(crop);
+        long timePlanted = crop.getTimePlanted().getTime();
+
+        // Calculate the remaining time in milliseconds
+        long remainingTime = (long) (growthTime - (currentTime - timePlanted));
+        // Check if the remaining time is negative, in which case the crop is ready to grow
+        if (remainingTime <= 0) {
+            return "0h 0m";
+        }
+        // Convert remaining time to minutes, rounding up if necessary
+        long remainingMinutes = (remainingTime + 59999) / 60000;
+
+        // Convert the remaining minutes into hours and minutes
+        long hours = remainingMinutes / 60;
+        long minutes = remainingMinutes % 60;
+        return hours + "h " + minutes + "m";
     }
 
     public static void removeCrop(Location location) {
