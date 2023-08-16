@@ -4,12 +4,9 @@ import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.objects.Crop;
+import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.Document;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Biome;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
@@ -48,7 +45,7 @@ public class FarmingHandler implements Listener {
         // Start crop scanner to run every 10 minutes
         Bukkit.getServer().getScheduler().runTaskTimer(
                 CraftedKingdoms.plugin,
-                new CropGrowTask(), 0, 20 * 5);
+                new CropGrowTask(), 0, 20 * 60 * 10);
     }
 
     /**
@@ -66,7 +63,24 @@ public class FarmingHandler implements Listener {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            ItemStack itemInHand = event.getItem();
+            Block clickedBlock = event.getClickedBlock();
+
+            if (!BiomeData.isSeed(itemInHand.getType())) return;
+            Block blockAbove = clickedBlock.getRelative(0, 1, 0);
+            Crop crop = new Crop(blockAbove.getLocation(), itemInHand.getType());
+            double growthTime = BiomeData.getGrowthTime(crop) / 60 / 60 / 1000;
+
+            String itemName = itemInHand.getItemMeta().getDisplayName();
+            if (growthTime <= 0) {
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
+            } else {
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will grow here within " + growthTime + " hours");
+            }
+        }
+
+        else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack itemInHand = event.getItem();
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock == null || itemInHand == null) return;
@@ -158,7 +172,7 @@ public class FarmingHandler implements Listener {
 
             if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
                 long currentTime = System.currentTimeMillis();
-                double growthTime = BiomeData.getGrowthTime(crop.getBlockCoord().asLocation().getBlock().getBiome(), cropMaterial);
+                double growthTime = BiomeData.getGrowthTime(crop);
                 if (growthTime <= 0) continue;
                 int elapsedCycles = (int) ((currentTime - crop.getTimePlanted().getTime()) / growthTime);
 
@@ -191,10 +205,8 @@ public class FarmingHandler implements Listener {
      * @return True if crop is ready to grow, otherwise false.
      */
     public static boolean isReadyToGrow(Crop crop) {
-        Material cropMat = Material.valueOf(crop.getMaterial());
-        Biome cropBiome = crop.getBlockCoord().asLocation().getBlock().getBiome();
         long currentTime = System.currentTimeMillis();
-        double growthTime = BiomeData.getGrowthTime(cropBiome, cropMat);
+        double growthTime = BiomeData.getGrowthTime(crop);
         return currentTime - crop.getTimePlanted().getTime() >= growthTime;
     }
 

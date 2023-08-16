@@ -1,7 +1,13 @@
 package com.technovision.craftedkingdoms.data.enums;
 
+import com.technovision.craftedkingdoms.data.objects.Crop;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.entity.EntityType;
 
 import java.util.*;
@@ -562,12 +568,109 @@ public class BiomeData {
 
     /**
      * Gets the time in milliseconds that it takes to grow a specific crop in a specific biome.
-     * @param biome the biome the crop is growing in.
-     * @param crop the material type of the crop.
+     * @param crop the crop object
      * @return the time in milliseconds for the crop to grow in the biome.
      */
-    public static double getGrowthTime(Biome biome, Material crop) {
-        return 1000 * CROPS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(crop, 0.0);
+    public static double getGrowthTime(Crop crop) {
+        // Get base growth time
+        Material cropType = Material.valueOf(crop.getMaterial());
+        Location cropLocation = crop.getBlockCoord().asLocation();
+        Biome biome = cropLocation.getBlock().getBiome();
+        double growthTime = CROPS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(cropType, 0.0);
+        if (growthTime <= 0) return 0;
+
+        // Apply low light modifier
+        if (!hasFullSunlight(cropLocation)) {
+            double modifier = CROP_LOW_LIGHT_MODIFIER.get(cropType);
+            if (modifier > 0) {
+                if (cropType == Material.NETHER_WART_BLOCK) {
+                    growthTime /= modifier;
+                } else {
+                    growthTime *= modifier;
+                }
+            }
+        }
+
+        // Check if block is adjacent to lamp or glowstone
+        if (isGreenhouseCrop(cropLocation)) {
+            double greenhouseRate = CROPS.getOrDefault(Biome.THE_END, Collections.emptyMap()).getOrDefault(cropType, 0.0);
+            if (greenhouseRate < growthTime) {
+                growthTime = greenhouseRate;
+            }
+        }
+
+        // Apply fertilizer bonus
+        int fertilizer = countFertilizerBlocks(cropLocation);
+        if (fertilizer > 0) {
+            double discountFactor = 1 + (0.25 * fertilizer);
+            growthTime = growthTime / discountFactor;
+        }
+
+        // Return growth time in hours
+        return 60 * 60 * 1000 * growthTime;
+    }
+
+    public static int countFertilizerBlocks(Location cropLocation) {
+        Material cropMaterial = cropLocation.getBlock().getType();
+        Material targetMaterialToCount = Material.CLAY;
+        if (cropMaterial == Material.NETHER_WART_BLOCK) {
+            targetMaterialToCount = Material.SOUL_SAND;
+        } else if (cropMaterial == Material.COCOA) {
+            targetMaterialToCount = Material.VINE;
+        }
+
+        // Start one block below the crop
+        Block currentBlock = cropLocation.getBlock().getRelative(0, -1, 0);
+        int blockCount = 0;
+        for (int i = 0; i < 5; i++) {
+            currentBlock = currentBlock.getRelative(0, -1, 0);
+            if (currentBlock.getType() == targetMaterialToCount) {
+                blockCount++;
+            } else {
+                break;
+            }
+        }
+        return blockCount;
+    }
+
+    /**
+     * Checks if a greenhouse block (redstone lamp or glowstone) is adjacent to crop.
+     * @param location the location of the crop block.
+     * @return
+     */
+    public static boolean isGreenhouseCrop(Location location) {
+        Block block = location.getBlock();
+        BlockFace[] faces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+
+        for (BlockFace face : faces) {
+            Block adjacentBlock = block.getRelative(face);
+            Material adjacentType = adjacentBlock.getType();
+
+            if (adjacentType == Material.GLOWSTONE) {
+                return true;
+            }
+
+            if (adjacentType == Material.REDSTONE_LAMP) {
+                // Check if the Redstone Lamp is 'on'
+                BlockData blockData = adjacentBlock.getBlockData();
+                if (blockData instanceof Lightable lightable) {
+                    if (lightable.isLit()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks the light level that the sun provides to a crop location.
+     * @param location the location of a crop block.
+     * @return true if the crop has full access, otherwise false.
+     */
+    public static boolean hasFullSunlight(Location location) {
+        int lightLevel = location.getBlock().getLightFromSky();
+        return lightLevel == 15;
     }
 
     public static double getBreedingRate(Biome biome, EntityType animal) {
