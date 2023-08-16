@@ -25,6 +25,19 @@ public class BiomeData {
     /** For each biome, maps an animal to the percentage chance for successfully breeding */
     private static final Map<Biome, Map<EntityType, Double>> ANIMALS = new HashMap<>();
 
+    /** Crops that cannot be placed to grow (may change with future updates). */
+    public static Set<Material> BLOCKED_CROPS;
+    static {
+        BLOCKED_CROPS = new HashSet<>();
+        BLOCKED_CROPS.add(Material.BAMBOO);
+        BLOCKED_CROPS.add(Material.SWEET_BERRY_BUSH);
+        BLOCKED_CROPS.add(Material.TORCHFLOWER_CROP);
+        BLOCKED_CROPS.add(Material.PITCHER_CROP);
+        BLOCKED_CROPS.add(Material.CAVE_VINES);
+        BLOCKED_CROPS.add(Material.KELP);
+        BLOCKED_CROPS.add(Material.SEA_PICKLE);
+    }
+
     /** Maps the material of a seed to the material of it's crop in block form */
     public static Map<Material, Material> SEED_TO_CROP;
     static {

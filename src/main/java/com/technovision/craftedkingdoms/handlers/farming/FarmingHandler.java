@@ -135,6 +135,7 @@ public class FarmingHandler implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            // Show information for growing a crop here
             ItemStack itemInHand = event.getItem();
             if (itemInHand == null) return;
             Block clickedBlock = event.getClickedBlock();
@@ -155,6 +156,7 @@ public class FarmingHandler implements Listener {
         }
 
         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            // Plant crop
             ItemStack itemInHand = event.getItem();
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock == null || itemInHand == null) return;
@@ -162,6 +164,7 @@ public class FarmingHandler implements Listener {
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
                 if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE) {
+                    System.out.println("PLANTING CROP!" + itemType);
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
                     PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
                 }
@@ -176,22 +179,21 @@ public class FarmingHandler implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         ItemStack itemInHand = event.getItemInHand();
-        Block clickedBlock = event.getBlockPlaced();
+        Block placedBlock = event.getBlockPlaced();
+
+        Material blockType = placedBlock.getType();
+        if (BiomeData.BLOCKED_CROPS.contains(blockType)) {
+            event.setCancelled(true);
+            MessageUtils.sendError(event.getPlayer(), "You cannot grow that crop!");
+            return;
+        }
 
         Material itemType = itemInHand.getType();
-        if (itemType == Material.SWEET_BERRIES
-                || itemType == Material.SWEET_BERRY_BUSH
-                || itemType == Material.GLOW_BERRIES
-                || itemType == Material.KELP
-                || itemType == Material.BAMBOO
-                || itemType == Material.CHORUS_PLANT
-        ) return;
-
         if (itemType == Material.CACTUS || itemType == Material.SUGAR_CANE) {
-            while (clickedBlock.getRelative(BlockFace.DOWN).getType() == itemType) {
-                clickedBlock = clickedBlock.getRelative(BlockFace.DOWN);
+            while (placedBlock.getRelative(BlockFace.DOWN).getType() == itemType) {
+                placedBlock = placedBlock.getRelative(BlockFace.DOWN);
             }
-            Location cropLocation = clickedBlock.getLocation();
+            Location cropLocation = placedBlock.getLocation();
             PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
         }
     }
