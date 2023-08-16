@@ -7,17 +7,22 @@ import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.Document;
 import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +51,40 @@ public class FarmingHandler implements Listener {
         Bukkit.getServer().getScheduler().runTaskTimer(
                 CraftedKingdoms.plugin,
                 new CropGrowTask(), 0, 20 * 60 * 10);
+    }
+
+    /**
+     * Handles custom breeding mechanics.
+     * @param event Fires when a creature is born from breeding.
+     */
+    @EventHandler
+    public void onAnimalBreeding(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.BREEDING) return;
+        Biome biome = event.getEntity().getLocation().getBlock().getBiome();
+        EntityType type = event.getEntityType();
+
+        double breedingChance = BiomeData.getBreedingChance(biome, type);
+        if (breedingChance <= 0) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Random random = new Random();
+        double randomNumber = random.nextDouble();
+
+        if (randomNumber > breedingChance) {
+            // Breeding is unsuccessful
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Removes experience from breeding animals.
+     * @param event Fires when breeding is performed.
+     */
+    @EventHandler
+    public void onEntityBreed(EntityBreedEvent event) {
+        event.setExperience(0);
     }
 
     /**

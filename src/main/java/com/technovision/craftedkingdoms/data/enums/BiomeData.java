@@ -673,8 +673,8 @@ public class BiomeData {
         return lightLevel == 15;
     }
 
-    public static double getBreedingRate(Biome biome, EntityType animal) {
-        return ANIMALS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(animal, 100.0);
+    public static double getBreedingChance(Biome biome, EntityType animal) {
+        return ANIMALS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(animal, 0.0);
     }
 
     public static Material getCropForm(Material seedForm) {
