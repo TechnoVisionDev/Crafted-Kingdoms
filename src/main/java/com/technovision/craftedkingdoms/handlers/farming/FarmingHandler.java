@@ -25,9 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -116,16 +114,11 @@ public class FarmingHandler implements Listener {
             // Check if the adjacent block is a stem
             if (adjacentBlockType != Material.ATTACHED_MELON_STEM && adjacentBlockType != Material.ATTACHED_PUMPKIN_STEM) continue;
 
-            System.out.println("Checking adjacent block... " + adjacentBlockType.toString());
-
             // Check the direction of the stem
             BlockData blockData = adjacentBlock.getBlockData();
             if (blockData instanceof Directional directional) {
 
-                System.out.println("Got directional data");
-
                 if (directional.getFacing().getOppositeFace() == face) {
-                    System.out.println("Adding stem back as crop");
                     Crop crop = new Crop(adjacentBlock.getLocation(), adjacentBlockType);
                     PLANTED_CROPS.put(adjacentBlock.getLocation(), crop);
                     return;
@@ -148,22 +141,33 @@ public class FarmingHandler implements Listener {
             Location location = entry.getKey();
             Crop crop = entry.getValue();
 
-            if (FarmingHandler.isReadyToGrow(crop)) {
-                if (chunk.equals(location.getChunk())) {
-                    FarmingHandler.growCrop(crop);
-                    Material cropMaterial = Material.valueOf(crop.getMaterial());
-                    if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
-                        crop.setTimePlanted(new Date());
-                        FarmingHandler.PLANTED_CROPS.put(location, crop);
-                    } else if (cropMaterial == Material.PUMPKIN_STEM) {
-                        crop = new Crop(location, Material.PUMPKIN_STEM);
-                        FarmingHandler.PLANTED_CROPS.put(location, crop);
-                    } else if (cropMaterial == Material.MELON_STEM) {
-                        crop = new Crop(location, Material.MELON_STEM);
-                        FarmingHandler.PLANTED_CROPS.put(location, crop);
-                    } else {
-                        iterator.remove();
+            if (chunk.equals(location.getChunk())) continue;
+            Material cropMaterial = Material.valueOf(crop.getMaterial());
+
+            if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
+                long currentTime = System.currentTimeMillis();
+                double growthTime = BiomeData.getGrowthTime(crop.getBlockCoord().asLocation().getBlock().getBiome(), cropMaterial);
+                if (growthTime <= 0) continue;
+                int elapsedCycles = (int) ((currentTime - crop.getTimePlanted().getTime()) / growthTime);
+
+                if (elapsedCycles > 0) {
+                    for (int i = 0; i < elapsedCycles && i < 2; i++) {
+                        FarmingHandler.growCrop(crop);
                     }
+                }
+                crop.setTimePlanted(new Date());
+                FarmingHandler.PLANTED_CROPS.put(location, crop);
+            }
+            else if (FarmingHandler.isReadyToGrow(crop)) {
+                FarmingHandler.growCrop(crop);
+                if (cropMaterial == Material.PUMPKIN_STEM) {
+                    crop = new Crop(location, Material.PUMPKIN_STEM);
+                    FarmingHandler.PLANTED_CROPS.put(location, crop);
+                } else if (cropMaterial == Material.MELON_STEM) {
+                    crop = new Crop(location, Material.MELON_STEM);
+                    FarmingHandler.PLANTED_CROPS.put(location, crop);
+                } else {
+                    iterator.remove();
                 }
             }
         }
