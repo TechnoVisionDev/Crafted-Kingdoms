@@ -83,12 +83,15 @@ public class VanillaHandler implements Listener {
     }
 
     /**
-     * Disables the wither from being spawned.
+     * Disables the wither, dragon, and phantom from being spawned.
      * @param event fires when player creates a wither.
      */
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getEntityType() == EntityType.WITHER) {
+        if (event.getEntityType() == EntityType.WITHER
+                || event.getEntityType() == EntityType.PHANTOM
+                || event.getEntityType() == EntityType.ENDER_DRAGON
+        ) {
             event.setCancelled(true);
         }
     }
