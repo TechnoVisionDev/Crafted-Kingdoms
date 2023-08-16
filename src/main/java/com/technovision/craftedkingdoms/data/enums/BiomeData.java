@@ -47,6 +47,43 @@ public class BiomeData {
         SEED_TO_CROP.put(Material.DARK_OAK_SAPLING, Material.DARK_OAK_SAPLING);
     }
 
+    public static Map<Material, Double> CROP_LOW_LIGHT_MODIFIER;
+    static {
+        CROP_LOW_LIGHT_MODIFIER = new HashMap<>();
+        CROP_LOW_LIGHT_MODIFIER.put(Material.WHEAT, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.CARROTS, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.POTATOES, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.NETHER_WART_BLOCK, 2.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.MELON_STEM, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.PUMPKIN_STEM, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.MELON, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.PUMPKIN, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.BEETROOTS, 4.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.CACTUS, 2.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.SUGAR_CANE, 2.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.COCOA, 5.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.OAK_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.SPRUCE_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.ACACIA_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.BAMBOO_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.BIRCH_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.CHERRY_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.JUNGLE_SAPLING, 8.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.DARK_OAK_SAPLING, 8.0);
+    }
+
+    public static Map<EntityType, Double> ANIMAL_LOW_LIGHT_MODIFIER;
+    static {
+        ANIMAL_LOW_LIGHT_MODIFIER = new HashMap<>();
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.COW, 8.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.CHICKEN, 1.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.HORSE, 8.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.PIG, 8.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.SHEEP, 8.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.MUSHROOM_COW, 2.0);
+        ANIMAL_LOW_LIGHT_MODIFIER.put(EntityType.RABBIT, 8.0);
+    }
+
     static {
         // Initialize maps
         for (Biome biome : Biome.values()) {
@@ -56,33 +93,471 @@ public class BiomeData {
             ANIMALS.put(biome, new HashMap<>());
         }
 
-        // Populate crop map
-        CROPS.get(Biome.DESERT).put(Material.WHEAT, 0.0);
-        CROPS.get(Biome.DESERT).put(Material.CARROTS, 0.0);
-        CROPS.get(Biome.DESERT).put(Material.POTATOES, 0.0);
+        /** Populate crops & animals map */
 
-        CROPS.get(Biome.FOREST).put(Material.WHEAT, 5.0);
-        CROPS.get(Biome.FOREST).put(Material.CARROTS, 4.0);
-        CROPS.get(Biome.FOREST).put(Material.POTATOES, 3.0);
+        // Greenhouse (uses THE_END biome)
+        CROPS.get(Biome.THE_END).put(Material.WHEAT, 2.25);
+        CROPS.get(Biome.THE_END).put(Material.CARROTS, 2.25);
+        CROPS.get(Biome.THE_END).put(Material.POTATOES, 2.25);
+        CROPS.get(Biome.THE_END).put(Material.MELON_STEM, 9.0);
+        CROPS.get(Biome.THE_END).put(Material.MELON, 9.0);
+        CROPS.get(Biome.THE_END).put(Material.PUMPKIN_STEM, 9.0);
+        CROPS.get(Biome.THE_END).put(Material.PUMPKIN, 9.0);
+        CROPS.get(Biome.THE_END).put(Material.BEETROOTS, 2.25);
+        CROPS.get(Biome.THE_END).put(Material.OAK_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.SPRUCE_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.ACACIA_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.BAMBOO_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.BIRCH_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.CHERRY_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.JUNGLE_SAPLING, 4.5);
+        CROPS.get(Biome.THE_END).put(Material.DARK_OAK_SAPLING, 4.5);
 
-        CROPS.get(Biome.PLAINS).put(Material.WHEAT, 7.0);
-        CROPS.get(Biome.PLAINS).put(Material.CARROTS, 6.0);
-        CROPS.get(Biome.PLAINS).put(Material.POTATOES, 5.0);
+        // Badlands
+        CROPS.get(Biome.BADLANDS).put(Material.CACTUS, 12.0);
+        CROPS.get(Biome.BADLANDS).put(Material.ACACIA_SAPLING, 24.0);
+        ANIMALS.get(Biome.BADLANDS).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.BADLANDS).put(EntityType.RABBIT, 0.25);
 
-        CROPS.get(Biome.BADLANDS).put(Material.COCOA, 10.0);
-        CROPS.get(Biome.BADLANDS).put(Material.BEETROOTS, 10.0);
-        CROPS.get(Biome.BADLANDS).put(Material.WHEAT, 30.0);
-        CROPS.get(Biome.BADLANDS).put(Material.CARROTS, 60.0);
-        CROPS.get(Biome.BADLANDS).put(Material.POTATOES, 180.0);
-        CROPS.get(Biome.BADLANDS).put(Material.SUGAR_CANE, 10.0);
-        CROPS.get(Biome.BADLANDS).put(Material.CACTUS, 20.0);
-        CROPS.get(Biome.BADLANDS).put(Material.MELON_STEM, 10.0);
-        CROPS.get(Biome.BADLANDS).put(Material.PUMPKIN_STEM, 20.0);
-        CROPS.get(Biome.BADLANDS).put(Material.MELON, 10.0);
-        CROPS.get(Biome.BADLANDS).put(Material.PUMPKIN, 20.0);
-        
-        // Populate animal map
+        // Bamboo Jungle
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.CARROTS, 1.0);
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.MELON_STEM, 8.0);
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.MELON, 24.0);
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.SUGAR_CANE, 8.0);
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.BAMBOO_SAPLING, 3.0);
+        CROPS.get(Biome.BAMBOO_JUNGLE).put(Material.JUNGLE_SAPLING, 24.0);
+        ANIMALS.get(Biome.BAMBOO_JUNGLE).put(EntityType.PIG, 1.0);
 
+        // Basalt Deltas
+        CROPS.get(Biome.BASALT_DELTAS).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.BASALT_DELTAS).put(Material.CACTUS, 24.0);
+
+        // Beach
+        CROPS.get(Biome.BEACH).put(Material.SUGAR_CANE, 24.0);
+        ANIMALS.get(Biome.BEACH).put(EntityType.FISHING_HOOK, 1.0);
+
+        // Birch Forest
+        CROPS.get(Biome.BIRCH_FOREST).put(Material.WHEAT, 1.33);
+        CROPS.get(Biome.BIRCH_FOREST).put(Material.BEETROOTS, 1.33);
+        CROPS.get(Biome.BIRCH_FOREST).put(Material.OAK_SAPLING, 3.0);
+        CROPS.get(Biome.BIRCH_FOREST).put(Material.BIRCH_SAPLING, 3.0);
+        CROPS.get(Biome.BIRCH_FOREST).put(Material.DARK_OAK_SAPLING, 6.0);
+        ANIMALS.get(Biome.BIRCH_FOREST).put(EntityType.CHICKEN, 1.0);
+
+        // Cherry Grove
+        CROPS.get(Biome.CHERRY_GROVE).put(Material.WHEAT, 2.0);
+        CROPS.get(Biome.CHERRY_GROVE).put(Material.BEETROOTS, 2.0);
+        CROPS.get(Biome.CHERRY_GROVE).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.CHERRY_GROVE).put(Material.BIRCH_SAPLING, 12.0);
+        CROPS.get(Biome.CHERRY_GROVE).put(Material.DARK_OAK_SAPLING, 6.0);
+        ANIMALS.get(Biome.CHERRY_GROVE).put(EntityType.HORSE, 0.10);
+        ANIMALS.get(Biome.CHERRY_GROVE).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.CHERRY_GROVE).put(EntityType.RABBIT, 1.0);
+
+        // Oceans
+        ANIMALS.get(Biome.OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.COLD_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.DEEP_COLD_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.DEEP_LUKEWARM_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.DEEP_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.DEEP_FROZEN_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.FROZEN_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.WARM_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+        ANIMALS.get(Biome.LUKEWARM_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
+
+        // Crimson Forest (Nether)
+        CROPS.get(Biome.CRIMSON_FOREST).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.CRIMSON_FOREST).put(Material.CACTUS, 24.0);
+
+        // Dark Forest
+        CROPS.get(Biome.DARK_FOREST).put(Material.WHEAT, 2.0);
+        CROPS.get(Biome.DARK_FOREST).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.DARK_FOREST).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.DARK_FOREST).put(Material.BEETROOTS, 2.0);
+        CROPS.get(Biome.DARK_FOREST).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.DARK_FOREST).put(Material.DARK_OAK_SAPLING, 3.0);
+        ANIMALS.get(Biome.DARK_FOREST).put(EntityType.CHICKEN, 0.50);
+        ANIMALS.get(Biome.DARK_FOREST).put(EntityType.HORSE, 0.10);
+        ANIMALS.get(Biome.DARK_FOREST).put(EntityType.SHEEP, 0.50);
+
+        // Deep Dark
+        CROPS.get(Biome.DEEP_DARK).put(Material.NETHER_WART, 10.67);
+
+        // Desert
+        CROPS.get(Biome.DESERT).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.DESERT).put(Material.CARROTS, 10.0);
+        CROPS.get(Biome.DESERT).put(Material.NETHER_WART_BLOCK, 21.33);
+        CROPS.get(Biome.DESERT).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.DESERT).put(Material.CACTUS, 12.0);
+        CROPS.get(Biome.DESERT).put(Material.ACACIA_SAPLING, 3.0);
+        ANIMALS.get(Biome.DESERT).put(EntityType.COW, 0.10);
+        ANIMALS.get(Biome.DESERT).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.DESERT).put(EntityType.RABBIT, 0.25);
+
+        // Eroded Badlands
+        CROPS.get(Biome.ERODED_BADLANDS).put(Material.CACTUS, 12.0);
+        CROPS.get(Biome.ERODED_BADLANDS).put(Material.ACACIA_SAPLING, 24.0);
+        ANIMALS.get(Biome.ERODED_BADLANDS).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.ERODED_BADLANDS).put(EntityType.RABBIT, 0.25);
+
+        // Flower Forest
+        CROPS.get(Biome.FLOWER_FOREST).put(Material.WHEAT, 1.33);
+        CROPS.get(Biome.FLOWER_FOREST).put(Material.BEETROOTS, 1.33);
+        CROPS.get(Biome.FLOWER_FOREST).put(Material.OAK_SAPLING, 3.0);
+        CROPS.get(Biome.FLOWER_FOREST).put(Material.BIRCH_SAPLING, 3.0);
+        CROPS.get(Biome.FLOWER_FOREST).put(Material.DARK_OAK_SAPLING, 6.0);
+        ANIMALS.get(Biome.FLOWER_FOREST).put(EntityType.CHICKEN, 1.0);
+
+        // Forest
+        CROPS.get(Biome.FOREST).put(Material.WHEAT, 1.33);
+        CROPS.get(Biome.FOREST).put(Material.BEETROOTS, 1.33);
+        CROPS.get(Biome.FOREST).put(Material.OAK_SAPLING, 3.0);
+        CROPS.get(Biome.FOREST).put(Material.BIRCH_SAPLING, 3.0);
+        CROPS.get(Biome.FOREST).put(Material.DARK_OAK_SAPLING, 6.0);
+        ANIMALS.get(Biome.FOREST).put(EntityType.CHICKEN, 1.0);
+
+        // Frozen Peaks
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.SPRUCE_SAPLING, 8.0);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.RABBIT, 0.25);
+
+        // Frozen River
+        CROPS.get(Biome.FROZEN_RIVER).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.FROZEN_RIVER).put(Material.SPRUCE_SAPLING, 12.0);
+        CROPS.get(Biome.FROZEN_RIVER).put(Material.ACACIA_SAPLING, 12.0);
+        CROPS.get(Biome.FROZEN_RIVER).put(Material.BIRCH_SAPLING, 12.0);
+        CROPS.get(Biome.FROZEN_RIVER).put(Material.DARK_OAK_SAPLING, 12.0);
+
+        // Grove
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.FROZEN_PEAKS).put(Material.SPRUCE_SAPLING, 8.0);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.FROZEN_PEAKS).put(EntityType.RABBIT, 0.25);
+
+        // Ice Spikes
+        CROPS.get(Biome.ICE_SPIKES).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.ICE_SPIKES).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.ICE_SPIKES).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.ICE_SPIKES).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.ICE_SPIKES).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.ICE_SPIKES).put(Material.SPRUCE_SAPLING, 8.0);
+        ANIMALS.get(Biome.ICE_SPIKES).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.ICE_SPIKES).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.ICE_SPIKES).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.ICE_SPIKES).put(EntityType.RABBIT, 0.25);
+
+        // Jagged Peaks
+        ANIMALS.get(Biome.JAGGED_PEAKS).put(EntityType.SHEEP, 0.25);
+
+        // Jungle
+        CROPS.get(Biome.JUNGLE).put(Material.CARROTS, 1.0);
+        CROPS.get(Biome.JUNGLE).put(Material.MELON_STEM, 8.0);
+        CROPS.get(Biome.JUNGLE).put(Material.MELON, 24.0);
+        CROPS.get(Biome.JUNGLE).put(Material.SUGAR_CANE, 12.0);
+        CROPS.get(Biome.JUNGLE).put(Material.COCOA, 2.82);
+        CROPS.get(Biome.JUNGLE).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.JUNGLE).put(Material.JUNGLE_SAPLING, 6.0);
+        ANIMALS.get(Biome.JUNGLE).put(EntityType.COW, 0.10);
+        ANIMALS.get(Biome.JUNGLE).put(EntityType.HORSE, 0.10);
+        ANIMALS.get(Biome.JUNGLE).put(EntityType.PIG, 1.0);
+
+        // Lush Caves
+        CROPS.get(Biome.LUSH_CAVES).put(Material.NETHER_WART, 10.67);
+
+        // Mangrove Swamp
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.CARROTS, 2.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.MELON_STEM, 4.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.MELON, 12.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.SUGAR_CANE, 24.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.BAMBOO_SAPLING, 12.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.JUNGLE_SAPLING, 12.0);
+        CROPS.get(Biome.MANGROVE_SWAMP).put(Material.DARK_OAK_SAPLING, 3.0);
+        ANIMALS.get(Biome.MANGROVE_SWAMP).put(EntityType.PIG, 1.0);
+
+        // Meadow
+        CROPS.get(Biome.MEADOW).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.MEADOW).put(Material.CARROTS, 1.0);
+        CROPS.get(Biome.MEADOW).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.MEADOW).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.MEADOW).put(Material.MELON, 48.0);
+        CROPS.get(Biome.MEADOW).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.MEADOW).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.MEADOW).put(Material.BEETROOTS, 1.0);
+        CROPS.get(Biome.MEADOW).put(Material.OAK_SAPLING, 24.0);
+        CROPS.get(Biome.MEADOW).put(Material.BIRCH_SAPLING, 24.0);
+        ANIMALS.get(Biome.MEADOW).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.MEADOW).put(EntityType.CHICKEN, 1.0);
+        ANIMALS.get(Biome.MEADOW).put(EntityType.HORSE, 0.50);
+        ANIMALS.get(Biome.MEADOW).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.MEADOW).put(EntityType.RABBIT, 1.0);
+
+        // Mushroom Fields
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.NETHER_WART_BLOCK, 10.67);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.SPRUCE_SAPLING, 12.0);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.BIRCH_SAPLING, 12.0);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.CHICKEN, 1.0);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.PIG, 1.0);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.MUSHROOM_COW, 1.0);
+
+        // Nether Wastes (Nether)
+        CROPS.get(Biome.NETHER_WASTES).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.NETHER_WASTES).put(Material.CACTUS, 24.0);
+
+        // Old Growth Birch Forest
+        CROPS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(Material.WHEAT, 1.33);
+        CROPS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(Material.BEETROOTS, 1.33);
+        CROPS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(Material.OAK_SAPLING, 3.0);
+        CROPS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(Material.BIRCH_SAPLING, 3.0);
+        CROPS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(Material.DARK_OAK_SAPLING, 6.0);
+        ANIMALS.get(Biome.OLD_GROWTH_BIRCH_FOREST).put(EntityType.CHICKEN, 1.0);
+
+        // Old Growth Pine Taiga
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.SPRUCE_SAPLING, 8.0);
+        CROPS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(EntityType.SHEEP, 1.0);
+        ANIMALS.get(Biome.OLD_GROWTH_PINE_TAIGA).put(EntityType.RABBIT, 0.25);
+
+        // Old Growth Spruce Taiga
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.SPRUCE_SAPLING, 8.0);
+        CROPS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(EntityType.SHEEP, 1.0);
+        ANIMALS.get(Biome.OLD_GROWTH_SPRUCE_TAIGA).put(EntityType.RABBIT, 0.25);
+
+        // Plains
+        CROPS.get(Biome.PLAINS).put(Material.WHEAT, 1.0);
+        CROPS.get(Biome.PLAINS).put(Material.CARROTS, 4.0);
+        CROPS.get(Biome.PLAINS).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.PLAINS).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.PLAINS).put(Material.MELON, 48.0);
+        CROPS.get(Biome.PLAINS).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.PLAINS).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.PLAINS).put(Material.BEETROOTS, 1.0);
+        CROPS.get(Biome.PLAINS).put(Material.OAK_SAPLING, 24.0);
+        CROPS.get(Biome.PLAINS).put(Material.ACACIA_SAPLING, 6.0);
+        CROPS.get(Biome.PLAINS).put(Material.BIRCH_SAPLING, 24.0);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.CHICKEN, 0.50);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.PIG, 0.50);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.PLAINS).put(EntityType.RABBIT, 1.0);
+
+        // River
+        CROPS.get(Biome.RIVER).put(Material.SUGAR_CANE, 24.0);
+        CROPS.get(Biome.RIVER).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.RIVER).put(Material.SPRUCE_SAPLING, 12.0);
+        CROPS.get(Biome.RIVER).put(Material.ACACIA_SAPLING, 12.0);
+        CROPS.get(Biome.RIVER).put(Material.BIRCH_SAPLING, 12.0);
+        CROPS.get(Biome.RIVER).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.RIVER).put(EntityType.FISHING_HOOK, 1.0);
+
+        // Savanna
+        CROPS.get(Biome.SAVANNA).put(Material.CARROTS, 4.0);
+        CROPS.get(Biome.SAVANNA).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.SAVANNA).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.SAVANNA).put(Material.MELON, 48.0);
+        CROPS.get(Biome.SAVANNA).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.SAVANNA).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.SAVANNA).put(Material.ACACIA_SAPLING, 6.0);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.CHICKEN, 0.50);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.PIG, 0.50);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.SAVANNA).put(EntityType.RABBIT, 1.0);
+
+        // Savanna Plateau
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.CARROTS, 4.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.MELON, 48.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.SAVANNA_PLATEAU).put(Material.ACACIA_SAPLING, 6.0);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.CHICKEN, 0.50);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.PIG, 0.50);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.SAVANNA_PLATEAU).put(EntityType.RABBIT, 1.0);
+
+        // Snowy Beach
+        ANIMALS.get(Biome.SNOWY_BEACH).put(EntityType.FISHING_HOOK, 1.0);
+
+        // Snowy Plains
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.SNOWY_PLAINS).put(Material.SPRUCE_SAPLING, 12.0);
+        ANIMALS.get(Biome.SNOWY_PLAINS).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.SNOWY_PLAINS).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.SNOWY_PLAINS).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.SNOWY_PLAINS).put(EntityType.RABBIT, 0.50);
+
+        // Snowy Slopes
+        ANIMALS.get(Biome.SNOWY_SLOPES).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.SNOWY_SLOPES).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.SNOWY_SLOPES).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.SNOWY_SLOPES).put(EntityType.RABBIT, 0.50);
+
+        // Snowy Taiga
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.SPRUCE_SAPLING, 8.0);
+        CROPS.get(Biome.SNOWY_TAIGA).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.SNOWY_TAIGA).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.SNOWY_TAIGA).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.SNOWY_TAIGA).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.SNOWY_TAIGA).put(EntityType.RABBIT, 0.25);
+
+        // Soul Sand Valley (Nether)
+        CROPS.get(Biome.SOUL_SAND_VALLEY).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.SOUL_SAND_VALLEY).put(Material.CACTUS, 24.0);
+
+        // Sparse Jungle
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.CARROTS, 1.0);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.MELON_STEM, 8.0);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.MELON, 24.0);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.SUGAR_CANE, 12.0);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.COCOA, 2.82);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.SPARSE_JUNGLE).put(Material.JUNGLE_SAPLING, 6.0);
+        ANIMALS.get(Biome.SPARSE_JUNGLE).put(EntityType.COW, 0.10);
+        ANIMALS.get(Biome.SPARSE_JUNGLE).put(EntityType.HORSE, 0.10);
+        ANIMALS.get(Biome.SPARSE_JUNGLE).put(EntityType.PIG, 1.0);
+
+        // Stony Peaks
+        ANIMALS.get(Biome.STONY_PEAKS).put(EntityType.SHEEP, 0.25);
+
+        // Stony Shore
+        CROPS.get(Biome.STONY_SHORE).put(Material.SUGAR_CANE, 32.0);
+        ANIMALS.get(Biome.STONY_SHORE).put(EntityType.FISHING_HOOK, 1.0);
+
+        // Sunflower Plains
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.CARROTS, 1.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.MELON, 48.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.BEETROOTS, 1.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.OAK_SAPLING, 24.0);
+        CROPS.get(Biome.SUNFLOWER_PLAINS).put(Material.BIRCH_SAPLING, 24.0);
+        ANIMALS.get(Biome.SUNFLOWER_PLAINS).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.SUNFLOWER_PLAINS).put(EntityType.CHICKEN, 1.0);
+        ANIMALS.get(Biome.SUNFLOWER_PLAINS).put(EntityType.HORSE, 0.50);
+        ANIMALS.get(Biome.SUNFLOWER_PLAINS).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.SUNFLOWER_PLAINS).put(EntityType.RABBIT, 1.0);
+
+        // Swamp
+        CROPS.get(Biome.SWAMP).put(Material.CARROTS, 2.0);
+        CROPS.get(Biome.SWAMP).put(Material.MELON_STEM, 4.0);
+        CROPS.get(Biome.SWAMP).put(Material.MELON, 12.0);
+        CROPS.get(Biome.SWAMP).put(Material.SUGAR_CANE, 24.0);
+        CROPS.get(Biome.SWAMP).put(Material.BAMBOO_SAPLING, 12.0);
+        CROPS.get(Biome.SWAMP).put(Material.JUNGLE_SAPLING, 12.0);
+        CROPS.get(Biome.SWAMP).put(Material.DARK_OAK_SAPLING, 3.0);
+        ANIMALS.get(Biome.SWAMP).put(EntityType.PIG, 1.0);
+
+        // Taiga
+        CROPS.get(Biome.TAIGA).put(Material.WHEAT, 4.0);
+        CROPS.get(Biome.TAIGA).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.TAIGA).put(Material.PUMPKIN_STEM, 4.0);
+        CROPS.get(Biome.TAIGA).put(Material.PUMPKIN, 12.0);
+        CROPS.get(Biome.TAIGA).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.TAIGA).put(Material.SPRUCE_SAPLING, 8.0);
+        CROPS.get(Biome.TAIGA).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.TAIGA).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.TAIGA).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.TAIGA).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.TAIGA).put(EntityType.RABBIT, 0.25);
+
+        // Warped Forest (Nether)
+        CROPS.get(Biome.WARPED_FOREST).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.WARPED_FOREST).put(Material.CACTUS, 24.0);
+
+        // Windswept Forest
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.WHEAT, 2.0);
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.POTATOES, 4.0);
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.SPRUCE_SAPLING, 8.0);
+        CROPS.get(Biome.WINDSWEPT_FOREST).put(Material.DARK_OAK_SAPLING, 12.0);
+        ANIMALS.get(Biome.WINDSWEPT_FOREST).put(EntityType.COW, 0.50);
+        ANIMALS.get(Biome.WINDSWEPT_FOREST).put(EntityType.HORSE, 0.25);
+        ANIMALS.get(Biome.WINDSWEPT_FOREST).put(EntityType.SHEEP, 1.0);
+        ANIMALS.get(Biome.WINDSWEPT_FOREST).put(EntityType.RABBIT, 1.0);
+
+        // Windswept Hills
+        CROPS.get(Biome.WINDSWEPT_HILLS).put(Material.BEETROOTS, 4.0);
+        CROPS.get(Biome.WINDSWEPT_HILLS).put(Material.OAK_SAPLING, 12.0);
+        CROPS.get(Biome.WINDSWEPT_HILLS).put(Material.SPRUCE_SAPLING, 12.0);
+        ANIMALS.get(Biome.WINDSWEPT_HILLS).put(EntityType.COW, 0.25);
+        ANIMALS.get(Biome.WINDSWEPT_HILLS).put(EntityType.HORSE, 0.50);
+        ANIMALS.get(Biome.WINDSWEPT_HILLS).put(EntityType.SHEEP, 0.50);
+        ANIMALS.get(Biome.WINDSWEPT_HILLS).put(EntityType.RABBIT, 0.25);
+
+        // Windswept Savanna
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.CARROTS, 4.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.POTATOES, 2.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.MELON_STEM, 16.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.MELON, 48.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.PUMPKIN_STEM, 16.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.PUMPKIN, 48.0);
+        CROPS.get(Biome.WINDSWEPT_SAVANNA).put(Material.ACACIA_SAPLING, 6.0);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.COW, 1.0);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.CHICKEN, 0.50);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.PIG, 0.50);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.SHEEP, 0.25);
+        ANIMALS.get(Biome.WINDSWEPT_SAVANNA).put(EntityType.RABBIT, 1.0);
+
+        // Wooded Badlands
+        CROPS.get(Biome.WOODED_BADLANDS).put(Material.WHEAT, 8.0);
+        CROPS.get(Biome.WOODED_BADLANDS).put(Material.CACTUS, 24.0);
+        CROPS.get(Biome.WOODED_BADLANDS).put(Material.ACACIA_SAPLING, 3.0);
+        ANIMALS.get(Biome.WOODED_BADLANDS).put(EntityType.CHICKEN, 0.25);
+        ANIMALS.get(Biome.WOODED_BADLANDS).put(EntityType.HORSE, 1.0);
+        ANIMALS.get(Biome.WOODED_BADLANDS).put(EntityType.RABBIT, 0.50);
     }
 
     /**

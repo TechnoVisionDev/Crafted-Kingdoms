@@ -91,6 +91,14 @@ public class FarmingHandler implements Listener {
         Block clickedBlock = event.getBlockPlaced();
 
         Material itemType = itemInHand.getType();
+        if (itemType == Material.SWEET_BERRIES
+                || itemType == Material.SWEET_BERRY_BUSH
+                || itemType == Material.GLOW_BERRIES
+                || itemType == Material.KELP
+                || itemType == Material.BAMBOO
+                || itemType == Material.CHORUS_PLANT
+        ) return;
+
         if (itemType == Material.CACTUS || itemType == Material.SUGAR_CANE) {
             while (clickedBlock.getRelative(BlockFace.DOWN).getType() == itemType) {
                 clickedBlock = clickedBlock.getRelative(BlockFace.DOWN);
@@ -100,6 +108,10 @@ public class FarmingHandler implements Listener {
         }
     }
 
+    /**
+     * Handles pumpkin and melon stem placement when removing fruit.
+     * @param event Fires when player breaks a pumpkin or melon attached to a stem.
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Block brokenBlock = event.getBlock();
