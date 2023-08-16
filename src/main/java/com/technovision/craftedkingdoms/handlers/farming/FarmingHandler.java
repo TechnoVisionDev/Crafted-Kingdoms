@@ -14,6 +14,7 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,9 +24,11 @@ import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,6 +91,35 @@ public class FarmingHandler implements Listener {
     }
 
     /**
+     * Requires select biomes for fishing & removes treasure.
+     * @param event Fires when fishing is performed.
+     */
+    @EventHandler
+    public void onPlayerFish(PlayerFishEvent event) {
+        Player player = event.getPlayer();
+        Biome biome = event.getPlayer().getLocation().getBlock().getBiome();
+        double chance = BiomeData.getBreedingChance(biome, EntityType.FISHING_HOOK);
+
+        if (chance < 1.0) {
+            event.setCancelled(true);
+            MessageUtils.sendError(player, "You cannot catch fish in this biome!");
+        }
+
+        if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH && event.getCaught() instanceof Item caughtItem) {
+            ItemStack item = caughtItem.getItemStack();
+
+            // Check if the caught item is a fish
+            switch (item.getType()) {
+                case COD, SALMON, TROPICAL_FISH, PUFFERFISH -> { }
+                default -> {
+                    // Give random fish instead of junk or treasure
+                    caughtItem.setItemStack(new ItemStack(Material.KELP));
+                }
+            }
+        }
+    }
+
+    /**
      * Cancels vanilla growth mechanics.
      * @param event Fires when crop is supposed to grow.
      */
@@ -104,6 +136,7 @@ public class FarmingHandler implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             ItemStack itemInHand = event.getItem();
+            if (itemInHand == null) return;
             Block clickedBlock = event.getClickedBlock();
 
             if (!BiomeData.isSeed(itemInHand.getType())) return;
@@ -111,7 +144,9 @@ public class FarmingHandler implements Listener {
             Crop crop = new Crop(blockAbove.getLocation(), itemInHand.getType());
             double growthTime = BiomeData.getGrowthTime(crop) / 60 / 60 / 1000;
 
-            String itemName = itemInHand.getItemMeta().getDisplayName();
+            String itemName = "That crop";
+            ItemMeta meta = itemInHand.getItemMeta();
+            if (meta != null) itemName = meta.getDisplayName();
             if (growthTime <= 0) {
                 MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
             } else {
