@@ -14,18 +14,17 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Farmland;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -227,6 +226,15 @@ public class FarmingHandler implements Listener {
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
                 if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE) {
+                    // Check if farmland is irrigated
+                    if (clickedBlock.getType() == Material.FARMLAND) {
+                        Farmland farmlandData = (Farmland) clickedBlock.getBlockData();
+                        if (farmlandData.getMoisture() != 7) {
+                            MessageUtils.sendError(event.getPlayer(), "Farmland must be irrigated with water to plant crops!");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
                     PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
                 }
@@ -311,6 +319,29 @@ public class FarmingHandler implements Listener {
     }
 
     /**
+     * Prevents crops being trampled by entity
+     * @param event Fires when entity tramples a crop.
+     */
+    @EventHandler
+    public void onEntityBreakBlock(EntityChangeBlockEvent event) {
+        if (event.getBlock().getType() == Material.FARMLAND && event.getTo() == Material.DIRT) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Prevents crops fading due to lack of water
+     * @param event Fires when crop fades.
+     */
+    @EventHandler
+    public void onBlockFade(BlockFadeEvent event) {
+        Crop crop = PLANTED_CROPS.get(event.getBlock().getLocation());
+        if (crop != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
      * Grows any plants with persistence when a chunk loads.
      * @param event Fires when a chunk is loaded.
      */
@@ -324,9 +355,12 @@ public class FarmingHandler implements Listener {
             Location location = entry.getKey();
             Crop crop = entry.getValue();
 
-            if (chunk.equals(location.getChunk())) continue;
-            Material cropMaterial = Material.valueOf(crop.getMaterial());
+            // Check if the location is in the chunk of the event
+            int locChunkX = location.getBlockX() >> 4;
+            int locChunkZ = location.getBlockZ() >> 4;
+            if (locChunkX != chunk.getX() || locChunkZ != chunk.getZ()) continue;
 
+            Material cropMaterial = Material.valueOf(crop.getMaterial());
             if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
                 long currentTime = System.currentTimeMillis();
                 double growthTime = BiomeData.getGrowthTime(crop);
