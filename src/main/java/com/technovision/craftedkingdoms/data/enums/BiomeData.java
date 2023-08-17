@@ -615,7 +615,7 @@ public class BiomeData {
         }
 
         // Apply fertilizer bonus
-        int fertilizer = countFertilizerBlocks(cropLocation);
+        int fertilizer = countFertilizerBlocks(crop);
         if (fertilizer > 0) {
             double discountFactor = 1 + (0.25 * fertilizer);
             growthTime = growthTime / discountFactor;
@@ -625,19 +625,23 @@ public class BiomeData {
         return 60 * 60 * 1000 * growthTime;
     }
 
-    public static int countFertilizerBlocks(Location cropLocation) {
-        Material cropMaterial = cropLocation.getBlock().getType();
+    public static int countFertilizerBlocks(Crop crop) {
+        // default fertilizer block material
+        Material cropMaterial = Material.valueOf(crop.getMaterial());
         Material targetMaterialToCount = Material.CLAY;
+
         if (cropMaterial == Material.NETHER_WART_BLOCK) {
+            // Nether Wart uses Soul Sand as fertilizer
             targetMaterialToCount = Material.SOUL_SAND;
         } else if (cropMaterial == Material.COCOA) {
+            // Cocoa uses Vine as fertilizer
             targetMaterialToCount = Material.VINE;
         }
 
-        // Start one block below the crop
-        Block currentBlock = cropLocation.getBlock().getRelative(0, -1, 0);
+        // Start one block below the crop and loop to 4
+        Block currentBlock = crop.getBlockCoord().asLocation().getBlock().getRelative(0, -1, 0);
         int blockCount = 0;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             currentBlock = currentBlock.getRelative(0, -1, 0);
             if (currentBlock.getType() == targetMaterialToCount) {
                 blockCount++;

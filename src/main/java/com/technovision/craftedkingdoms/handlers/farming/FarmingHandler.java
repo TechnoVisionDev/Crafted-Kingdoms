@@ -167,23 +167,41 @@ public class FarmingHandler implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            // Show information for growing a crop here
             ItemStack itemInHand = event.getItem();
             if (itemInHand == null) return;
-            Block clickedBlock = event.getClickedBlock();
 
+            Block clickedBlock = event.getClickedBlock();
+            if (clickedBlock == null) return;
             if (!BiomeData.isSeed(itemInHand.getType())) return;
-            Block blockAbove = clickedBlock.getRelative(0, 1, 0);
-            Crop crop = new Crop(blockAbove.getLocation(), itemInHand.getType());
-            double growthTime = BiomeData.getGrowthTime(crop) / 60 / 60 / 1000;
+
+            Block targetBlock;
+            if (itemInHand.getType() == Material.COCOA_BEANS) {
+                // Find the face of the log that is closest to the player
+                BlockFace closestFace = getClosestFace(clickedBlock, event.getPlayer());
+                // Get the block adjacent to the face where the Cocoa would be placed
+                targetBlock = clickedBlock.getRelative(closestFace);
+            } else {
+                // For other crops, assume they would be planted in the block above the clicked block
+                targetBlock = clickedBlock.getRelative(0, 1, 0);
+            }
+
+            Crop crop = new Crop(targetBlock.getLocation(), itemInHand.getType());
+            double growthTimeInHours = BiomeData.getGrowthTime(crop) / 60.0 / 60.0 / 1000.0;
+            int hours = (int) growthTimeInHours;
+            int minutes = (int) Math.round((growthTimeInHours - hours) * 60);
+
+            if (minutes == 60) {
+                hours++;
+                minutes = 0;
+            }
 
             String itemName = "That crop";
             ItemMeta meta = itemInHand.getItemMeta();
             if (meta != null) itemName = meta.getDisplayName();
-            if (growthTime <= 0) {
+            if (growthTimeInHours <= 0) {
                 MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
             } else {
-                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will grow here within " + growthTime + " hours");
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will grow here within " + hours + " hours and " + minutes + " minutes");
             }
         }
         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -208,6 +226,25 @@ public class FarmingHandler implements Listener {
                 }
             }
         }
+    }
+
+    private BlockFace getClosestFace(Block block, Player player) {
+        Location blockLocation = block.getLocation().add(0.5, 0.5, 0.5); // Center of the block
+        Location playerLocation = player.getLocation();
+
+        org.bukkit.util.Vector blockToPlayer = playerLocation.toVector().subtract(blockLocation.toVector());
+        double maxDot = -Double.MAX_VALUE;
+        BlockFace closestFace = BlockFace.SELF;
+
+        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
+            org.bukkit.util.Vector faceDirection = new org.bukkit.util.Vector(face.getModX(), face.getModY(), face.getModZ());
+            double dot = blockToPlayer.normalize().dot(faceDirection);
+            if (dot > maxDot) {
+                maxDot = dot;
+                closestFace = face;
+            }
+        }
+        return closestFace;
     }
 
     /**
