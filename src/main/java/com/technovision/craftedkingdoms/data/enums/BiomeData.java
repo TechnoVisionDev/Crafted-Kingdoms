@@ -638,8 +638,13 @@ public class BiomeData {
             targetMaterialToCount = Material.VINE;
         }
 
-        // Start one block below the crop and loop to 4
+        // Start one block below the crop and loop to
         Block currentBlock = crop.getBlockCoord().asLocation().getBlock().getRelative(0, -1, 0);
+        if (cropMaterial == Material.COCOA) {
+            currentBlock = crop.getBlockCoord().asLocation().getBlock();
+        }
+
+        // Attempt to find up to 4 fertilizer blocks
         int blockCount = 0;
         for (int i = 0; i < 4; i++) {
             currentBlock = currentBlock.getRelative(0, -1, 0);
@@ -650,6 +655,19 @@ public class BiomeData {
             }
         }
         return blockCount;
+    }
+
+    public static boolean isValidCropLocation(Crop crop, Block clickedBlock) {
+        Material type = Material.valueOf(crop.getMaterial());
+        Block soil = crop.getBlockCoord().asLocation().getBlock().getRelative(0, -1, 0);
+
+        if (type == Material.NETHER_WART_BLOCK) {
+            return soil.getType() == Material.SOUL_SAND;
+        }
+        else if (type == Material.COCOA) {
+            return clickedBlock.getType() == Material.JUNGLE_LOG;
+        }
+        return (soil.getType() == Material.DIRT || soil.getType() == Material.GRASS_BLOCK);
     }
 
     /**

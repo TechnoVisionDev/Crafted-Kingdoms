@@ -5,6 +5,7 @@ import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.util.MessageUtils;
+import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bson.Document;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -178,30 +179,35 @@ public class FarmingHandler implements Listener {
             if (itemInHand.getType() == Material.COCOA_BEANS) {
                 // Find the face of the log that is closest to the player
                 BlockFace closestFace = getClosestFace(clickedBlock, event.getPlayer());
-                // Get the block adjacent to the face where the Cocoa would be placed
                 targetBlock = clickedBlock.getRelative(closestFace);
             } else {
                 // For other crops, assume they would be planted in the block above the clicked block
                 targetBlock = clickedBlock.getRelative(0, 1, 0);
             }
 
+            // Check if crop location is suitable
             Crop crop = new Crop(targetBlock.getLocation(), itemInHand.getType());
+            if (!BiomeData.isValidCropLocation(crop, clickedBlock)) {
+                String itemName = StringUtils.stringifyType(itemInHand.getType());
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
+                return;
+            }
+
+            // Calculate growth time
             double growthTimeInHours = BiomeData.getGrowthTime(crop) / 60.0 / 60.0 / 1000.0;
             int hours = (int) growthTimeInHours;
             int minutes = (int) Math.round((growthTimeInHours - hours) * 60);
-
             if (minutes == 60) {
                 hours++;
                 minutes = 0;
             }
 
-            String itemName = "That crop";
-            ItemMeta meta = itemInHand.getItemMeta();
-            if (meta != null) itemName = meta.getDisplayName();
+            // Send message to player
+            String itemName = StringUtils.stringifyType(itemInHand.getType());
             if (growthTimeInHours <= 0) {
-                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " can't grow here!");
             } else {
-                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will grow here within " + hours + " hours and " + minutes + " minutes");
+                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " would grow here in " + hours + "h " + minutes + "m");
             }
         }
         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
