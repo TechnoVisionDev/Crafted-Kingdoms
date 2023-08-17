@@ -212,14 +212,6 @@ public class FarmingHandler implements Listener {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock == null || itemInHand == null) return;
 
-            // Check crop stats
-            if (itemInHand.getType() == Material.STICK) {
-                Crop crop = PLANTED_CROPS.get(clickedBlock.getLocation());
-                if (crop == null) return;
-                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + "This crop will be ready to harvest in " + getTimeRemaining(crop));
-                return;
-            }
-
             // Plant new crop
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
@@ -240,6 +232,27 @@ public class FarmingHandler implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerUseStickOrBone(PlayerInteractEvent event) {
+         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+         ItemStack itemInHand = event.getItem();
+         Block clickedBlock = event.getClickedBlock();
+         if (clickedBlock == null || itemInHand == null) return;
+
+         // Check crop stats
+        if (itemInHand.getType() == Material.STICK) {
+            Crop crop = PLANTED_CROPS.get(clickedBlock.getLocation());
+            if (crop == null) return;
+            MessageUtils.send(event.getPlayer(), ChatColor.GOLD + "This crop will be ready to harvest in " + getTimeRemaining(crop));
+        }
+        // Handle bone meal on crop
+        else if (itemInHand.getType() == Material.BONE_MEAL) {
+            if (!BiomeData.isCrop(clickedBlock.getType())) return;
+            event.setCancelled(true);
+            //TODO: Add custom bone meal function
         }
     }
 
