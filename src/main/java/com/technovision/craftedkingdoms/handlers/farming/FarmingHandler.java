@@ -25,13 +25,11 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +50,7 @@ public class FarmingHandler implements Listener {
         // Get crops from database
         for (Crop crop : Database.CROPS.find()) {
             Location cropLocation = crop.getBlockCoord().asLocation();
-            PLANTED_CROPS.put(cropLocation, crop);
+            addCrop(cropLocation, crop);
         }
         Database.CROPS.deleteMany(new Document());
 
@@ -236,7 +234,10 @@ public class FarmingHandler implements Listener {
                         }
                     }
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
-                    PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
+                    Crop crop = new Crop(cropLocation, itemType);
+                    if (BiomeData.isValidCropLocation(crop, clickedBlock)) {
+                        addCrop(cropLocation, crop);
+                    }
                 }
             }
         }
@@ -283,7 +284,7 @@ public class FarmingHandler implements Listener {
                 placedBlock = placedBlock.getRelative(BlockFace.DOWN);
             }
             Location cropLocation = placedBlock.getLocation();
-            PLANTED_CROPS.put(cropLocation, new Crop(cropLocation, itemType));
+            addCrop(cropLocation, new Crop(cropLocation, itemType));
         }
     }
 
@@ -311,7 +312,7 @@ public class FarmingHandler implements Listener {
 
                 if (directional.getFacing().getOppositeFace() == face) {
                     Crop crop = new Crop(adjacentBlock.getLocation(), adjacentBlockType);
-                    PLANTED_CROPS.put(adjacentBlock.getLocation(), crop);
+                    addCrop(adjacentBlock.getLocation(), crop);
                     return;
                 }
             }
@@ -373,16 +374,16 @@ public class FarmingHandler implements Listener {
                     }
                 }
                 crop.setTimePlanted(new Date());
-                FarmingHandler.PLANTED_CROPS.put(location, crop);
+                addCrop(location, crop);
             }
             else if (FarmingHandler.isReadyToGrow(crop)) {
                 FarmingHandler.growCrop(crop);
                 if (cropMaterial == Material.PUMPKIN_STEM) {
                     crop = new Crop(location, Material.PUMPKIN_STEM);
-                    FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    addCrop(location, crop);
                 } else if (cropMaterial == Material.MELON_STEM) {
                     crop = new Crop(location, Material.MELON_STEM);
-                    FarmingHandler.PLANTED_CROPS.put(location, crop);
+                    addCrop(location, crop);
                 } else {
                     iterator.remove();
                 }
@@ -424,6 +425,11 @@ public class FarmingHandler implements Listener {
         long hours = remainingMinutes / 60;
         long minutes = remainingMinutes % 60;
         return hours + "h " + minutes + "m";
+    }
+
+    public static void addCrop(Location location, Crop crop) {
+        System.out.println("Adding Crop!\n");
+        FarmingHandler.PLANTED_CROPS.put(location, crop);
     }
 
     public static void removeCrop(Location location) {

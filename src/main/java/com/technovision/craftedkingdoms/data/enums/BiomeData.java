@@ -667,7 +667,7 @@ public class BiomeData {
         else if (type == Material.COCOA) {
             return clickedBlock.getType() == Material.JUNGLE_LOG;
         }
-        return (soil.getType() == Material.DIRT || soil.getType() == Material.GRASS_BLOCK);
+        return (soil.getType() == Material.FARMLAND);
     }
 
     /**
