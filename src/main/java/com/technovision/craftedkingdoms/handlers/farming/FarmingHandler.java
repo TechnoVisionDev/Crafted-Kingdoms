@@ -223,7 +223,7 @@ public class FarmingHandler implements Listener {
             // Plant new crop
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
-                if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE) {
+                if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE && itemType != Material.COCOA_BEANS) {
                     // Check if farmland is irrigated
                     if (clickedBlock.getType() == Material.FARMLAND) {
                         Farmland farmlandData = (Farmland) clickedBlock.getBlockData();
@@ -279,7 +279,7 @@ public class FarmingHandler implements Listener {
         }
 
         Material itemType = itemInHand.getType();
-        if (itemType == Material.CACTUS || itemType == Material.SUGAR_CANE) {
+        if (itemType == Material.CACTUS || itemType == Material.SUGAR_CANE || itemType == Material.COCOA_BEANS) {
             while (placedBlock.getRelative(BlockFace.DOWN).getType() == itemType) {
                 placedBlock = placedBlock.getRelative(BlockFace.DOWN);
             }
@@ -428,7 +428,6 @@ public class FarmingHandler implements Listener {
     }
 
     public static void addCrop(Location location, Crop crop) {
-        System.out.println("Adding Crop!\n");
         FarmingHandler.PLANTED_CROPS.put(location, crop);
     }
 
