@@ -6,8 +6,10 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
+import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ public class Group {
     private String password;
     private Date dateCreated;
     private Map<String, Set<String>> rankPermissions;
+    private Set<ObjectId> snitches;
 
     public Group() { }
 
@@ -45,6 +48,7 @@ public class Group {
         this.password = null;
         this.dateCreated = new Date();
         fillDefaultPermissions();
+        this.snitches = new HashSet<>();
     }
 
     public Group(String name, Player owner, boolean isPublic) {
@@ -60,6 +64,7 @@ public class Group {
         this.password = null;
         this.dateCreated = new Date();
         fillDefaultPermissions();
+        this.snitches = new HashSet<>();
     }
 
     public Group(String name, Player owner, boolean isPublic, String password) {
@@ -75,9 +80,10 @@ public class Group {
         this.password = password;
         this.dateCreated = new Date();
         fillDefaultPermissions();
+        this.snitches = new HashSet<>();
     }
 
-    public Group(String name, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated, Map<String, Set<String>> rankPermissions) {
+    public Group(String name, String biography, UUID ownerID, Set<UUID> admins, Set<UUID> moderators, Set<UUID> members, Set<String> subGroups, Set<FortifiedBlock> fortifiedBlocks, boolean isPublic, String password, Date dateCreated, Map<String, Set<String>> rankPermissions, Set<ObjectId> snitches) {
         this.name = name;
         this.biography = biography;
         this.ownerID = ownerID;
@@ -90,6 +96,7 @@ public class Group {
         this.password = password;
         this.dateCreated = dateCreated;
         this.rankPermissions = rankPermissions;
+        this.snitches = snitches;
     }
 
     /**
@@ -270,6 +277,31 @@ public class Group {
         return ownerID.equals(playerID);
     }
 
+    public void addSnitch(Block block) {
+        boolean isJukebox = block.getType() == Material.JUKEBOX;
+        Snitch snitch = new Snitch(name, block, isJukebox);
+        snitches.add(snitch.getId());
+        CKGlobal.addSnitch(snitch);
+
+        // Create snitch document
+        Database.SNITCHES.insertOne(snitch);
+
+        // Update group
+        Bson update = Updates.push("snitches", snitch.getId());
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
+    public void removeSnitch(Snitch snitch) {
+        snitches.remove(snitch.getId());
+
+        // Delete snitch document
+        Database.SNITCHES.deleteOne(Filters.eq("_id", snitch.getId()));
+
+        // Update group
+        Bson update = Updates.pull("snitches", snitch.getId());
+        Database.GROUPS.updateOne(Filters.eq("name", name), update);
+    }
+
     /** Getters */
 
     public String getName() {
@@ -320,6 +352,10 @@ public class Group {
         return rankPermissions;
     }
 
+    public Set<ObjectId> getSnitches() {
+        return snitches;
+    }
+
     /** Setters */
 
     public void setName(String name) {
@@ -368,5 +404,9 @@ public class Group {
 
     public void setRankPermissions(Map<String, Set<String>> rankPermissions) {
         this.rankPermissions = rankPermissions;
+    }
+
+    public void setSnitches(Set<ObjectId> snitches) {
+        this.snitches = snitches;
     }
 }

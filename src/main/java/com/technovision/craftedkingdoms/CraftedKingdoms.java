@@ -74,6 +74,7 @@ public class CraftedKingdoms extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ResidentHandler(), this);
         getServer().getPluginManager().registerEvents(new FortifyHandler(), this);
         getServer().getPluginManager().registerEvents(new FarmingHandler(), this);
+        getServer().getPluginManager().registerEvents(new SnitchHandler(), this);
     }
 
     private void registerCommands() {

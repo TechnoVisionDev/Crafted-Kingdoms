@@ -186,7 +186,16 @@ public class FortifiedBlock {
      * Deletes a fortified block from a group's list
      */
     public void delete() {
-        CKGlobal.removeFortifiedBlock(blockCoord.asLocation());
+        Location location = blockCoord.asLocation();
+
+        // If block is snitch, delete it
+        Snitch snitch = CKGlobal.getSnitch(location);
+        if (snitch != null) {
+            snitch.delete();
+        }
+
+        // Delete fortified block
+        CKGlobal.removeFortifiedBlock(location);
         Database.GROUPS.updateOne(
                 Filters.eq("name", group),
                 Updates.pull("fortifiedBlocks", Filters.eq("blockCoord", blockCoord))

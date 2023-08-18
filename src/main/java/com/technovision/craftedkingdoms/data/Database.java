@@ -12,6 +12,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
+import com.technovision.craftedkingdoms.data.objects.Snitch;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -34,6 +35,7 @@ public class Database {
     public static @NotNull MongoCollection<Group> GROUPS;
     public static @NotNull MongoCollection<Resident> RESIDENTS;
     public static @NotNull MongoCollection<Crop> CROPS;
+    public static @NotNull MongoCollection<Snitch> SNITCHES;
 
     /**
      * Connect to database using MongoDB URI and
@@ -57,10 +59,14 @@ public class Database {
         GROUPS = database.getCollection("groups", Group.class);
         RESIDENTS = database.getCollection("residents", Resident.class);
         CROPS = database.getCollection("crops", Crop.class);
+        SNITCHES = database.getCollection("snitches", Snitch.class);
 
         // Create collection indexes if they don't exist.
         Bson nameIndex = Indexes.descending("name");
         GROUPS.createIndex(nameIndex);
+
+        Bson groupIndex = Indexes.descending("group");
+        SNITCHES.createIndex(groupIndex);
 
         Bson playerIndex = Indexes.descending("playerID");
         RESIDENTS.createIndex(playerIndex);

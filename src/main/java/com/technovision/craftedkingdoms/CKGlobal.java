@@ -16,6 +16,7 @@ public class CKGlobal {
     private static final HashMap<UUID, Resident> RESIDENTS = new HashMap<>();
     private static final HashMap<Player, String> FORTIFY_GROUPS = new HashMap<>();
     private static final HashMap<Location, FortifiedBlock> FORTIFIED_BLOCKS = new HashMap<>();
+    public static final HashMap<Location, Snitch> SNITCHES = new HashMap<>();
 
 
     public CKGlobal() {
@@ -29,6 +30,10 @@ public class CKGlobal {
         // Get residents from database
         for (Resident res : Database.RESIDENTS.find()) {
             addResident(res);
+        }
+        // Get snitches from database
+        for (Snitch snitch : Database.SNITCHES.find()) {
+            addSnitch(snitch);
         }
     }
 
@@ -151,5 +156,17 @@ public class CKGlobal {
 
     private static void addResident(Resident res) {
         RESIDENTS.put(res.getPlayerID(), res);
+    }
+
+    public static void addSnitch(Snitch snitch) {
+        SNITCHES.put(snitch.getBlockCoord().asLocation(), snitch);
+    }
+
+    public static Snitch getSnitch(Location location) {
+        return SNITCHES.get(location);
+    }
+
+    public static Snitch removeSnitch(Location location) {
+        return SNITCHES.remove(location);
     }
 }

@@ -75,14 +75,15 @@ public class FortifyHandler implements Listener {
             // Check if player has inspect mode on
             Player player = event.getPlayer();
             Resident res = CKGlobal.getResident(player);
-            if (!res.isInspectMode()) return;
 
             // Update nametag if needed
-            BlockFace face = getPlayerFacing(event.getPlayer());
-            Location adjustedLocation = adjustLocationForFace(event.getClickedBlock().getLocation(), face);
-            FortifiedBlock fb = CKGlobal.getFortifiedBlock(event.getClickedBlock().getLocation());
-            if (fb != null) {
-                updateNametag(adjustedLocation, fb);
+            if (res.isInspectMode()) {
+                BlockFace face = getPlayerFacing(event.getPlayer());
+                Location adjustedLocation = adjustLocationForFace(event.getClickedBlock().getLocation(), face);
+                FortifiedBlock fb = CKGlobal.getFortifiedBlock(event.getClickedBlock().getLocation());
+                if (fb != null) {
+                    updateNametag(adjustedLocation, fb);
+                }
             }
         }
 
@@ -90,11 +91,8 @@ public class FortifyHandler implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
 
-        // Check if player has inspect mode on
         Player player = event.getPlayer();
         Resident res = CKGlobal.getResident(player);
-        if (!res.isInspectMode()) return;
-
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         Material itemType = mainHandItem.getType();
         if (!isValidMaterial(itemType, player.getWorld())) return;
@@ -436,6 +434,11 @@ public class FortifyHandler implements Listener {
         Material itemType = item.getType();
         item.setAmount(item.getAmount() - 1);
         group.fortifyBlock(block, itemType);
+
+        // Add snitch if block is noteblock or jukebox
+        if (block.getType() == Material.JUKEBOX || block.getType() == Material.NOTE_BLOCK) {
+            group.addSnitch(block);
+        }
 
         if (res.isInspectMode()) {
             MessageUtils.send(player, fortifyMessage(block, itemType));
