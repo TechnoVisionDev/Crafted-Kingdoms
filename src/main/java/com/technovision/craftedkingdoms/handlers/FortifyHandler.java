@@ -135,6 +135,8 @@ public class FortifyHandler implements Listener {
             if (BiomeData.isCrop(block.getType())) {
                 FarmingHandler.removeCrop(block.getLocation());
             }
+            // Check if snitch is nearby
+            SnitchHandler.handleBlockBreak(event);
             return;
         }
 
@@ -155,6 +157,8 @@ public class FortifyHandler implements Listener {
                 FarmingHandler.removeCrop(block.getLocation());
             }
             removeNametag(block.getLocation());
+            // Check if snitch is nearby
+            SnitchHandler.handleBlockBreak(event);
             return;
         }
         event.setCancelled(true);
@@ -179,7 +183,11 @@ public class FortifyHandler implements Listener {
 
         // Check if block is fortified
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getInventory().getLocation());
-        if (fortifiedBlock == null) return;
+        if (fortifiedBlock == null) {
+            // Check if snitch is nearby
+            SnitchHandler.handleChestOpen(event, player);
+            return;
+        }
         String groupName = fortifiedBlock.getGroup();
 
         Resident res = CKGlobal.getResident(player);
@@ -199,6 +207,7 @@ public class FortifyHandler implements Listener {
             MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CONTAINERS, groupName));
             return;
         }
+        event.setCancelled(true);
         MessageUtils.send(player, String.format("%sThat container is fortified with %s%s%s by %s%s%s.",
                 ChatColor.GRAY, ChatColor.YELLOW,
                 StringUtils.stringifyType(Material.valueOf(fortifiedBlock.getMaterial()), true),

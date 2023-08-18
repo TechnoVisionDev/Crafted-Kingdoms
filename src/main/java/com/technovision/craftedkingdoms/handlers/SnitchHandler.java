@@ -7,6 +7,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.HashMap;
@@ -21,7 +26,7 @@ public class SnitchHandler implements Listener {
     public static final int RADIUS = 11;
     private static final long COOLDOWN_IN_MILLIS = 1000;
     private final HashMap<Player, Long> COOLDOWNS = new HashMap<>();
-    private final HashMap<Player, Location> PLAYER_IN_RADIUS = new HashMap<>();
+    private static final HashMap<Player, Location> PLAYER_IN_RADIUS = new HashMap<>();
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -49,14 +54,87 @@ public class SnitchHandler implements Listener {
 
         if (snitch != null && !snitch.equals(prevSnitch)) {
             PLAYER_IN_RADIUS.put(player, snitch.getBlockCoord().asLocation());
-            snitch.logEvent(player, SnitchEvent.ENTER);
+            snitch.logPlayerEvent(player, SnitchEvent.ENTER);
         } else if (snitch == null && prevSnitch != null) {
             PLAYER_IN_RADIUS.remove(player);
-            prevSnitch.logEvent(player, SnitchEvent.EXIT);
+            prevSnitch.logPlayerEvent(player, SnitchEvent.EXIT);
         }
     }
 
-    private Snitch getNearbySnitch(Location playerLocation) {
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        // Check if player is in radius of a snitch
+        Player player = event.getPlayer();
+        Location snitchLocation = PLAYER_IN_RADIUS.get(player);
+        Snitch snitch;
+        if (snitchLocation == null) {
+            snitch = getNearbySnitch(player.getLocation());
+            if (snitch == null) return;
+        } else {
+            snitch = CKGlobal.getSnitch(snitchLocation);
+        }
+
+        // Log block placed to snitch
+        snitch.logBlockEvent(player, event.getBlock(), SnitchEvent.BLOCK_PLACE);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        // Check if player is in radius of a snitch
+        Player player = event.getEntity().getKiller();
+        if (player == null) return;
+        Location snitchLocation = PLAYER_IN_RADIUS.get(player);
+        Snitch snitch;
+        if (snitchLocation == null) {
+            snitch = getNearbySnitch(player.getLocation());
+            if (snitch == null) return;
+        } else {
+            snitch = CKGlobal.getSnitch(snitchLocation);
+        }
+
+        // Log entity death to snitch
+        snitch.logEntityEvent(player, event.getEntityType(), SnitchEvent.ENTITY_KILLED);
+    }
+
+    public static void handleChestOpen(InventoryOpenEvent event, Player player) {
+        // Check if player is in radius of a snitch
+        Location snitchLocation = PLAYER_IN_RADIUS.get(player);
+        Snitch snitch;
+        if (snitchLocation == null) {
+            snitch = getNearbySnitch(player.getLocation());
+            if (snitch == null) return;
+        } else {
+            snitch = CKGlobal.getSnitch(snitchLocation);
+        }
+
+        // Get container type
+        SnitchEvent snitchEvent = SnitchEvent.CONTAINER_OPEN;
+        InventoryType type = event.getInventory().getType();
+        if (type == InventoryType.CHEST || type == InventoryType.ENDER_CHEST) {
+            snitchEvent = SnitchEvent.CHEST_OPEN;
+        }
+
+        // Log block placed to snitch
+        snitch.logPlayerEvent(player, snitchEvent);
+    }
+
+    public static void handleBlockBreak(BlockBreakEvent event) {
+        // Check if player is in radius of a snitch
+        Player player = event.getPlayer();
+        Location snitchLocation = PLAYER_IN_RADIUS.get(player);
+        Snitch snitch;
+        if (snitchLocation == null) {
+            snitch = getNearbySnitch(player.getLocation());
+            if (snitch == null) return;
+        } else {
+            snitch = CKGlobal.getSnitch(snitchLocation);
+        }
+
+        // Log block placed to snitch
+        snitch.logBlockEvent(player, event.getBlock(), SnitchEvent.BLOCK_BREAK);
+    }
+
+    private static Snitch getNearbySnitch(Location playerLocation) {
         for (Location snitchLocation : CKGlobal.SNITCHES.keySet()) {
             int dx = Math.abs(snitchLocation.getBlockX() - playerLocation.getBlockX());
             int dy = Math.abs(snitchLocation.getBlockY() - playerLocation.getBlockY());

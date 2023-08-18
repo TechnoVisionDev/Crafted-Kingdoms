@@ -2,6 +2,7 @@ package com.technovision.craftedkingdoms.util;
 
 import com.technovision.craftedkingdoms.exceptions.CKException;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -44,6 +45,11 @@ public class StringUtils {
             String materialName = type.toString().replace('_', ' ');
             return capitalizeEachWord(materialName);
         }
+    }
+
+    public static String stringifyType(EntityType type) {
+        String materialName = type.toString().replace('_', ' ');
+        return capitalizeEachWord(materialName);
     }
 
     private static String capitalizeEachWord(String str) {
