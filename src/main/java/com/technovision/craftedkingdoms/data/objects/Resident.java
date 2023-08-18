@@ -7,6 +7,7 @@ import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.bukkit.entity.Player;
 
@@ -129,6 +130,18 @@ public class Resident {
     public void leaveGroup(String groupName) {
         groups.remove(groupName);
         Bson update = Updates.pull("groups", groupName);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
+
+    public void pearlPlayer() {
+        isPearled = true;
+        Bson update = Updates.set("pearled", true);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+    }
+
+    public void freePlayer() {
+        isPearled = false;
+        Bson update = Updates.set("pearled", false);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
