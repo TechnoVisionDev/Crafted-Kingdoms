@@ -212,15 +212,6 @@ public class FarmingHandler implements Listener {
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
                 if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE && itemType != Material.COCOA_BEANS) {
-                    // Check if farmland is irrigated
-                    if (clickedBlock.getType() == Material.FARMLAND) {
-                        Farmland farmlandData = (Farmland) clickedBlock.getBlockData();
-                        if (farmlandData.getMoisture() != 7) {
-                            MessageUtils.sendError(event.getPlayer(), "Farmland must be irrigated with water to plant crops!");
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
                     Crop crop = new Crop(cropLocation, itemType);
                     if (BiomeData.isValidCropLocation(crop, clickedBlock)) {
@@ -335,34 +326,28 @@ public class FarmingHandler implements Listener {
     }
 
     /**
-     * Prevents crops being trampled by entity
+     * Removes crops that have been trampled by entity
      * @param event Fires when entity tramples a crop.
      */
     @EventHandler
     public void onEntityBreakBlock(EntityChangeBlockEvent event) {
-        // TODO: Remove
-        System.out.println(event.getBlock().getType());
-        if (event.getBlock().getType() == Material.FARMLAND && event.getTo() == Material.DIRT) {
-            event.setCancelled(true);
-        }
+        if (event.getBlock().getType() != Material.FARMLAND) return;
+        Location location = event.getBlock().getLocation();
+        Crop crop = getCrop(location.add(0, 1, 0));
+        if (crop == null) return;
+        removeCrop(location);
     }
 
     /**
-     * Prevents crops fading due to lack of water
+     * Remove crops that have faded away
      * @param event Fires when crop fades.
      */
     @EventHandler
     public void onBlockFade(BlockFadeEvent event) {
-        Location blockLocation = event.getBlock().getLocation();
-        Chunk chunk = blockLocation.getChunk();
-
-        Map<Location, Crop> chunkCrops = PLANTED_CROPS.get(chunk);
-        if (chunkCrops != null) {
-            Crop crop = chunkCrops.get(blockLocation);
-            if (crop != null) {
-                event.setCancelled(true);
-            }
-        }
+        Location location = event.getBlock().getLocation();
+        Crop crop = getCrop(location.add(0, 1, 0));
+        if (crop == null) return;
+        removeCrop(location);
     }
 
     /**
@@ -450,6 +435,13 @@ public class FarmingHandler implements Listener {
         long hours = remainingMinutes / 60;
         long minutes = remainingMinutes % 60;
         return hours + "h " + minutes + "m";
+    }
+
+    public static Crop getCrop(Location location) {
+        Chunk chunk = location.getChunk();
+        Map<Location,Crop> crops = PLANTED_CROPS.get(chunk);
+        if (crops == null) return null;
+        return crops.get(location);
     }
 
     public static void addCrop(Location location, Crop crop) {
