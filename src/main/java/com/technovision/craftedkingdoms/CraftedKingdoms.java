@@ -5,6 +5,7 @@ import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.handlers.*;
 import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
+import com.technovision.craftedkingdoms.handlers.sharding.ShardHandler;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;

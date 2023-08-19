@@ -6,11 +6,16 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
 import com.technovision.craftedkingdoms.data.enums.Ranks;
+import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +27,7 @@ public class Resident {
     private boolean groupChat;
     private Set<String> groups;
     private Set<String> invites;
-    private boolean isPearled;
+    private SoulShard soulShard;
     private boolean inspectMode;
 
     public Resident() { }
@@ -33,17 +38,17 @@ public class Resident {
         this.groupChat = false;
         this.groups = new HashSet<>();
         this.invites = new HashSet<>();
-        this.isPearled = false;
+        this.soulShard = null;
         this.inspectMode = false;
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, boolean isPearled, boolean inspectMode) {
+    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, SoulShard soulShard, boolean inspectMode) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
         this.groups = groups;
         this.invites = invites;
-        this.isPearled = isPearled;
+        this.soulShard = soulShard;
         this.inspectMode = inspectMode;
     }
 
@@ -133,16 +138,22 @@ public class Resident {
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
-    public void pearlPlayer() {
-        isPearled = true;
-        Bson update = Updates.set("pearled", true);
+    public void shardPlayer(Player killer) {
+        this.soulShard = new SoulShard(killer);
+        Bson update = Updates.set("soulShard", soulShard);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
-    public void freePlayer() {
-        isPearled = false;
-        Bson update = Updates.set("pearled", false);
+    public void freePlayer(ItemStack item) {
+        item.setAmount(0);
+        this.soulShard = null;
+        Bson update = Updates.unset("soulShard");
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
+
+        Player player = Bukkit.getPlayer(playerID);
+        if (player != null) {
+            MessageUtils.send(player, ChatColor.LIGHT_PURPLE + "You have been freed from your soul shard!");
+        }
     }
 
     @BsonIgnore
@@ -158,6 +169,20 @@ public class Resident {
             }
         }
         return false;
+    }
+
+    public void moveShardToPlayer(UUID playerID) {
+        soulShard.setBlockCoord(null);
+        soulShard.setHolder(playerID);
+        Bson update = Updates.set("soulShard", soulShard);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", this.playerID), update);
+    }
+
+    public void moveShardToLocation(Location location) {
+        soulShard.setHolder(null);
+        soulShard.setBlockCoord(new BlockCoord(location));
+        Bson update = Updates.set("soulShard", soulShard);
+        Database.RESIDENTS.updateOne(Filters.eq("playerID", this.playerID), update);
     }
 
     /** Getters */
@@ -182,8 +207,8 @@ public class Resident {
         return invites;
     }
 
-    public boolean isPearled() {
-        return isPearled;
+    public SoulShard getSoulShard() {
+        return soulShard;
     }
 
     public boolean isInspectMode() {
@@ -212,8 +237,8 @@ public class Resident {
         this.invites = invites;
     }
 
-    public void setPearled(boolean pearled) {
-        isPearled = pearled;
+    public void setSoulShard(SoulShard soulShard) {
+        this.soulShard = soulShard;
     }
 
     public void setInspectMode(boolean inspectMode) {

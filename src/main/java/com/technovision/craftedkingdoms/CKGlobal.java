@@ -13,7 +13,7 @@ import java.util.UUID;
 public class CKGlobal {
 
     private static final HashMap<String, Group> GROUPS = new HashMap<>();
-    private static final HashMap<UUID, Resident> RESIDENTS = new HashMap<>();
+    public static final HashMap<UUID, Resident> RESIDENTS = new HashMap<>();
     private static final HashMap<Player, String> FORTIFY_GROUPS = new HashMap<>();
     private static final HashMap<Location, FortifiedBlock> FORTIFIED_BLOCKS = new HashMap<>();
     public static final HashMap<Location, Snitch> SNITCHES = new HashMap<>();
