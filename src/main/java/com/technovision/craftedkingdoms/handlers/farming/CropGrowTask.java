@@ -18,31 +18,44 @@ class CropGrowTask implements Runnable {
 
     @Override
     public void run() {
-        Iterator<Map.Entry<Location, Crop>> iterator = FarmingHandler.PLANTED_CROPS.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Location, Crop> entry = iterator.next();
-            Location location = entry.getKey();
-            Crop crop = entry.getValue();
+        Iterator<Map.Entry<Chunk, Map<Location, Crop>>> chunkIterator = FarmingHandler.PLANTED_CROPS.entrySet().iterator();
 
-            Chunk chunk = location.getChunk();
-            if (!FarmingHandler.isReadyToGrow(crop) || !chunk.isLoaded()) { return; }
+        while (chunkIterator.hasNext()) {
+            Map.Entry<Chunk, Map<Location, Crop>> chunkEntry = chunkIterator.next();
+            Chunk chunk = chunkEntry.getKey();
 
-            FarmingHandler.growCrop(crop);
-            Material cropMaterial = Material.valueOf(crop.getMaterial());
-            if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
-                crop.setTimePlanted(new Date());
-                FarmingHandler.PLANTED_CROPS.put(location, crop);
+            if (!chunk.isLoaded()) {
+                continue;  // Skip this iteration if the chunk is not loaded
             }
-            else if (cropMaterial == Material.PUMPKIN_STEM) {
-                crop = new Crop(location, Material.PUMPKIN_STEM);
-                FarmingHandler.PLANTED_CROPS.put(location, crop);
+
+            Iterator<Map.Entry<Location, Crop>> locationIterator = chunkEntry.getValue().entrySet().iterator();
+
+            while (locationIterator.hasNext()) {
+                Map.Entry<Location, Crop> locationEntry = locationIterator.next();
+                Location location = locationEntry.getKey();
+                Crop crop = locationEntry.getValue();
+
+                if (!FarmingHandler.isReadyToGrow(crop)) {
+                    continue;  // Skip this iteration if the crop is not ready to grow
+                }
+
+                FarmingHandler.growCrop(crop);
+                Material cropMaterial = Material.valueOf(crop.getMaterial());
+
+                if (cropMaterial == Material.SUGAR_CANE || cropMaterial == Material.CACTUS) {
+                    crop.setTimePlanted(new Date());
+                }
+                else if (cropMaterial == Material.PUMPKIN_STEM || cropMaterial == Material.MELON_STEM) {
+                    crop = new Crop(location, cropMaterial);
+                }
+                else {
+                    locationIterator.remove();
+                }
             }
-            else if (cropMaterial == Material.MELON_STEM) {
-                crop = new Crop(location, Material.MELON_STEM);
-                FarmingHandler.PLANTED_CROPS.put(location, crop);
-            }
-            else {
-                iterator.remove();
+
+            // Remove the chunk from PLANTED_CROPS if there are no more crops in this chunk
+            if (chunkEntry.getValue().isEmpty()) {
+                chunkIterator.remove();
             }
         }
     }

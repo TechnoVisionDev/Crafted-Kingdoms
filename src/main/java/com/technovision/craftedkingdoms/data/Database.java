@@ -9,10 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
-import com.technovision.craftedkingdoms.data.objects.Crop;
-import com.technovision.craftedkingdoms.data.objects.Group;
-import com.technovision.craftedkingdoms.data.objects.Resident;
-import com.technovision.craftedkingdoms.data.objects.Snitch;
+import com.technovision.craftedkingdoms.data.objects.*;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -34,7 +31,7 @@ public class Database {
     /** Collections */
     public static @NotNull MongoCollection<Group> GROUPS;
     public static @NotNull MongoCollection<Resident> RESIDENTS;
-    public static @NotNull MongoCollection<Crop> CROPS;
+    public static @NotNull MongoCollection<FarmChunk> CROPS;
     public static @NotNull MongoCollection<Snitch> SNITCHES;
 
     /**
@@ -58,7 +55,7 @@ public class Database {
         // Initialize collections if they don't exist.
         GROUPS = database.getCollection("groups", Group.class);
         RESIDENTS = database.getCollection("residents", Resident.class);
-        CROPS = database.getCollection("crops", Crop.class);
+        CROPS = database.getCollection("crops", FarmChunk.class);
         SNITCHES = database.getCollection("snitches", Snitch.class);
 
         // Create collection indexes if they don't exist.

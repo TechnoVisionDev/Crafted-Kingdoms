@@ -4,6 +4,7 @@ import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.objects.Crop;
+import com.technovision.craftedkingdoms.data.objects.FarmChunk;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bson.Document;
@@ -44,13 +45,15 @@ public class FarmingHandler implements Listener {
     private final Map<UUID, Long> COOLDOWNS = new HashMap<>();
     private final long COOLDOWN_TIME_MS = 500; // 0.5 seconds
 
-    public static final Map<Location, Crop> PLANTED_CROPS = new ConcurrentHashMap<>();
+    public static final Map<Chunk, Map<Location, Crop>> PLANTED_CROPS = new ConcurrentHashMap<>();
 
     public FarmingHandler() {
         // Get crops from database
-        for (Crop crop : Database.CROPS.find()) {
-            Location cropLocation = crop.getBlockCoord().asLocation();
-            addCrop(cropLocation, crop);
+        for (FarmChunk farmChunk : Database.CROPS.find()) {
+            for (Crop crop : farmChunk.getCrops()) {
+                Location cropLocation = crop.getBlockCoord().asLocation();
+                addCrop(cropLocation, crop);
+            }
         }
         Database.CROPS.deleteMany(new Document());
 
@@ -182,15 +185,8 @@ public class FarmingHandler implements Listener {
                 targetBlock = clickedBlock.getRelative(0, 1, 0);
             }
 
-            // Check if crop location is suitable
+            // Calculate growth time for crop
             Crop crop = new Crop(targetBlock.getLocation(), itemInHand.getType());
-            if (!BiomeData.isValidCropLocation(crop, clickedBlock)) {
-                String itemName = StringUtils.stringifyType(itemInHand.getType());
-                MessageUtils.send(event.getPlayer(), ChatColor.GOLD + itemName + " will not grow here!");
-                return;
-            }
-
-            // Calculate growth time
             double growthTimeInHours = BiomeData.getGrowthTime(crop) / 60.0 / 60.0 / 1000.0;
             int hours = (int) growthTimeInHours;
             int minutes = (int) Math.round((growthTimeInHours - hours) * 60);
@@ -237,14 +233,20 @@ public class FarmingHandler implements Listener {
 
     @EventHandler
     public void onPlayerUseStickOrBone(PlayerInteractEvent event) {
-         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-         ItemStack itemInHand = event.getItem();
-         Block clickedBlock = event.getClickedBlock();
-         if (clickedBlock == null || itemInHand == null) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        ItemStack itemInHand = event.getItem();
+        Block clickedBlock = event.getClickedBlock();
+        if (clickedBlock == null || itemInHand == null) return;
 
-         // Check crop stats
+        Location blockLocation = clickedBlock.getLocation();
+        Chunk chunk = blockLocation.getChunk();
+
+        Map<Location, Crop> chunkCrops = PLANTED_CROPS.get(chunk);
+
+        // Check crop stats
         if (itemInHand.getType() == Material.STICK) {
-            Crop crop = PLANTED_CROPS.get(clickedBlock.getLocation());
+            if (chunkCrops == null) return;
+            Crop crop = chunkCrops.get(blockLocation);
             if (crop == null) return;
             MessageUtils.send(event.getPlayer(), ChatColor.GOLD + "This crop will be ready to harvest in " + getTimeRemaining(crop));
         }
@@ -338,6 +340,8 @@ public class FarmingHandler implements Listener {
      */
     @EventHandler
     public void onEntityBreakBlock(EntityChangeBlockEvent event) {
+        // TODO: Remove
+        System.out.println(event.getBlock().getType());
         if (event.getBlock().getType() == Material.FARMLAND && event.getTo() == Material.DIRT) {
             event.setCancelled(true);
         }
@@ -349,9 +353,15 @@ public class FarmingHandler implements Listener {
      */
     @EventHandler
     public void onBlockFade(BlockFadeEvent event) {
-        Crop crop = PLANTED_CROPS.get(event.getBlock().getLocation());
-        if (crop != null) {
-            event.setCancelled(true);
+        Location blockLocation = event.getBlock().getLocation();
+        Chunk chunk = blockLocation.getChunk();
+
+        Map<Location, Crop> chunkCrops = PLANTED_CROPS.get(chunk);
+        if (chunkCrops != null) {
+            Crop crop = chunkCrops.get(blockLocation);
+            if (crop != null) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -362,8 +372,10 @@ public class FarmingHandler implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
-        Iterator<Map.Entry<Location, Crop>> iterator = FarmingHandler.PLANTED_CROPS.entrySet().iterator();
+        Map<Location, Crop> chunkCrops = PLANTED_CROPS.get(chunk);
+        if (chunkCrops == null) return;
 
+        Iterator<Map.Entry<Location, Crop>> iterator = chunkCrops.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Location, Crop> entry = iterator.next();
             Location location = entry.getKey();
@@ -441,11 +453,20 @@ public class FarmingHandler implements Listener {
     }
 
     public static void addCrop(Location location, Crop crop) {
-        FarmingHandler.PLANTED_CROPS.put(location, crop);
+        Chunk chunk = location.getChunk();
+        Map<Location, Crop> chunkCrops = FarmingHandler.PLANTED_CROPS.computeIfAbsent(chunk, k -> new HashMap<>());
+        chunkCrops.put(location, crop);
     }
 
     public static void removeCrop(Location location) {
-        FarmingHandler.PLANTED_CROPS.remove(location);
+        Chunk chunk = location.getChunk();
+        Map<Location, Crop> chunkCrops = FarmingHandler.PLANTED_CROPS.get(chunk);
+        if (chunkCrops != null) {
+            chunkCrops.remove(location);
+            if (chunkCrops.isEmpty()) {
+                FarmingHandler.PLANTED_CROPS.remove(chunk);
+            }
+        }
     }
 
     /**
@@ -501,8 +522,16 @@ public class FarmingHandler implements Listener {
      * Saves all un-grown crops to database as documents.
      */
     public static void saveCropsToDatabase() {
-        for (Crop crop : PLANTED_CROPS.values()) {
-            Database.CROPS.insertOne(crop);
+        for (Map.Entry<Chunk, Map<Location, Crop>> chunkEntry : FarmingHandler.PLANTED_CROPS.entrySet()) {
+
+            Chunk chunk = chunkEntry.getKey();
+            Set<Crop> crops = new HashSet<>();
+            for (Map.Entry<Location, Crop> locationCropEntry : chunkEntry.getValue().entrySet()) {
+                crops.add(locationCropEntry.getValue());
+            }
+
+            FarmChunk farmChunk = new FarmChunk(chunk, crops);
+            Database.CROPS.insertOne(farmChunk);
         }
     }
 }
