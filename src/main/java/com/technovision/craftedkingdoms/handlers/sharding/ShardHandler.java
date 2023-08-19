@@ -41,17 +41,16 @@ public class ShardHandler implements Listener {
 
     public ShardHandler() {
         // Created soulshard upkeep recipe
-        // TODO: Change recipe to use essence instead
         NamespacedKey key = new NamespacedKey(CraftedKingdoms.plugin, "soulshard_upkeep");
         ItemStack dummySoulShard = new ItemStack(Material.ENDER_EYE, 1);
         ShapelessRecipe recipe = new ShapelessRecipe(key, dummySoulShard);
-        recipe.addIngredient(Material.ENDER_EYE);
+        recipe.addIngredient(new RecipeChoice.ExactChoice(EssenceHandler.ESSENCE));
         recipe.addIngredient(Material.ENDER_PEARL);
         Bukkit.addRecipe(recipe);
 
         // Schedule shard scanner to run every hour
         Bukkit.getScheduler().runTaskTimer(CraftedKingdoms.plugin,
-                new ShardUpkeepTask(), 0, 20 * 10);
+                new ShardUpkeepTask(), 0, 20 * 60 * 60);
     }
 
     /**
@@ -293,6 +292,7 @@ public class ShardHandler implements Listener {
         Resident resident = CKGlobal.getResident(event.getPlayer());
         if (resident.getSoulShard() != null) {
             event.setCancelled(true);
+            MessageUtils.sendError(event.getPlayer(), "You can't leave the nether until your soul is freed!");
         }
     }
 

@@ -29,6 +29,7 @@ public class Resident {
     private Set<String> invites;
     private SoulShard soulShard;
     private boolean inspectMode;
+    private Date rewardDate;
 
     public Resident() { }
 
@@ -40,9 +41,10 @@ public class Resident {
         this.invites = new HashSet<>();
         this.soulShard = null;
         this.inspectMode = false;
+        this.rewardDate = null;
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, SoulShard soulShard, boolean inspectMode) {
+    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, SoulShard soulShard, boolean inspectMode, Date rewardDate) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
@@ -50,6 +52,7 @@ public class Resident {
         this.invites = invites;
         this.soulShard = soulShard;
         this.inspectMode = inspectMode;
+        this.rewardDate = rewardDate;
     }
 
     /**
@@ -215,6 +218,10 @@ public class Resident {
         return inspectMode;
     }
 
+    public Date getRewardDate() {
+        return rewardDate;
+    }
+
     /** Setters */
 
     public void setPlayerID(UUID playerID) {
@@ -243,5 +250,9 @@ public class Resident {
 
     public void setInspectMode(boolean inspectMode) {
         this.inspectMode = inspectMode;
+    }
+
+    public void setRewardDate(Date rewardDate) {
+        this.rewardDate = rewardDate;
     }
 }

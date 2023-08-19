@@ -5,6 +5,7 @@ import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.handlers.*;
 import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
+import com.technovision.craftedkingdoms.handlers.sharding.EssenceHandler;
 import com.technovision.craftedkingdoms.handlers.sharding.ShardHandler;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
@@ -71,6 +72,7 @@ public class CraftedKingdoms extends JavaPlugin {
 
     private void registerEventHandlers() {
         getServer().getPluginManager().registerEvents(new VanillaHandler(), this);
+        getServer().getPluginManager().registerEvents(new EssenceHandler(), this);
         getServer().getPluginManager().registerEvents(new ShardHandler(), this);
         getServer().getPluginManager().registerEvents(new ResidentHandler(), this);
         getServer().getPluginManager().registerEvents(new FortifyHandler(), this);
