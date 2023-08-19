@@ -23,7 +23,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -34,7 +33,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Handles events for fortifying blocks.
@@ -327,7 +325,6 @@ public class FortifyHandler implements Listener {
             event.setCancelled(true);
             return;
         }
-
         // Prevent water flow on crops
         Location toLocation = event.getToBlock().getLocation();
         if (FarmingHandler.getCrop(toLocation) != null || CKGlobal.getFortifiedBlock(toLocation) != null) {
@@ -352,7 +349,6 @@ public class FortifyHandler implements Listener {
             }
             return;
         }
-
         event.setCancelled(true);
         MessageUtils.sendError(player, "You can't place liquids on another group's fortified blocks!");
     }

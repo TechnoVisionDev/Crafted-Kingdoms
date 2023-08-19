@@ -15,6 +15,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.raid.RaidSpawnWaveEvent;
+import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -84,17 +86,29 @@ public class VanillaHandler implements Listener {
     }
 
     /**
-     * Disables the wither, dragon, and phantom from being spawned.
+     * Disables the wither, dragon, pillager, patrols, & phantom from being spawned.
      * @param event fires when player creates a wither.
      */
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getEntityType() == EntityType.WITHER
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.PATROL) {
+            event.setCancelled(true);
+        }
+        else if (event.getEntityType() == EntityType.WITHER
                 || event.getEntityType() == EntityType.PHANTOM
                 || event.getEntityType() == EntityType.ENDER_DRAGON
         ) {
             event.setCancelled(true);
         }
+    }
+
+    /**
+     * Prevent pillager raids.
+     * @param event Fires when pillager raid begins.
+     */
+    @EventHandler
+    public void onRaidTrigger(RaidTriggerEvent event) {
+        event.setCancelled(true);
     }
 
     /**
