@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.raid.RaidSpawnWaveEvent;
 import org.bukkit.event.raid.RaidTriggerEvent;
@@ -82,6 +83,21 @@ public class VanillaHandler implements Listener {
     public void onEndermanChangeBlock(EntityChangeBlockEvent event) {
         if (event.getEntity() instanceof Enderman) {
             event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Disable ender chest crafting.
+     * @param event Fires when ender chest is crafted.
+     */
+    @EventHandler
+    public void onCraftItem(CraftItemEvent event) {
+        ItemStack item = event.getRecipe().getResult();
+
+        // Check if the item is an Ender Chest
+        if (item.getType() == Material.ENDER_CHEST) {
+            event.setCancelled(true);
+            MessageUtils.sendError(event.getWhoClicked(), "Ender chests have been disabled!");
         }
     }
 
