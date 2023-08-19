@@ -14,15 +14,15 @@ import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -32,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Handles events for fortifying blocks.
@@ -295,6 +296,21 @@ public class FortifyHandler implements Listener {
                 ChatColor.GRAY, ChatColor.YELLOW,
                 groupName, ChatColor.GRAY
         ));
+    }
+
+    /**
+     * Prevent TNT for going off if a fortified block is within the blast radius.
+     * @param event Fires when a TNT or creeper explosion goes off.
+     */
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        for (Block block : event.blockList()) {
+            FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
+            if (fortifiedBlock != null) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     private String getPermsNeededString(Permissions perm, String groupName) {
