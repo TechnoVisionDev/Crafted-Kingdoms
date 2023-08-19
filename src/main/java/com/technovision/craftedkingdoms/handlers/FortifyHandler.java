@@ -8,6 +8,7 @@ import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
+import com.technovision.craftedkingdoms.util.BlockUtils;
 import com.technovision.craftedkingdoms.util.EffectUtils;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
@@ -128,8 +129,13 @@ public class FortifyHandler implements Listener {
      */
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        // Check if block is fortified
+        // Get bottom half if block is a door
         Block block = event.getBlock();
+        if (BlockUtils.isDoor(block)) {
+            block = BlockUtils.getBottomPartOfDoor(block);
+        }
+
+        // Check if block is fortified
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
         if (fortifiedBlock == null) {
             if (BiomeData.isCrop(block.getType())) {
@@ -231,12 +237,18 @@ public class FortifyHandler implements Listener {
         boolean isSpecialBlock = type.name().endsWith("_DOOR") || type.name().endsWith("_TRAPDOOR") || type.name().endsWith("_BUTTON") || type.name().endsWith("_PLATE") || type.name().endsWith("_BED");
         if (!isSpecialBlock) return;
 
+        // Get bottom half if block is a door
+        if (BlockUtils.isDoor(clickedBlock)) {
+            clickedBlock = BlockUtils.getBottomPartOfDoor(clickedBlock);
+        }
+
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(clickedBlock.getLocation());
         if (fortifiedBlock == null) return;
 
         String groupName = fortifiedBlock.getGroup();
         Resident res = CKGlobal.getResident(event.getPlayer());
         if (!res.getGroups().contains(groupName)) {
+            event.setCancelled(true);
             event.getPlayer().sendMessage(String.format("%sThat block is fortified with %s%s%s by %s%s%s.",
                     ChatColor.GRAY, ChatColor.YELLOW,
                     StringUtils.stringifyType(Material.valueOf(fortifiedBlock.getMaterial()), true),
@@ -391,6 +403,10 @@ public class FortifyHandler implements Listener {
     }
 
     private void handleBlockInteraction(Player player, Group group, ItemStack item, Block block) {
+        // Get bottom half if block is a door
+        if (BlockUtils.isDoor(block)) {
+            block = BlockUtils.getBottomPartOfDoor(block);
+        }
         // Check if block is already fortified
         FortifiedBlock alreadyFortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
         Material itemType = item.getType();
@@ -440,6 +456,11 @@ public class FortifyHandler implements Listener {
     }
 
     private void fortifyBlock(Resident res, Player player, Group group, ItemStack item, Block block) {
+        // Get bottom half if block is a door
+        if (BlockUtils.isDoor(block)) {
+            block = BlockUtils.getBottomPartOfDoor(block);
+        }
+
         Material itemType = item.getType();
         item.setAmount(item.getAmount() - 1);
         group.fortifyBlock(block, itemType);
