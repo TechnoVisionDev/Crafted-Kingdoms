@@ -20,12 +20,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -311,6 +313,48 @@ public class FortifyHandler implements Listener {
                 return;
             }
         }
+    }
+
+    /**
+     * Prevent liquid flow from damaging fortified crops.
+     * @param event Fires when liquid flows.
+     */
+    @EventHandler
+    public void onLiquidFlow(BlockFromToEvent event) {
+        // Prevent all lava flow
+        Material flowingMaterial = event.getBlock().getType();
+        if (flowingMaterial == Material.LAVA) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Prevent water flow on crops
+        Location toLocation = event.getToBlock().getLocation();
+        if (FarmingHandler.getCrop(toLocation) != null || CKGlobal.getFortifiedBlock(toLocation) != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        // Check if block below is fortified
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getBlockClicked().getLocation());
+        if (fortifiedBlock == null) return;
+        String groupName = fortifiedBlock.getGroup();
+
+        // Check if player is from fortified block's group
+        Player player = event.getPlayer();
+        Resident res = CKGlobal.getResident(player);
+        if (res.getGroups().contains(groupName)) {
+            if (!res.hasPermission(groupName, Permissions.BLOCKS)) {
+                event.setCancelled(true);
+                MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.BLOCKS, groupName));
+            }
+            return;
+        }
+
+        event.setCancelled(true);
+        MessageUtils.sendError(player, "You can't place liquids on another group's fortified blocks!");
     }
 
     private String getPermsNeededString(Permissions perm, String groupName) {

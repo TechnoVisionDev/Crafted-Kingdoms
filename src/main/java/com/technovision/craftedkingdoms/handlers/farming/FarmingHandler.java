@@ -330,7 +330,7 @@ public class FarmingHandler implements Listener {
      * @param event Fires when entity tramples a crop.
      */
     @EventHandler
-    public void onEntityBreakBlock(EntityChangeBlockEvent event) {
+    public void onEntityTrampleCrop(EntityChangeBlockEvent event) {
         if (event.getBlock().getType() != Material.FARMLAND) return;
         Location location = event.getBlock().getLocation();
         Crop crop = getCrop(location.add(0, 1, 0));
