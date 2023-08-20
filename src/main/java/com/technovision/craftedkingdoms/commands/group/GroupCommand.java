@@ -4,6 +4,7 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.commands.CommandBase;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.enums.Ranks;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.exceptions.CKException;
@@ -49,10 +50,10 @@ public class GroupCommand extends CommandBase {
         commands.put("bio", "[group] [text] - Set a biography for a group (100 chars max).");
         commands.put("delete", "[group] - Delete a group you are currently in.");
         commands.put("info", "[group] - Display information about a group.");
+        commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
 
         // Not Yet Implemented
         /**
-        commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
         commands.put("link", "[group] [subgroup] - Link two groups together.");
         commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
         commands.put("merge", "[group] [merge-group] - Merges the first group into the second group.");
@@ -406,6 +407,95 @@ public class GroupCommand extends CommandBase {
         MessageUtils.send(sender, msg);
     }
 
+    public void promote_cmd() throws CKException {
+        // Get data from args and check if valid
+        Group group = getGroupFromArgs(1);
+        Resident restoPromote = getResidentFromArgs(2);
+        Ranks rank = getRankFromArgs(3);
+        Resident senderRes = getResident();
+        if (!senderRes.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (!restoPromote.isInGroup(group.getName())) {
+            throw new CKException("That player is not in your group!");
+        }
+        if (senderRes.getPlayerID().equals(restoPromote.getPlayerID())) {
+            throw new CKException("You can't promote yourself!");
+        }
+
+        // Check if sender has perms to promote
+        UUID id = restoPromote.getPlayerID();
+        if (group.isOwner(id)) {
+            throw new CKException("You cannot promote the owner of a group!");
+        }
+
+        // Check permissions and current ranks based on the target rank
+        Ranks currentRank;
+        if (group.isMember(id)) currentRank = Ranks.MEMBER;
+        else if (group.isModerator(id)) currentRank = Ranks.MODERATOR;
+        else if (group.isAdmin(id)) currentRank = Ranks.ADMIN;
+        else throw new CKException("Invalid current rank for the player.");
+
+        if (currentRank == rank) {
+            throw new CKException("That player already has that rank!");
+        }
+
+        switch (rank) {
+            case MEMBER -> {
+                if (senderRes.hasPermission(group, Permissions.ADMINS)) {
+                    // Demotion allowed
+                    group.promote(id, currentRank, rank);
+                } else {
+                    throw new CKException("You need the " + ChatColor.YELLOW + "ADMINS" + ChatColor.RED + " permission to demote to member rank.");
+                }
+            }
+            case MODERATOR -> {
+                if (currentRank == Ranks.MEMBER && (senderRes.hasPermission(group, Permissions.MODS) || senderRes.hasPermission(group, Permissions.ADMINS))) {
+                    // Promotion allowed
+                    group.promote(id, currentRank, rank);
+                } else if (currentRank == Ranks.ADMIN && senderRes.hasPermission(group, Permissions.ADMINS)) {
+                    // Demotion allowed
+                    group.promote(id, currentRank, rank);
+                } else {
+                    throw new CKException("You need appropriate permissions to promote or demote to moderator rank.");
+                }
+            }
+            case ADMIN -> {
+                if (senderRes.hasPermission(group, Permissions.ADMINS)) {
+                    // Promotion allowed
+                    group.promote(id, currentRank, rank);
+                } else {
+                    throw new CKException("You need the " + ChatColor.YELLOW + "ADMINS" + ChatColor.RED + " permission to promote to admin rank.");
+                }
+            }
+            default -> throw new CKException("Invalid target rank specified.");
+        }
+
+        // Send messages
+        Player promotedPlayer = Bukkit.getPlayer(restoPromote.getPlayerID());
+        if (promotedPlayer != null) {
+            MessageUtils.send(promotedPlayer, String.format("%sYour rank in %s%s%s changed from %s%s%s to %s%s",
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    group.getName(),
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    currentRank.getName(),
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    rank.getName()
+            ));
+        }
+
+        MessageUtils.send(sender, String.format("%sYou changed %s%s%s rank in %s%s%s from %s%s%s to %s%s",
+                ChatColor.GRAY, ChatColor.YELLOW,
+                restoPromote.getPlayerName(),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                group.getName(),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                currentRank.getName(),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                rank.getName()
+        ));
+    }
+
     private void joinGroup(Group group, Resident res) {
         MessageUtils.sendGroup(group, String.format("%s%s%s has joined the group %s%s",
                 ChatColor.YELLOW,
@@ -475,7 +565,7 @@ public class GroupCommand extends CommandBase {
                 return CKGlobal.getResident((Player) sender).getGroups().stream().toList();
             }
             switch (args[0].toLowerCase()) {
-                case "invite", "rescind", "remove", "transfer" -> {
+                case "invite", "rescind", "remove", "transfer", "promote" -> {
                     return filterPlayerNames(args[2]);
                 }
                 case "link", "unlink", "merge" -> {

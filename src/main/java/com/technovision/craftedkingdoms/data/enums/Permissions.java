@@ -24,7 +24,8 @@ public enum Permissions {
     TRANSFER("Can transfer the group from one OWNER to another person. Does not affect other owners on the group"),
     CROPS("Allows access to reinforced crops"),
     GROUPSTATS("Allows access to use GroupStats Command"),
-    LINKING("Can nest and un-nest the group");
+    LINKING("Can nest and un-nest the group"),
+    SNITCH_IMMUNE("Player will not trigger snitch for this group");
 
     private final String description;
 

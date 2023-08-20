@@ -184,6 +184,49 @@ public class Group {
     }
 
     /**
+     * Change the rank of a resident in a group.
+     * @param playerID the ID of the player.
+     * @param currentRank the current rank of the player.
+     * @param rank the rank to change to.
+     */
+    public void promote(UUID playerID, Ranks currentRank, Ranks rank) {
+        // Remove current rank
+        Bson pullUpdate = null;
+        if (currentRank == Ranks.MEMBER) {
+            members.remove(playerID);
+            pullUpdate = Updates.pull("members", playerID);
+        }
+        else if (currentRank == Ranks.MODERATOR) {
+            moderators.remove(playerID);
+            pullUpdate = Updates.pull("moderators", playerID);
+        }
+        else if (currentRank == Ranks.ADMIN) {
+            admins.remove(playerID);
+            pullUpdate = Updates.pull("admins", playerID);
+        }
+
+        // Give new rank
+        Bson pushUpdate = null;
+        if (rank == Ranks.MEMBER) {
+            members.add(playerID);
+            pushUpdate = Updates.push("members", playerID);
+        }
+        else if (rank == Ranks.MODERATOR) {
+            moderators.add(playerID);
+            pushUpdate = Updates.push("moderators", playerID);
+        }
+        else if (rank == Ranks.ADMIN) {
+            admins.add(playerID);
+            pushUpdate = Updates.push("admins", playerID);
+        }
+
+        // Update in database
+        if (pullUpdate != null && pushUpdate != null) {
+            Database.GROUPS.updateOne(Filters.eq("name", name), Updates.combine(pullUpdate, pushUpdate));
+        }
+    }
+
+    /**
      * Add a block to the list of fortified blocks.
      * @param block the block to fortify
      * @param material the material used to fortify
