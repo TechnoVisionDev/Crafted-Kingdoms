@@ -46,7 +46,7 @@ class CropGrowTask implements Runnable {
                     crop.setTimePlanted(new Date());
                 }
                 else if (cropMaterial == Material.PUMPKIN_STEM || cropMaterial == Material.MELON_STEM) {
-                    crop = new Crop(location, cropMaterial);
+                    chunkEntry.getValue().put(location, new Crop(location, cropMaterial));
                 }
                 else {
                     locationIterator.remove();
