@@ -18,10 +18,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -154,6 +151,13 @@ public class FortifyHandler implements Listener {
                 removeNametag(block.getLocation());
                 fortifiedBlock.delete();
                 return;
+            }
+            if (BiomeData.isCrop(block.getType())) {
+                if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.CROPS)) {
+                    removeNametag(block.getLocation());
+                    fortifiedBlock.delete();
+                    return;
+                }
             }
         }
 
@@ -511,7 +515,14 @@ public class FortifyHandler implements Listener {
         }
     }
 
-    private void fortifyBlock(Resident res, Player player, Group group, ItemStack item, Block block) {
+    public static void fortifyCrop(FortifiedBlock fortifiedBlock, Location cropLocation) {
+        Material material = Material.valueOf(fortifiedBlock.getMaterial());
+        Group group = CKGlobal.getGroup(fortifiedBlock.getGroup());
+        if (group == null) return;
+        group.fortifyBlock(cropLocation, material);
+    }
+
+    public void fortifyBlock(Resident res, Player player, Group group, ItemStack item, Block block) {
         // Get bottom half if block is a door
         if (BlockUtils.isDoor(block)) {
             block = BlockUtils.getBottomPartOfDoor(block);

@@ -10,6 +10,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -188,7 +189,16 @@ public class Group {
      * @param material the material used to fortify
      */
     public void fortifyBlock(Block block, Material material) {
-        FortifiedBlock fortifiedBlock = new FortifiedBlock(name, block, material);
+        fortifyBlock(block.getLocation(), material);
+    }
+
+    /**
+     * Add a block to the list of fortified blocks.
+     * @param blockLocation the location of the block to fortify
+     * @param material the material used to fortify
+     */
+    public void fortifyBlock(Location blockLocation, Material material) {
+        FortifiedBlock fortifiedBlock = new FortifiedBlock(name, blockLocation, material);
         fortifiedBlocks.add(fortifiedBlock);
         CKGlobal.addFortifiedBlock(fortifiedBlock);
         Bson update = Updates.push("fortifiedBlocks", fortifiedBlock);

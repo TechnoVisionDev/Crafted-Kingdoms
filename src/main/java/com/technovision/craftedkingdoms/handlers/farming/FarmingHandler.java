@@ -1,10 +1,13 @@
 package com.technovision.craftedkingdoms.handlers.farming;
 
+import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.data.objects.FarmChunk;
+import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
+import com.technovision.craftedkingdoms.handlers.FortifyHandler;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bson.Document;
@@ -326,16 +329,13 @@ public class FarmingHandler implements Listener {
     }
 
     /**
-     * Removes crops that have been trampled by entity
+     * Prevents crops from being trampled by entity.
      * @param event Fires when entity tramples a crop.
      */
     @EventHandler
     public void onEntityTrampleCrop(EntityChangeBlockEvent event) {
         if (event.getBlock().getType() != Material.FARMLAND) return;
-        Location location = event.getBlock().getLocation();
-        Crop crop = getCrop(location.add(0, 1, 0));
-        if (crop == null) return;
-        removeCrop(location);
+        event.setCancelled(true);
     }
 
     /**
@@ -448,6 +448,10 @@ public class FarmingHandler implements Listener {
         Chunk chunk = location.getChunk();
         Map<Location, Crop> chunkCrops = FarmingHandler.PLANTED_CROPS.computeIfAbsent(chunk, k -> new HashMap<>());
         chunkCrops.put(location, crop);
+
+        FortifiedBlock belowBlock = CKGlobal.getFortifiedBlock(location.add(0, -1, 0));
+        if (belowBlock == null) return;
+        FortifyHandler.fortifyCrop(belowBlock, location.add(0, 1, 0));
     }
 
     public static void removeCrop(Location location) {

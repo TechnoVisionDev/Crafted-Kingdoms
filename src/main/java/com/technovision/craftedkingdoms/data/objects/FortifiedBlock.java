@@ -100,6 +100,13 @@ public class FortifiedBlock {
         this.material = material.toString();
     }
 
+    public FortifiedBlock(String group, Location blockLocation, Material material) {
+        this.group = group;
+        this.blockCoord = new BlockCoord(blockLocation);
+        this.reinforcements = calculateReinforcements(material);
+        this.material = material.toString();
+    }
+
     public FortifiedBlock(BlockCoord blockCoord, int reinforcements, String material, String group) {
         this.blockCoord = blockCoord;
         this.reinforcements = reinforcements;

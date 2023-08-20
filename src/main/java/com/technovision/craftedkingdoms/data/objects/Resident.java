@@ -117,7 +117,7 @@ public class Resident {
      */
     public void toggleInspectMode() {
         inspectMode = !this.inspectMode;
-        Bson update = Updates.pull("inspectMode", inspectMode);
+        Bson update = Updates.set("inspectMode", inspectMode);
         Database.RESIDENTS.updateOne(Filters.eq("playerID", playerID), update);
     }
 
