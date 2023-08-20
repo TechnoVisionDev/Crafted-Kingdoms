@@ -128,7 +128,7 @@ public class ShardCommand extends CommandBase {
         MessageUtils.send(player, ChatColor.GRAY + "They will be teleported in 5 seconds!");
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(CraftedKingdoms.plugin, () -> {
-            if (shardedPlayer.isOnline()) {
+            if (shardedPlayer.isOnline() && player.isOnline()) {
                 shardedPlayer.teleport(player.getLocation());
             }
         }, 20 * 5);
@@ -180,7 +180,7 @@ public class ShardCommand extends CommandBase {
 
         Location finalStoredLocation = storedLocation;
         Bukkit.getScheduler().scheduleSyncDelayedTask(CraftedKingdoms.plugin, () -> {
-            if (shardedPlayer.isOnline()) {
+            if (shardedPlayer.isOnline() && player.isOnline()) {
                 shardedPlayer.teleport(finalStoredLocation);
                 storedLocations.remove(shardedPlayer.getUniqueId());
             }
@@ -210,6 +210,7 @@ public class ShardCommand extends CommandBase {
                 for (ItemStack item : inventory.getContents()) {
                     if (isShard(shardedResident, item)) {
                         shardedResident.freePlayer(item);
+                        MessageUtils.sendError(sender, ChatColor.LIGHT_PURPLE + "You have freed the player in this soul shard!");
                         return;
                     }
                 }
@@ -220,6 +221,7 @@ public class ShardCommand extends CommandBase {
                 for (ItemStack item : holder.getInventory().getContents()) {
                     if (isShard(shardedResident, item)) {
                         shardedResident.freePlayer(item);
+                        MessageUtils.sendError(sender, ChatColor.LIGHT_PURPLE + "You have freed the player in this soul shard!");
                         return;
                     }
                 }

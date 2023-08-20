@@ -14,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
@@ -305,6 +302,29 @@ public class ShardHandler implements Listener {
         if (item.getType() == Material.ENDER_EYE) {
             if (isSoulShard(item)) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageByEntityEvent event) {
+        // Check if the entity being damaged is a player
+        if (event.getEntity() instanceof Player) {
+            Player damaged = (Player) event.getEntity();
+
+            // Check if the damager is also a player (i.e., PvP)
+            if (event.getDamager() instanceof Player) {
+                Player damager = (Player) event.getDamager();
+
+                // If both entities are in the Overworld, cancel the event
+                if (damaged.getWorld().getEnvironment() == World.Environment.NORMAL) {
+
+                    Resident res = CKGlobal.getResident(damager);
+                    if (res.getSoulShard() == null) return;
+
+                    event.setCancelled(true);
+                    MessageUtils.sendError(damager, "You cannot PVP here while sharded!");
+                }
             }
         }
     }
