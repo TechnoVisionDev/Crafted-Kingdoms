@@ -161,6 +161,13 @@ public class FortifyHandler implements Listener {
             }
         }
 
+        // Check if resident is sharded
+        if (res.getSoulShard() != null) {
+            event.setCancelled(true);
+            MessageUtils.sendError(event.getPlayer(), "You cannot break reinforced blocks while sharded!");
+            return;
+        }
+
         // Remove one reinforcement from block
         fortifiedBlock.decrement();
         if (fortifiedBlock.getReinforcements() <= 0) {

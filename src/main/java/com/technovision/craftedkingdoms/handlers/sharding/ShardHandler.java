@@ -186,7 +186,7 @@ public class ShardHandler implements Listener {
         );
     }
 
-    public Resident getResidentFromShard(ItemStack shard) {
+    public static Resident getResidentFromShard(ItemStack shard) {
         if (shard == null || !shard.hasItemMeta()) return null;
 
         // Get the UUID string stored in the item's metadata
@@ -219,7 +219,7 @@ public class ShardHandler implements Listener {
         }
     }
 
-    public Location findSafeNetherRespawn(Player player) {
+    public static Location findSafeNetherRespawn(Player player) {
         World nether = player.getServer().getWorld("world_nether");
         Random random = new Random();
         for (int attempts = 0; attempts < 100; attempts++) {
@@ -233,7 +233,7 @@ public class ShardHandler implements Listener {
         return null;
     }
 
-    private int findSafeY(World world, int x, int z) {
+    private static int findSafeY(World world, int x, int z) {
         for (int y = 120; y > 30; y--) {
             if (isSafeSpawn(world, x, y, z)) {
                 return y;
@@ -242,7 +242,7 @@ public class ShardHandler implements Listener {
         return -1;
     }
 
-    private boolean isSafeSpawn(World world, int x, int y, int z) {
+    private static boolean isSafeSpawn(World world, int x, int y, int z) {
         return world.getBlockAt(x, y, z).getType().isSolid() &&
                 world.getBlockAt(x, y + 1, z).getType() == Material.AIR &&
                 world.getBlockAt(x, y + 2, z).getType() == Material.AIR;

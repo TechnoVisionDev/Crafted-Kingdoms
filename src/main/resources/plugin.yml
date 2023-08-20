@@ -11,3 +11,7 @@ commands:
     description: Protect blocks for your groups
     usage: /fortify
     aliases: [f]
+  soulshard:
+    description: Manage your soul shards
+    usage: /soulshard
+    aliases: [shard, ss]
