@@ -591,8 +591,9 @@ public class BiomeData {
         Material cropType = Material.valueOf(crop.getMaterial());
         Location cropLocation = crop.getBlockCoord().asLocation();
         Biome biome = cropLocation.getBlock().getBiome();
-        double growthTime = CROPS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(cropType, 0.0);
-        if (growthTime <= 0) return 0;
+        double growthTime = CROPS.getOrDefault(biome, Collections.emptyMap()).getOrDefault(cropType, -1.0);
+        if (growthTime == 0) return 0;
+        if (growthTime < 0) return -1;
 
         // Apply low light modifier
         if (!hasFullSunlight(cropLocation)) {
@@ -608,8 +609,8 @@ public class BiomeData {
 
         // Check if block is adjacent to lamp or glowstone
         if (isGreenhouseCrop(cropLocation)) {
-            double greenhouseRate = CROPS.getOrDefault(Biome.THE_END, Collections.emptyMap()).getOrDefault(cropType, 0.0);
-            if (greenhouseRate < growthTime) {
+            double greenhouseRate = CROPS.getOrDefault(Biome.THE_END, Collections.emptyMap()).getOrDefault(cropType, -1.0);
+            if (greenhouseRate > -1 && greenhouseRate < growthTime) {
                 growthTime = greenhouseRate;
             }
         }

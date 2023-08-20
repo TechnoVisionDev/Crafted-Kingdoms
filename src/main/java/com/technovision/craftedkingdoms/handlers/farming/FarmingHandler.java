@@ -409,6 +409,7 @@ public class FarmingHandler implements Listener {
     public static boolean isReadyToGrow(Crop crop) {
         long currentTime = System.currentTimeMillis();
         double growthTime = BiomeData.getGrowthTime(crop);
+        if (growthTime < 0) return false;
         return currentTime - crop.getTimePlanted().getTime() >= growthTime;
     }
 
