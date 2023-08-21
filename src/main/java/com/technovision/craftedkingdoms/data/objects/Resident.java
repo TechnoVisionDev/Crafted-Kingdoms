@@ -24,7 +24,7 @@ public class Resident {
 
     private UUID playerID;
     private String playerName;
-    private boolean groupChat;
+    private String groupChat;
     private Set<String> groups;
     private Set<String> invites;
     private SoulShard soulShard;
@@ -36,7 +36,7 @@ public class Resident {
     public Resident(Player player) {
         this.playerID = player.getUniqueId();
         this.playerName = player.getName();
-        this.groupChat = false;
+        this.groupChat = "global";
         this.groups = new HashSet<>();
         this.invites = new HashSet<>();
         this.soulShard = null;
@@ -44,7 +44,7 @@ public class Resident {
         this.rewardDate = null;
     }
 
-    public Resident(UUID playerID, String playerName, boolean groupChat, Set<String> groups, Set<String> invites, SoulShard soulShard, boolean inspectMode, Date rewardDate) {
+    public Resident(UUID playerID, String playerName, String groupChat, Set<String> groups, Set<String> invites, SoulShard soulShard, boolean inspectMode, Date rewardDate) {
         this.playerID = playerID;
         this.playerName = playerName;
         this.groupChat = groupChat;
@@ -198,7 +198,7 @@ public class Resident {
         return playerName;
     }
 
-    public boolean isGroupChat() {
+    public String getGroupChat() {
         return groupChat;
     }
 
@@ -232,7 +232,7 @@ public class Resident {
         this.playerName = playerName;
     }
 
-    public void setGroupChat(boolean groupChat) {
+    public void setGroupChat(String groupChat) {
         this.groupChat = groupChat;
     }
 
