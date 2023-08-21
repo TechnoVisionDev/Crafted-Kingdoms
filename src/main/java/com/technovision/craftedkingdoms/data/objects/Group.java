@@ -184,6 +184,35 @@ public class Group {
     }
 
     /**
+     * Sets a new player to be the group owner.
+     * @param newOwner the player to become the new owner.
+     */
+    public void transferOwnership(UUID newOwner) {
+        UUID oldOwner = ownerID;
+        admins.add(oldOwner);
+        ownerID = newOwner;
+
+        Bson pullUpdate;
+        if (isMember(newOwner)) {
+            members.remove(newOwner);
+            pullUpdate = Updates.pull("members", newOwner);
+        }
+        else if (isModerator(newOwner)) {
+            moderators.remove(newOwner);
+            pullUpdate = Updates.pull("moderators", newOwner);
+        }
+        else {
+            admins.remove(newOwner);
+            pullUpdate = Updates.pull("admins", newOwner);
+        }
+        Database.GROUPS.updateOne(Filters.eq("name", name), pullUpdate);
+
+        Bson update1 = Updates.set("ownerID", newOwner);
+        Bson update2 = Updates.push("admins", oldOwner);
+        Database.GROUPS.updateOne(Filters.eq("name", name), Updates.combine(update1, update2));
+    }
+
+    /**
      * Change the rank of a resident in a group.
      * @param playerID the ID of the player.
      * @param currentRank the current rank of the player.

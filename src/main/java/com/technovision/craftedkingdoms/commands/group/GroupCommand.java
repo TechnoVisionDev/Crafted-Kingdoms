@@ -51,14 +51,50 @@ public class GroupCommand extends CommandBase {
         commands.put("delete", "[group] - Delete a group you are currently in.");
         commands.put("info", "[group] - Display information about a group.");
         commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
+        commands.put("transfer", "[group] [player] - Transfer ownership of a group.");
 
         // Not Yet Implemented
         /**
-        commands.put("link", "[group] [subgroup] - Link two groups together.");
-        commands.put("unlink", "[group] [subgroup] - Unlink two groups from each other.");
+        commands.put("link", "[super-group] [sub-group] - Link two groups together.");
+        commands.put("unlink", "[super-group] [sub-group] - Unlink two groups from each other.");
         commands.put("merge", "[group] [merge-group] - Merges the first group into the second group.");
-        commands.put("transfer", "[group] [player] - Transfer ownership of a group.");
         */
+    }
+
+    public void transfer_cmd() throws CKException {
+        // Get group from args
+        Group group = getGroupFromArgs(1);
+
+        // Check if sender is owner
+        Resident senderRes = getResident();
+        if (!senderRes.isInGroup(group.getName())) {
+            throw new CKException("You are not a member of that group!");
+        }
+        if (!group.isOwner(senderRes.getPlayerID())) {
+            throw new CKException("You must be the group owner to transfer ownership!");
+        }
+
+        // Get resident to transfer to from args
+        Resident newOwnerRes = getResidentFromArgs(2);
+        if (!newOwnerRes.isInGroup(group.getName())) {
+            throw new CKException("You can't transfer ownership to someone outside the group!");
+        }
+
+        // Transfer ownership to new player
+        group.transferOwnership(newOwnerRes.getPlayerID());
+        Player newOwner = Bukkit.getPlayer(newOwnerRes.getPlayerID());
+        if (newOwner != null) {
+            MessageUtils.send(newOwner, String.format("%sYou have become the new owner of %s%s",
+                    ChatColor.GRAY, ChatColor.YELLOW,
+                    group.getName()
+            ));
+        }
+        MessageUtils.send(sender, String.format("%sYou have transferred ownership of %s%s%s to %s%s",
+                ChatColor.GRAY, ChatColor.YELLOW,
+                group.getName(),
+                ChatColor.GRAY, ChatColor.YELLOW,
+                newOwnerRes.getPlayerName()
+        ));
     }
 
     public void create_cmd() throws CKException {
