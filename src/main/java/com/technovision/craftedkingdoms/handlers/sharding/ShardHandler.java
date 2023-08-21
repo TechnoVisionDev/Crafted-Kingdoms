@@ -70,6 +70,11 @@ public class ShardHandler implements Listener {
                     MessageUtils.sendError(killer, "That player's soul is already trapped in a soul shard!");
                     return;
                 }
+                if (isSharded(killer)) {
+                    MessageUtils.sendError(killer, "You must free your own soul before trapping others!");
+                    return;
+                }
+
                 // Use up the pearl
                 if (item.getAmount() == 1) {
                     killer.getInventory().setItem(i, null);

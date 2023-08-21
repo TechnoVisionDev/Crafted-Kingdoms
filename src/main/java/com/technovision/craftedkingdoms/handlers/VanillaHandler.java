@@ -1,22 +1,21 @@
 package com.technovision.craftedkingdoms.handlers;
 
+import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.util.MessageUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.event.raid.RaidSpawnWaveEvent;
 import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
@@ -24,12 +23,87 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Random;
+
 /**
  * Event handlers that disable or modify core elements of vanilla Minecraft.
  *
  * @author TechnoVision
  */
 public class VanillaHandler implements Listener {
+
+    private static final Random random = new Random();
+    private static final World overworld = Bukkit.getWorld("world");
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        String deathMessage = event.getDeathMessage();
+
+        // Send the death message directly to the player
+        if (deathMessage != null && !deathMessage.isEmpty()) {
+            event.getEntity().sendMessage(ChatColor.GRAY + deathMessage);
+        }
+        // Prevent the death message from being broadcasted to all players
+        event.setDeathMessage(null);
+    }
+
+    /**
+     * Makes player spawn in random spot if no bed is set.
+     * @param event Fires when player respawns.
+     */
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        // Check if the respawn is not due to a bed
+        Resident res = CKGlobal.getResident(event.getPlayer());
+        if (res.getSoulShard() == null && !event.isBedSpawn()) {
+            Location randomSpawnLocation = getRandomSpawnLocation(overworld);
+            event.setRespawnLocation(randomSpawnLocation);
+            MessageUtils.send(event.getPlayer(), ChatColor.GRAY + "You wake up in a strange and mysterious place...");
+        }
+    }
+
+    /**
+     * Makes player spawn in random spot when first joining.
+     * @param event Fires when player joins server for first time.
+     */
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (!player.hasPlayedBefore()) {
+            // Player has never played before, set a random spawn location
+            Location randomSpawnLocation = getRandomSpawnLocation(overworld);
+            player.teleport(randomSpawnLocation);
+            MessageUtils.send(event.getPlayer(), ChatColor.GRAY + "You wake up in a strange and mysterious place...");
+        }
+    }
+
+    /**
+     * Finds a save spot to teleport for random spawn.
+     * @param world the world to teleport in.
+     * @return the safe spawn location.
+     */
+    private Location getRandomSpawnLocation(World world) {
+        Location location = null;
+        do {
+            // Randomly calculate the X and Z coordinates within a 5000x5000 block area (from -2500 to 2500)
+            int x = random.nextInt(5001) - 2500;
+            int z = random.nextInt(5001) - 2500;
+
+            // Assume the world's sea level is 64. Adjust as needed or use a more dynamic height detection.
+            int y = world.getHighestBlockYAt(x, z); // This gets the highest non-air block at the x, z location
+            location = new Location(world, x, y, z);
+
+        } while (isOceanBiome(location));
+        return location;
+    }
+
+    private boolean isOceanBiome(Location location) {
+        return switch (location.getBlock().getBiome()) {
+            case OCEAN, DEEP_OCEAN, WARM_OCEAN, LUKEWARM_OCEAN, COLD_OCEAN, DEEP_LUKEWARM_OCEAN, DEEP_COLD_OCEAN, FROZEN_OCEAN ->
+                    true;
+            default -> false;
+        };
+    }
 
     /**
      * Makes the overworld and nether ratio 1:1 for portal travel.

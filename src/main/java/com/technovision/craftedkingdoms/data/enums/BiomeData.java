@@ -29,7 +29,7 @@ public class BiomeData {
     public static Set<Material> BLOCKED_CROPS;
     static {
         BLOCKED_CROPS = new HashSet<>();
-        BLOCKED_CROPS.add(Material.BAMBOO);
+        BLOCKED_CROPS.add(Material.BAMBOO_SAPLING);
         BLOCKED_CROPS.add(Material.SWEET_BERRY_BUSH);
         BLOCKED_CROPS.add(Material.TORCHFLOWER_CROP);
         BLOCKED_CROPS.add(Material.PITCHER_CROP);
