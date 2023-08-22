@@ -1,7 +1,7 @@
 name: CraftedKingdoms
 version: 1.0.0
 main: com.technovision.craftedkingdoms.CraftedKingdoms
-api-version: 1.20
+api-version: '1.20'
 commands:
   group:
     description: Manage your groups
