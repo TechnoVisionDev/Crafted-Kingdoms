@@ -36,6 +36,12 @@ public class VanillaHandler implements Listener {
     private static final World overworld = Bukkit.getWorld("world");
 
     @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        String playerName = event.getPlayer().getName();
+        event.setQuitMessage(ChatColor.WHITE + playerName + ChatColor.YELLOW + " left the game");
+    }
+
+    @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         String deathMessage = event.getDeathMessage();
 
@@ -69,6 +75,7 @@ public class VanillaHandler implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        event.setJoinMessage(ChatColor.WHITE + player.getName() + ChatColor.YELLOW + " joined the game");
         if (!player.hasPlayedBefore()) {
             // Player has never played before, set a random spawn location
             Location randomSpawnLocation = getRandomSpawnLocation(overworld);
