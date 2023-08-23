@@ -671,6 +671,11 @@ public class BiomeData {
         return (soil.getType() == Material.FARMLAND);
     }
 
+    public static boolean isSapling(Material itemType) {
+        String materialName = itemType.name();
+        return materialName.endsWith("_SAPLING");
+    }
+
     /**
      * Checks if a greenhouse block (redstone lamp or glowstone) is adjacent to crop.
      * @param location the location of the crop block.

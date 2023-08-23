@@ -214,7 +214,7 @@ public class FarmingHandler implements Listener {
             // Plant new crop
             Material itemType = itemInHand.getType();
             if (BiomeData.isSeed(itemType)) {
-                if (itemType != Material.CACTUS && itemType != Material.SUGAR_CANE && itemType != Material.COCOA_BEANS) {
+                if (!BiomeData.isSapling(itemType) && itemType != Material.CACTUS && itemType != Material.SUGAR_CANE && itemType != Material.COCOA_BEANS) {
                     Location cropLocation = clickedBlock.getRelative(BlockFace.UP).getLocation();
                     Crop crop = new Crop(cropLocation, itemType);
                     if (BiomeData.isValidCropLocation(crop, clickedBlock)) {
@@ -288,7 +288,7 @@ public class FarmingHandler implements Listener {
         }
 
         Material itemType = itemInHand.getType();
-        if (itemType == Material.CACTUS || itemType == Material.SUGAR_CANE || itemType == Material.COCOA_BEANS) {
+        if (BiomeData.isSapling(itemType) || itemType == Material.CACTUS || itemType == Material.SUGAR_CANE || itemType == Material.COCOA_BEANS) {
             while (placedBlock.getRelative(BlockFace.DOWN).getType() == itemType) {
                 placedBlock = placedBlock.getRelative(BlockFace.DOWN);
             }
@@ -421,6 +421,9 @@ public class FarmingHandler implements Listener {
     public static String getTimeRemaining(Crop crop) {
         long currentTime = System.currentTimeMillis();
         double growthTime = BiomeData.getGrowthTime(crop);
+        if (growthTime == -1) {
+            return "∞";
+        }
         long timePlanted = crop.getTimePlanted().getTime();
 
         // Calculate the remaining time in milliseconds
@@ -450,9 +453,10 @@ public class FarmingHandler implements Listener {
         Map<Location, Crop> chunkCrops = FarmingHandler.PLANTED_CROPS.computeIfAbsent(chunk, k -> new HashMap<>());
         chunkCrops.put(location, crop);
 
-        FortifiedBlock belowBlock = CKGlobal.getFortifiedBlock(location.add(0, -1, 0));
+        Location fortifiedLocation = location.clone();
+        FortifiedBlock belowBlock = CKGlobal.getFortifiedBlock(fortifiedLocation.add(0, -1, 0));
         if (belowBlock == null) return;
-        FortifyHandler.fortifyCrop(belowBlock, location.add(0, 1, 0));
+        FortifyHandler.fortifyCrop(belowBlock, fortifiedLocation.add(0, 1, 0));
     }
 
     public static void removeCrop(Location location) {
@@ -512,6 +516,21 @@ public class FarmingHandler implements Listener {
             if (stackHeight < 3 && block.getRelative(0, stackHeight, 0).getType() == Material.AIR) {
                 block.getRelative(0, stackHeight, 0).setType(cropType);
             }
+        }
+        if (BiomeData.isSapling(cropType)) {
+            TreeType treeType = TreeType.TREE;
+            switch (cropType) {
+                case OAK_SAPLING -> treeType = TreeType.TREE;
+                case SPRUCE_SAPLING -> treeType = TreeType.REDWOOD;
+                case BIRCH_SAPLING -> treeType = TreeType.BIRCH;
+                case JUNGLE_SAPLING -> treeType = TreeType.SMALL_JUNGLE;
+                case ACACIA_SAPLING -> treeType = TreeType.ACACIA;
+                case DARK_OAK_SAPLING -> treeType = TreeType.DARK_OAK;
+                case CHERRY_SAPLING -> treeType = TreeType.CHERRY;
+            };
+            block.setType(Material.AIR);
+            System.out.println(block.getLocation());
+            block.getWorld().generateTree(block.getLocation(), treeType);
         }
     }
 
