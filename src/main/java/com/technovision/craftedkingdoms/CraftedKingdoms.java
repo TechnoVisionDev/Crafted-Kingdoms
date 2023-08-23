@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms;
 import com.technovision.craftedkingdoms.commands.FortifyCommand;
 import com.technovision.craftedkingdoms.commands.ChatCommand;
 import com.technovision.craftedkingdoms.commands.ShardCommand;
+import com.technovision.craftedkingdoms.commands.SnitchCommand;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.handlers.*;
@@ -88,16 +89,19 @@ public class CraftedKingdoms extends JavaPlugin {
         FortifyCommand fortifyCommand = new FortifyCommand(this);
         ShardCommand shardCommand = new ShardCommand(this);
         ChatCommand chatCommand = new ChatCommand(this);
+        SnitchCommand snitchCommand = new SnitchCommand(this);
 
         this.getCommand("group").setExecutor(groupCommand);
         this.getCommand("fortify").setExecutor(fortifyCommand);
         this.getCommand("soulshard").setExecutor(shardCommand);
         this.getCommand("chat").setExecutor(chatCommand);
+        this.getCommand("snitch").setExecutor(snitchCommand);
 
         this.getCommand("group").setTabCompleter(groupCommand);
         this.getCommand("fortify").setTabCompleter(fortifyCommand);
         this.getCommand("soulshard").setTabCompleter(shardCommand);
         this.getCommand("chat").setTabCompleter(chatCommand);
+        this.getCommand("snitch").setTabCompleter(snitchCommand);
     }
 
     public void loadConfig() {

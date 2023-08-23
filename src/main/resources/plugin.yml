@@ -19,3 +19,6 @@ commands:
     description: Switch chat groups
     usage: /chat
     aliases: [c]
+  snitch:
+    description: Manage your group snitches
+    usage: /snitch

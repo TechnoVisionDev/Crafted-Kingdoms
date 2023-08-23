@@ -19,11 +19,12 @@ public enum Permissions {
     PERMS("Can modify the permissions a PlayerType has"),
     DELETE("Can delete the group"),
     JOIN_PASSWORD("Can specify which PlayerType a player will be, when they join with a password"),
-    MERGE("Can merge groups with another group they have MERGE permissions on"),
+    MERGE("Can merge groups with another group that has the MERGE permissions on"),
     LIST_PERMS("Can list the permissions of any PlayerType"),
     TRANSFER("Can transfer the group from one OWNER to another person. Does not affect other owners on the group"),
     CROPS("Allows access to reinforced crops"),
-    GROUPSTATS("Allows access to use GroupStats Command"),
+    SNITCH_NAME("Allows player to name group snitches"),
+    SNITCH_VIEW("Allows player to view snitch logs"),
     LINKING("Can nest and un-nest the group"),
     SNITCH_IMMUNE("Player will not trigger snitch for this group");
 

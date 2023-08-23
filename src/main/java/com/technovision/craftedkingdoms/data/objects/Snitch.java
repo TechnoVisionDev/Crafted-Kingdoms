@@ -4,6 +4,8 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.data.Database;
+import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.enums.Ranks;
 import com.technovision.craftedkingdoms.data.enums.SnitchEvent;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
@@ -57,7 +59,11 @@ public class Snitch {
     public boolean isImmune(Player player) {
         Group group = CKGlobal.getGroup(this.group);
         if (group == null) return true;
-        return group.isResident(player.getUniqueId());
+        Ranks rank = group.findRank(player.getUniqueId());
+        if (rank == null) {
+            return false;
+        }
+        return group.hasPermission(rank, Permissions.SNITCH_IMMUNE);
     }
 
     public void logPlayerEvent(Player player, SnitchEvent event) {
@@ -139,6 +145,12 @@ public class Snitch {
         String snitchName = "a snitch";
         if (name != null) snitchName = name;
         return snitchName;
+    }
+
+    public void assignName(String name) {
+        this.name = name;
+        Bson update = Updates.set("name", name);
+        Database.SNITCHES.updateOne(Filters.eq("_id", id), update);
     }
 
     /** Getters */

@@ -32,7 +32,7 @@ public class ChatCommand extends CommandBase {
         displayName = "Chat";
 
         // Implemented
-        commands.put("set", "[group] - Set your group for chat messages.");
+        commands.put("set", "<group> - Set your group for chat messages.");
     }
 
     public void set_cmd() throws CKException {

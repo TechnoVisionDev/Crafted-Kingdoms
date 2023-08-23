@@ -26,8 +26,8 @@ public class GroupPermsCommand extends CommandBase {
         command = "/group perms";
         displayName = "Group Permissions";
 
-        commands.put("add", "[group] [rank] [permission] - Add a permission to a group's player rank.");
-        commands.put("remove", "[group] [rank] [permission] - Remove a permission from a group's player rank.");
+        commands.put("add", "<group> <rank> <permission> - Add a permission to a group's player rank.");
+        commands.put("remove", "<group> <rank> <permission> - Remove a permission from a group's player rank.");
 
         // Not implemented
         /**

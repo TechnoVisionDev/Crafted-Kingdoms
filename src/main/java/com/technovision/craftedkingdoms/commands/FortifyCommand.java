@@ -39,7 +39,7 @@ public class FortifyCommand extends CommandBase {
         displayName = "Fortify";
 
         // Implemented
-        commands.put("enable", "[group] - Enables fortify mode to reinforce blocks.");
+        commands.put("enable", "<group> - Enables fortify mode to reinforce blocks.");
         commands.put("disable", "Disables fortify mode.");
         commands.put("inspect", "Toggle inspect mode");
         commands.put("materials", "Show the materials used for fortifying blocks.");

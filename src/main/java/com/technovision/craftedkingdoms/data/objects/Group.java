@@ -340,6 +340,15 @@ public class Group {
     }
 
     @BsonIgnore
+    public Ranks findRank(UUID playerID) {
+        if (isMember(playerID)) return Ranks.MEMBER;
+        if (isModerator(playerID)) return Ranks.MODERATOR;
+        if (isAdmin(playerID)) return Ranks.ADMIN;
+        if (ownerID.equals(playerID)) return Ranks.OWNER;
+        return null;
+    }
+
+    @BsonIgnore
     public boolean isMember(UUID playerID) {
         return members.contains(playerID);
     }

@@ -38,20 +38,20 @@ public class GroupCommand extends CommandBase {
         displayName = "Group";
 
         // Implemented
-        commands.put("create", "[name] <type> <password> - Create a new group (defaults to private).");
-        commands.put("invite", "[group] [player] - Invite a player to join a group.");
-        commands.put("rescind", "[group] [player] - Cancel a player's invite to your group.");
-        commands.put("join", "[group] <password> - Join a group that has invited you (or use a password).");
-        commands.put("leave", "[group] - Leave a group that you are currently in.");
-        commands.put("list", "<player> - List all groups that you or another player are in.");
+        commands.put("create", "<name> [type] [password] - Create a new group (defaults to private).");
+        commands.put("invite", "<group> <player> - Invite a player to join a group.");
+        commands.put("rescind", "<group> <player> - Cancel a player's invite to your group.");
+        commands.put("join", "<group> [password] - Join a group that has invited you (or use a password).");
+        commands.put("leave", "<group> - Leave a group that you are currently in.");
+        commands.put("list", "[player] - List all groups that you or another player are in.");
         commands.put("invites", "List all groups that have invited you.");
-        commands.put("remove", "[group] [player] - Remove a player from your group.");
+        commands.put("remove", "<group> <player> - Remove a player from your group.");
         commands.put("perms", "Manage permissions for player ranks in a group.");
-        commands.put("bio", "[group] [text] - Set a biography for a group (100 chars max).");
-        commands.put("delete", "[group] - Delete a group you are currently in.");
-        commands.put("info", "[group] - Display information about a group.");
-        commands.put("promote", "[group] [player] [rank] - Promote or demote a player to a new rank.");
-        commands.put("transfer", "[group] [player] - Transfer ownership of a group.");
+        commands.put("bio", "<group> <text> - Set a biography for a group (100 chars max).");
+        commands.put("delete", "<group> - Delete a group you are currently in.");
+        commands.put("info", "<group> - Display information about a group.");
+        commands.put("promote", "<group> <player> <rank> - Promote or demote a player to a new rank.");
+        commands.put("transfer", "<group> <player> - Transfer ownership of a group.");
 
         // Not Yet Implemented
         /**
