@@ -1,9 +1,6 @@
 package com.technovision.craftedkingdoms;
 
-import com.technovision.craftedkingdoms.commands.FortifyCommand;
-import com.technovision.craftedkingdoms.commands.ChatCommand;
-import com.technovision.craftedkingdoms.commands.ShardCommand;
-import com.technovision.craftedkingdoms.commands.SnitchCommand;
+import com.technovision.craftedkingdoms.commands.*;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.handlers.*;
@@ -83,6 +80,7 @@ public class CraftedKingdoms extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SnitchHandler(), this);
         getServer().getPluginManager().registerEvents(new ChatHandler(), this);
         getServer().getPluginManager().registerEvents(new ItemHandler(), this);
+        getServer().getPluginManager().registerEvents(new RecipesCommand(), this);
     }
 
     private void registerCommands() {
@@ -91,12 +89,14 @@ public class CraftedKingdoms extends JavaPlugin {
         ShardCommand shardCommand = new ShardCommand(this);
         ChatCommand chatCommand = new ChatCommand(this);
         SnitchCommand snitchCommand = new SnitchCommand(this);
+        RecipesCommand recipesCommand = new RecipesCommand();
 
         this.getCommand("group").setExecutor(groupCommand);
         this.getCommand("fortify").setExecutor(fortifyCommand);
         this.getCommand("soulshard").setExecutor(shardCommand);
         this.getCommand("chat").setExecutor(chatCommand);
         this.getCommand("snitch").setExecutor(snitchCommand);
+        this.getCommand("recipes").setExecutor(recipesCommand);
 
         this.getCommand("group").setTabCompleter(groupCommand);
         this.getCommand("fortify").setTabCompleter(fortifyCommand);

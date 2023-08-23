@@ -90,9 +90,9 @@ public class VanillaHandler implements Listener {
     private Location getRandomSpawnLocation(World world) {
         Location location = null;
         do {
-            // Randomly calculate the X and Z coordinates within a 5000x5000 block area (from -2500 to 2500)
-            int x = random.nextInt(5001) - 2500;
-            int z = random.nextInt(5001) - 2500;
+            // Randomly calculate the X and Z coordinates within a 5000x5000 block area (from -5000 to 5000)
+            int x = random.nextInt(10001) - 5000;
+            int z = random.nextInt(10001) - 5000;
 
             // Assume the world's sea level is 64. Adjust as needed or use a more dynamic height detection.
             int y = world.getHighestBlockYAt(x, z); // This gets the highest non-air block at the x, z location

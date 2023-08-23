@@ -225,8 +225,8 @@ public class ShardHandler implements Listener {
         World nether = player.getServer().getWorld("world_nether");
         Random random = new Random();
         for (int attempts = 0; attempts < 100; attempts++) {
-            int x = random.nextInt(5000) - 2500;
-            int z = random.nextInt(5000) - 2500;
+            int x = random.nextInt(10001) - 5000;
+            int z = random.nextInt(10001) - 5000;
             int y = findSafeY(nether, x, z);
             if (y != -1) {
                 return new Location(nether, x, y, z);

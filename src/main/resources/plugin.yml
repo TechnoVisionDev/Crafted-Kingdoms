@@ -22,3 +22,6 @@ commands:
   snitch:
     description: Manage your group snitches
     usage: /snitch
+  recipes:
+    description: View custom crafting recipes
+    usage: /recipes
