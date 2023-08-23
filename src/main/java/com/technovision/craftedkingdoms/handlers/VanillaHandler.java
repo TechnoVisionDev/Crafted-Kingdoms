@@ -106,7 +106,7 @@ public class VanillaHandler implements Listener {
 
     private boolean isOceanBiome(Location location) {
         return switch (location.getBlock().getBiome()) {
-            case OCEAN, DEEP_OCEAN, WARM_OCEAN, LUKEWARM_OCEAN, COLD_OCEAN, DEEP_LUKEWARM_OCEAN, DEEP_COLD_OCEAN, FROZEN_OCEAN ->
+            case RIVER, OCEAN, DEEP_OCEAN, WARM_OCEAN, LUKEWARM_OCEAN, COLD_OCEAN, DEEP_LUKEWARM_OCEAN, DEEP_COLD_OCEAN, FROZEN_OCEAN ->
                     true;
             default -> false;
         };
