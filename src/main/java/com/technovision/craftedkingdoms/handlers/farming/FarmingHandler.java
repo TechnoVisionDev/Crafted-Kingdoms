@@ -106,6 +106,7 @@ public class FarmingHandler implements Listener {
      */
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
+        event.setExpToDrop(0);
         Player player = event.getPlayer();
         Biome biome = event.getPlayer().getLocation().getBlock().getBiome();
         double chance = BiomeData.getBreedingChance(biome, EntityType.FISHING_HOOK);

@@ -5,16 +5,13 @@ import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.objects.Resident;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.*;
-import org.bukkit.block.Biome;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -284,4 +281,27 @@ public class VanillaHandler implements Listener {
             }, 1L);
         }
     }
+
+    /** Disable Vanilla XP & Mob Farming */
+
+    @EventHandler
+    public void onSpawnerSpawn(SpawnerSpawnEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        event.setDroppedExp(0);
+    }
+
+    @EventHandler
+    public void disableOreXP(BlockBreakEvent event) {
+        event.setExpToDrop(0);
+    }
+
+    @EventHandler
+    public void onFurnaceExtract(FurnaceExtractEvent event) {
+        event.setExpToDrop(0);
+    }
+
 }
