@@ -20,10 +20,10 @@ import java.util.*;
 public class BiomeData {
 
     /** For each biome, maps a crop to the hours it takes to grow */
-    private static final Map<Biome, Map<Material, Double>> CROPS = new HashMap<>();
+    public static final Map<Biome, Map<Material, Double>> CROPS = new HashMap<>();
 
     /** For each biome, maps an animal to the percentage chance for successfully breeding */
-    private static final Map<Biome, Map<EntityType, Double>> ANIMALS = new HashMap<>();
+    public static final Map<Biome, Map<EntityType, Double>> ANIMALS = new HashMap<>();
 
     /** Crops that cannot be placed to grow (may change with future updates). */
     public static Set<Material> BLOCKED_CROPS;

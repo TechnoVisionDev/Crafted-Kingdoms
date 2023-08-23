@@ -25,3 +25,8 @@ commands:
   recipes:
     description: View custom crafting recipes
     usage: /recipes
+    aliases: [crafting]
+  crops:
+    description: View crops that can grow in this biome
+    usage: /crops
+    aliases: [farming]

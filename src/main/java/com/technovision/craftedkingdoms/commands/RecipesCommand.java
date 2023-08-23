@@ -19,7 +19,6 @@ import java.util.Map;
 public class RecipesCommand implements CommandExecutor, Listener {
 
     private final String MAIN_GUI_TITLE = "Crafting Recipes";
-    private final String RECIPE_GUI_TITLE = "Recipe Details";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -47,7 +46,7 @@ public class RecipesCommand implements CommandExecutor, Listener {
         Player player = (Player) event.getWhoClicked();
         String title = event.getView().getTitle();
 
-        if (title.equals(MAIN_GUI_TITLE) || title.equals(RECIPE_GUI_TITLE)) {
+        if (title.equals(MAIN_GUI_TITLE) || title.startsWith("Recipe: ")) {
             event.setCancelled(true);
             for (CraftingRecipe recipe : ItemHandler.recipes) {
                 if (recipe.getResult().equals(event.getCurrentItem())) {
@@ -59,7 +58,8 @@ public class RecipesCommand implements CommandExecutor, Listener {
     }
 
     public void openRecipeDetailsGUI(Player player, Recipe recipe) {
-        Inventory gui = Bukkit.createInventory(null, 27, RECIPE_GUI_TITLE); // Using a 3x9 inventory for simplicity
+        String title = "Recipe: " + StringUtils.stringifyType(recipe.getResult().getType());
+        Inventory gui = Bukkit.createInventory(null, 27, title); // Using a 3x9 inventory for simplicity
 
         // If the recipe is a ShapedRecipe, we can get its ingredients.
         if (recipe instanceof ShapedRecipe shaped) {

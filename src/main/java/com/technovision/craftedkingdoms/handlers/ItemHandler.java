@@ -392,6 +392,7 @@ public class ItemHandler implements Listener {
     private void cancelCrafting(CraftItemEvent event, String message) {
         event.setCancelled(true);
         MessageUtils.sendError(event.getWhoClicked(), message);
+        MessageUtils.sendError(event.getWhoClicked(), "Use " + ChatColor.YELLOW + "/recipes " + ChatColor.RED + "to see new recipes.");
     }
 
     private boolean isCraftedWithMaterial(ItemStack[] matrix, Material material) {

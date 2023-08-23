@@ -81,6 +81,7 @@ public class CraftedKingdoms extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatHandler(), this);
         getServer().getPluginManager().registerEvents(new ItemHandler(), this);
         getServer().getPluginManager().registerEvents(new RecipesCommand(), this);
+        getServer().getPluginManager().registerEvents(new CropsCommand(), this);
     }
 
     private void registerCommands() {
@@ -90,6 +91,7 @@ public class CraftedKingdoms extends JavaPlugin {
         ChatCommand chatCommand = new ChatCommand(this);
         SnitchCommand snitchCommand = new SnitchCommand(this);
         RecipesCommand recipesCommand = new RecipesCommand();
+        CropsCommand cropsCommand = new CropsCommand();
 
         this.getCommand("group").setExecutor(groupCommand);
         this.getCommand("fortify").setExecutor(fortifyCommand);
@@ -97,6 +99,7 @@ public class CraftedKingdoms extends JavaPlugin {
         this.getCommand("chat").setExecutor(chatCommand);
         this.getCommand("snitch").setExecutor(snitchCommand);
         this.getCommand("recipes").setExecutor(recipesCommand);
+        this.getCommand("crops").setExecutor(cropsCommand);
 
         this.getCommand("group").setTabCompleter(groupCommand);
         this.getCommand("fortify").setTabCompleter(fortifyCommand);
