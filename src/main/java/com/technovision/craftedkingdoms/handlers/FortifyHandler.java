@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
@@ -362,6 +363,96 @@ public class FortifyHandler implements Listener {
         }
         event.setCancelled(true);
         MessageUtils.sendError(player, "You can't place liquids on another group's fortified blocks!");
+    }
+
+    @EventHandler
+    public void onBlockIgnite(BlockIgniteEvent event) {
+        BlockIgniteEvent.IgniteCause cause = event.getCause();
+        if (cause == BlockIgniteEvent.IgniteCause.LIGHTNING || cause == BlockIgniteEvent.IgniteCause.LAVA) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Block block = getAdjacentSolidBlock(event.getBlock(), event.getPlayer());
+        if (block.getType() == Material.NETHERRACK) return;
+
+        // Check if the block is fortified
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
+        if (fortifiedBlock != null) {
+            Player player = event.getPlayer();
+
+            if (cause == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL || cause == BlockIgniteEvent.IgniteCause.FIREBALL) {
+                if (player != null) {
+                    MessageUtils.sendError(player, "You cannot set fortified blocks on fire!");
+                }
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockSpread(BlockSpreadEvent event) {
+        if (event.getSource().getType() == Material.FIRE) {
+            Block targetBlock = event.getBlock();
+
+            // Check blocks around the target block
+            for (BlockFace face : BlockFace.values()) {
+                Block adjacentBlock = targetBlock.getRelative(face);
+
+                if (CKGlobal.getFortifiedBlock(adjacentBlock.getLocation()) != null) {
+                    event.setCancelled(true);
+                    return;  // No need to check further once we know we should cancel the event
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockBurn(BlockBurnEvent event) {
+        if (CKGlobal.getFortifiedBlock(event.getBlock().getLocation()) != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    private Block getAdjacentSolidBlock(Block airBlock, Player player) {
+        if (player == null) {
+            return getPriorityAdjacentSolidBlock(airBlock);
+        }
+
+        Vector direction = player.getLocation().getDirection();
+        BlockFace targetedFace = getTargetedBlockFace(direction);
+        Block adjacent = airBlock.getRelative(targetedFace.getOppositeFace());
+
+        if (!adjacent.getType().isAir()) {
+            return adjacent;
+        } else {
+            return getPriorityAdjacentSolidBlock(airBlock);
+        }
+    }
+
+    private BlockFace getTargetedBlockFace(Vector direction) {
+        double angle = -1;
+        BlockFace face = null;
+        for (BlockFace blockFace : BlockFace.values()) {
+            double currentAngle = direction.angle(blockFace.getDirection());
+            if (angle == -1 || currentAngle < angle) {
+                angle = currentAngle;
+                face = blockFace;
+            }
+        }
+        return face;
+    }
+
+    private Block getPriorityAdjacentSolidBlock(Block airBlock) {
+        BlockFace[] priorityFaces = {BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.DOWN};
+
+        for (BlockFace face : priorityFaces) {
+            Block adjacent = airBlock.getRelative(face);
+            if (!adjacent.getType().isAir()) {
+                return adjacent;
+            }
+        }
+        return null;
     }
 
     private String getPermsNeededString(Permissions perm, String groupName) {
