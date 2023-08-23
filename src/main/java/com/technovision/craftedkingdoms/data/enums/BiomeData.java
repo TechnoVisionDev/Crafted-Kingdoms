@@ -47,7 +47,7 @@ public class BiomeData {
         SEED_TO_CROP.put(Material.WHEAT_SEEDS, Material.WHEAT);
         SEED_TO_CROP.put(Material.CARROT, Material.CARROTS);
         SEED_TO_CROP.put(Material.POTATO, Material.POTATOES);
-        SEED_TO_CROP.put(Material.NETHER_WART, Material.NETHER_WART_BLOCK);
+        SEED_TO_CROP.put(Material.NETHER_WART, Material.NETHER_WART);
         SEED_TO_CROP.put(Material.MELON_SEEDS, Material.MELON_STEM);
         SEED_TO_CROP.put(Material.PUMPKIN_SEEDS, Material.PUMPKIN_STEM);
         SEED_TO_CROP.put(Material.MELON_STEM, Material.MELON);
@@ -74,7 +74,7 @@ public class BiomeData {
         CROP_LOW_LIGHT_MODIFIER.put(Material.WHEAT, 4.0);
         CROP_LOW_LIGHT_MODIFIER.put(Material.CARROTS, 4.0);
         CROP_LOW_LIGHT_MODIFIER.put(Material.POTATOES, 4.0);
-        CROP_LOW_LIGHT_MODIFIER.put(Material.NETHER_WART_BLOCK, 2.0);
+        CROP_LOW_LIGHT_MODIFIER.put(Material.NETHER_WART, 2.0);
         CROP_LOW_LIGHT_MODIFIER.put(Material.MELON_STEM, 4.0);
         CROP_LOW_LIGHT_MODIFIER.put(Material.PUMPKIN_STEM, 4.0);
         CROP_LOW_LIGHT_MODIFIER.put(Material.MELON, 4.0);
@@ -150,7 +150,7 @@ public class BiomeData {
         ANIMALS.get(Biome.BAMBOO_JUNGLE).put(EntityType.PIG, 1.0);
 
         // Basalt Deltas
-        CROPS.get(Biome.BASALT_DELTAS).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.BASALT_DELTAS).put(Material.NETHER_WART, 5.33);
         CROPS.get(Biome.BASALT_DELTAS).put(Material.CACTUS, 24.0);
 
         // Beach
@@ -187,7 +187,7 @@ public class BiomeData {
         ANIMALS.get(Biome.LUKEWARM_OCEAN).put(EntityType.FISHING_HOOK, 1.0);
 
         // Crimson Forest (Nether)
-        CROPS.get(Biome.CRIMSON_FOREST).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.CRIMSON_FOREST).put(Material.NETHER_WART, 5.33);
         CROPS.get(Biome.CRIMSON_FOREST).put(Material.CACTUS, 24.0);
 
         // Dark Forest
@@ -207,7 +207,7 @@ public class BiomeData {
         // Desert
         CROPS.get(Biome.DESERT).put(Material.WHEAT, 4.0);
         CROPS.get(Biome.DESERT).put(Material.CARROTS, 10.0);
-        CROPS.get(Biome.DESERT).put(Material.NETHER_WART_BLOCK, 21.33);
+        CROPS.get(Biome.DESERT).put(Material.NETHER_WART, 21.33);
         CROPS.get(Biome.DESERT).put(Material.BEETROOTS, 4.0);
         CROPS.get(Biome.DESERT).put(Material.CACTUS, 12.0);
         CROPS.get(Biome.DESERT).put(Material.ACACIA_SAPLING, 3.0);
@@ -327,7 +327,7 @@ public class BiomeData {
 
         // Mushroom Fields
         CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.WHEAT, 4.0);
-        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.NETHER_WART_BLOCK, 10.67);
+        CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.NETHER_WART, 10.67);
         CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.BEETROOTS, 4.0);
         CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.OAK_SAPLING, 12.0);
         CROPS.get(Biome.MUSHROOM_FIELDS).put(Material.SPRUCE_SAPLING, 12.0);
@@ -340,7 +340,7 @@ public class BiomeData {
         ANIMALS.get(Biome.MUSHROOM_FIELDS).put(EntityType.MUSHROOM_COW, 1.0);
 
         // Nether Wastes (Nether)
-        CROPS.get(Biome.NETHER_WASTES).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.NETHER_WASTES).put(Material.NETHER_WART, 5.33);
         CROPS.get(Biome.NETHER_WASTES).put(Material.CACTUS, 24.0);
 
         // Old Growth Birch Forest
@@ -470,7 +470,7 @@ public class BiomeData {
         ANIMALS.get(Biome.SNOWY_TAIGA).put(EntityType.RABBIT, 0.25);
 
         // Soul Sand Valley (Nether)
-        CROPS.get(Biome.SOUL_SAND_VALLEY).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.SOUL_SAND_VALLEY).put(Material.NETHER_WART, 5.33);
         CROPS.get(Biome.SOUL_SAND_VALLEY).put(Material.CACTUS, 24.0);
 
         // Sparse Jungle
@@ -533,7 +533,7 @@ public class BiomeData {
         ANIMALS.get(Biome.TAIGA).put(EntityType.RABBIT, 0.25);
 
         // Warped Forest (Nether)
-        CROPS.get(Biome.WARPED_FOREST).put(Material.NETHER_WART_BLOCK, 5.33);
+        CROPS.get(Biome.WARPED_FOREST).put(Material.NETHER_WART, 5.33);
         CROPS.get(Biome.WARPED_FOREST).put(Material.CACTUS, 24.0);
 
         // Windswept Forest
@@ -599,7 +599,7 @@ public class BiomeData {
         if (!hasFullSunlight(cropLocation)) {
             double modifier = CROP_LOW_LIGHT_MODIFIER.get(cropType);
             if (modifier > 0) {
-                if (cropType == Material.NETHER_WART_BLOCK) {
+                if (cropType == Material.NETHER_WART) {
                     growthTime /= modifier;
                 } else {
                     growthTime *= modifier;
@@ -631,7 +631,7 @@ public class BiomeData {
         Material cropMaterial = Material.valueOf(crop.getMaterial());
         Material targetMaterialToCount = Material.CLAY;
 
-        if (cropMaterial == Material.NETHER_WART_BLOCK) {
+        if (cropMaterial == Material.NETHER_WART) {
             // Nether Wart uses Soul Sand as fertilizer
             targetMaterialToCount = Material.SOUL_SAND;
         } else if (cropMaterial == Material.COCOA) {
@@ -662,7 +662,7 @@ public class BiomeData {
         Material type = Material.valueOf(crop.getMaterial());
         Block soil = crop.getBlockCoord().asLocation().getBlock().getRelative(0, -1, 0);
 
-        if (type == Material.NETHER_WART_BLOCK) {
+        if (type == Material.NETHER_WART) {
             return soil.getType() == Material.SOUL_SAND;
         }
         else if (type == Material.COCOA) {
