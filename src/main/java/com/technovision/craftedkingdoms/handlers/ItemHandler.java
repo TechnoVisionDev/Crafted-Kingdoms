@@ -1,6 +1,7 @@
 package com.technovision.craftedkingdoms.handlers;
 
 import com.technovision.craftedkingdoms.CraftedKingdoms;
+import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -360,14 +361,13 @@ public class ItemHandler implements Listener {
                     cancelCrafting(event, "The vanilla enchanting table recipe is disabled!");
                 }
             }
-            default -> {
-            }
+            default -> { }
         }
     }
 
     private void cancelCrafting(CraftItemEvent event, String message) {
         event.setCancelled(true);
-        event.getWhoClicked().sendMessage(message);
+        MessageUtils.sendError(event.getWhoClicked(), message);
     }
 
     private boolean isCraftedWithMaterial(ItemStack[] matrix, Material material) {

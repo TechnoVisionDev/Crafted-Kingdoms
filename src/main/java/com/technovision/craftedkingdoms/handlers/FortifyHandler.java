@@ -4,6 +4,7 @@ import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.enums.BiomeData;
 import com.technovision.craftedkingdoms.data.enums.Permissions;
+import com.technovision.craftedkingdoms.data.objects.Crop;
 import com.technovision.craftedkingdoms.data.objects.FortifiedBlock;
 import com.technovision.craftedkingdoms.data.objects.Group;
 import com.technovision.craftedkingdoms.data.objects.Resident;
@@ -137,9 +138,13 @@ public class FortifyHandler implements Listener {
         // Check if block is fortified
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
         if (fortifiedBlock == null) {
+            // Remove crops if necessary
             if (BiomeData.isCrop(block.getType())) {
                 FarmingHandler.removeCrop(block.getLocation());
             }
+            Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
+            Crop crop = FarmingHandler.getCrop(aboveCrop);
+            if (crop != null) FarmingHandler.removeCrop(aboveCrop);
             // Check if snitch is nearby
             SnitchHandler.handleBlockBreak(event);
             return;
@@ -151,12 +156,20 @@ public class FortifyHandler implements Listener {
             if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.BLOCKS)) {
                 removeNametag(block.getLocation());
                 fortifiedBlock.delete();
+                // Remove crops if necessary
+                Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
+                Crop crop = FarmingHandler.getCrop(aboveCrop);
+                if (crop != null) FarmingHandler.removeCrop(aboveCrop);
                 return;
             }
             if (BiomeData.isCrop(block.getType())) {
                 if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.CROPS)) {
                     removeNametag(block.getLocation());
                     fortifiedBlock.delete();
+                    // Remove crops if necessary
+                    Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
+                    Crop crop = FarmingHandler.getCrop(aboveCrop);
+                    if (crop != null) FarmingHandler.removeCrop(aboveCrop);
                     return;
                 }
             }
@@ -175,6 +188,9 @@ public class FortifyHandler implements Listener {
             if (BiomeData.isCrop(block.getType())) {
                 FarmingHandler.removeCrop(block.getLocation());
             }
+            Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
+            Crop crop = FarmingHandler.getCrop(aboveCrop);
+            if (crop != null) FarmingHandler.removeCrop(aboveCrop);
             removeNametag(block.getLocation());
             // Check if snitch is nearby
             SnitchHandler.handleBlockBreak(event);

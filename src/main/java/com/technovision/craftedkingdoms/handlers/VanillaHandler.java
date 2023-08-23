@@ -8,6 +8,7 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -283,6 +284,19 @@ public class VanillaHandler implements Listener {
     }
 
     /** Disable Vanilla XP & Mob Farming */
+
+    @EventHandler
+    public void onUseXPBottle(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+            ItemStack item = event.getItem();
+            if (item != null && item.getType() == Material.EXPERIENCE_BOTTLE) {
+                event.setCancelled(true);
+                item.setAmount(item.getAmount()-1);
+                event.getPlayer().giveExp(10);
+                MessageUtils.send(event.getPlayer(), ChatColor.GREEN + "You have gained " + ChatColor.YELLOW + "10 XP");
+            }
+        }
+    }
 
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
