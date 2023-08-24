@@ -3,6 +3,7 @@ package com.technovision.craftedkingdoms.handlers.sharding;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.objects.Resident;
+import com.technovision.craftedkingdoms.data.objects.SoulShard;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -236,7 +237,7 @@ public class ShardHandler implements Listener {
     }
 
     private static int findSafeY(World world, int x, int z) {
-        for (int y = 120; y > 30; y--) {
+        for (int y = 110; y > 30; y--) {
             if (isSafeSpawn(world, x, y, z)) {
                 return y;
             }
@@ -345,6 +346,8 @@ public class ShardHandler implements Listener {
 
                 // Remove the Exile Pearl from the player's inventory
                 player.getInventory().remove(item);
+                Resident resident = getResidentFromShard(item);
+                resident.moveShardToLocation(player.getLocation());
             }
         }
     }
