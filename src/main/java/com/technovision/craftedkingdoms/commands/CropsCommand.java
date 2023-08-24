@@ -32,8 +32,8 @@ public class CropsCommand implements CommandExecutor, Listener {
         }
         Biome biome = player.getLocation().getBlock().getBiome();
         Map<Material, Double> crops = BiomeData.CROPS.get(biome);
-        if (crops == null) {
-            MessageUtils.send(sender, "You cannot grow any crops in this biome!");
+        if (crops == null || crops.isEmpty()) {
+            MessageUtils.sendError(sender, "You cannot grow any crops in this biome!");
             return true;
         }
 
