@@ -219,8 +219,11 @@ public class FortifyHandler implements Listener {
         if (!(event.getPlayer() instanceof Player player)) return;
         if (event.getInventory().getType() == InventoryType.PLAYER) return;
 
+        // Modify location for double chests
+        Location chestLocation = event.getInventory().getLocation().getBlock().getLocation().clone();
+
         // Check if block is fortified
-        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(event.getInventory().getLocation());
+        FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(chestLocation);
         if (fortifiedBlock == null) {
             // Check if snitch is nearby
             SnitchHandler.handleChestOpen(event, player);
@@ -230,7 +233,6 @@ public class FortifyHandler implements Listener {
 
         Resident res = CKGlobal.getResident(player);
         if (res.getGroups().contains(groupName)) {
-
             // Check if player has perms to open chest
             InventoryType type = event.getInventory().getType();
             if (type == InventoryType.CHEST || type == InventoryType.ENDER_CHEST) {
