@@ -236,13 +236,13 @@ public class FortifyHandler implements Listener {
             // Check if player has perms to open chest
             InventoryType type = event.getInventory().getType();
             if (type == InventoryType.CHEST || type == InventoryType.ENDER_CHEST) {
-                if (res.hasPermission(groupName, Permissions.CHESTS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
+                if (res.hasPermission(groupName, Permissions.CHESTS)) { return; }
                 event.setCancelled(true);
                 MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CHESTS, groupName));
                 return;
             }
             // Check if player has perms to open containers
-            if (res.hasPermission(groupName, Permissions.CONTAINERS) || res.hasPermission(groupName, Permissions.BLOCKS)) { return; }
+            if (res.hasPermission(groupName, Permissions.CONTAINERS)) { return; }
             event.setCancelled(true);
             MessageUtils.send(event.getPlayer(), getPermsNeededString(Permissions.CONTAINERS, groupName));
             return;
