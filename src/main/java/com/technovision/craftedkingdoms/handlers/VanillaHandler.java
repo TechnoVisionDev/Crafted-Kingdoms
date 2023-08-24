@@ -301,7 +301,7 @@ public class VanillaHandler implements Listener {
                 event.setCancelled(true);
                 item.setAmount(item.getAmount()-1);
                 event.getPlayer().giveExp(10);
-                MessageUtils.send(event.getPlayer(), ChatColor.GREEN + "You have gained " + ChatColor.YELLOW + "10 XP");
+                MessageUtils.send(event.getPlayer(), ChatColor.GREEN + "You have gained " + ChatColor.YELLOW + "10 Exp");
             }
         }
     }

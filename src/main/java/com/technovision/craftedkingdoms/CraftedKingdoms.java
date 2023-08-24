@@ -4,6 +4,7 @@ import com.technovision.craftedkingdoms.commands.*;
 import com.technovision.craftedkingdoms.commands.group.GroupCommand;
 import com.technovision.craftedkingdoms.data.Database;
 import com.technovision.craftedkingdoms.handlers.*;
+import com.technovision.craftedkingdoms.handlers.factory.ExpFactoryHandler;
 import com.technovision.craftedkingdoms.handlers.farming.FarmingHandler;
 import com.technovision.craftedkingdoms.handlers.sharding.EssenceHandler;
 import com.technovision.craftedkingdoms.handlers.sharding.ShardHandler;
@@ -82,6 +83,7 @@ public class CraftedKingdoms extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemHandler(), this);
         getServer().getPluginManager().registerEvents(new RecipesCommand(), this);
         getServer().getPluginManager().registerEvents(new CropsCommand(), this);
+        getServer().getPluginManager().registerEvents(new ExpFactoryHandler(), this);
     }
 
     private void registerCommands() {

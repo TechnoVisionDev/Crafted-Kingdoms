@@ -94,6 +94,7 @@ public class FortifiedBlock {
     private String material;
     private String group;
     private Date dateFortified;
+    private int factoryLevel;
 
     public FortifiedBlock() { }
 
@@ -103,6 +104,7 @@ public class FortifiedBlock {
         this.reinforcements = calculateReinforcements(material);
         this.material = material.toString();
         this.dateFortified = new Date();
+        this.factoryLevel = 0;
     }
 
     public FortifiedBlock(String group, Location blockLocation, Material material) {
@@ -111,14 +113,16 @@ public class FortifiedBlock {
         this.reinforcements = calculateReinforcements(material);
         this.material = material.toString();
         this.dateFortified = new Date();
+        this.factoryLevel = 0;
     }
 
-    public FortifiedBlock(BlockCoord blockCoord, int reinforcements, String material, String group, Date dateFortified) {
+    public FortifiedBlock(BlockCoord blockCoord, int reinforcements, String material, String group, Date dateFortified, int factoryLevel) {
         this.blockCoord = blockCoord;
         this.reinforcements = reinforcements;
         this.material = material;
         this.group = group;
         this.dateFortified = dateFortified;
+        this.factoryLevel = factoryLevel;
     }
 
     @BsonIgnore
@@ -249,6 +253,10 @@ public class FortifiedBlock {
         return dateFortified;
     }
 
+    public int getFactoryLevel() {
+        return factoryLevel;
+    }
+
     /** Setters */
 
     public void setBlockCoord(BlockCoord blockCoord) {
@@ -269,6 +277,10 @@ public class FortifiedBlock {
 
     public void setDateFortified(Date dateFortified) {
         this.dateFortified = dateFortified;
+    }
+
+    public void setFactoryLevel(int factoryLevel) {
+        this.factoryLevel = factoryLevel;
     }
 
     @Override
