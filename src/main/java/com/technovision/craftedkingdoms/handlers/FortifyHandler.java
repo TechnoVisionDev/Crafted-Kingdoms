@@ -220,7 +220,9 @@ public class FortifyHandler implements Listener {
         if (event.getInventory().getType() == InventoryType.PLAYER) return;
 
         // Modify location for double chests
-        Location chestLocation = event.getInventory().getLocation().getBlock().getLocation().clone();
+        Location loc = event.getInventory().getLocation();
+        if (loc == null) return;
+        Location chestLocation = loc.getBlock().getLocation().clone();
 
         // Check if block is fortified
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(chestLocation);
