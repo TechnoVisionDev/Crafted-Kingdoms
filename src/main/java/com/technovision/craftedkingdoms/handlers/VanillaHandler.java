@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -285,6 +286,13 @@ public class VanillaHandler implements Listener {
     }
 
     /** Disable Vanilla XP & Mob Farming */
+
+    @EventHandler
+    public void onBlockDispense(BlockDispenseEvent event) {
+        if (event.getItem().getType() == Material.EXPERIENCE_BOTTLE) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onPrepareItemEnchant(PrepareItemEnchantEvent event) {
