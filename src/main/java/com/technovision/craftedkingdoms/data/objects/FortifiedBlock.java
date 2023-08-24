@@ -11,6 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -173,6 +175,17 @@ public class FortifiedBlock {
     @BsonIgnore
     public Location findLocation() {
         return new Location(Bukkit.getWorld(blockCoord.getWorldName()), blockCoord.getX(), blockCoord.getY(), blockCoord.getZ());
+    }
+
+    public void reimburseCost(Player player) {
+        if (getReinforcements() >= getMaxReinforcements() / 2) {
+            // Reimburse reinforcement cost
+            ItemStack item = new ItemStack(Material.valueOf(getMaterial()), 1);
+            HashMap<Integer, ItemStack> remainingItems = player.getInventory().addItem(item);
+            if (!remainingItems.isEmpty()) {
+                player.getWorld().dropItemNaturally(player.getLocation(), item);
+            }
+        }
     }
 
     public void decrement() {

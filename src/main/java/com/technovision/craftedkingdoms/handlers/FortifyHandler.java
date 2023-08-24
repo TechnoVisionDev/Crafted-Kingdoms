@@ -130,6 +130,7 @@ public class FortifyHandler implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         // Get bottom half if block is a door
+        Player player = event.getPlayer();
         Block block = event.getBlock();
         if (BlockUtils.isDoor(block)) {
             block = BlockUtils.getBottomPartOfDoor(block);
@@ -155,6 +156,7 @@ public class FortifyHandler implements Listener {
         if (res.getGroups().contains(fortifiedBlock.getGroup())) {
             if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.BLOCKS)) {
                 removeNametag(block.getLocation());
+                fortifiedBlock.reimburseCost(player);
                 fortifiedBlock.delete();
                 // Remove crops if necessary
                 Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
@@ -165,6 +167,7 @@ public class FortifyHandler implements Listener {
             if (BiomeData.isCrop(block.getType())) {
                 if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.CROPS)) {
                     removeNametag(block.getLocation());
+                    fortifiedBlock.reimburseCost(player);
                     fortifiedBlock.delete();
                     // Remove crops if necessary
                     Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
