@@ -92,6 +92,7 @@ public class CraftedKingdoms extends JavaPlugin {
         SnitchCommand snitchCommand = new SnitchCommand(this);
         RecipesCommand recipesCommand = new RecipesCommand();
         CropsCommand cropsCommand = new CropsCommand();
+        MapCommand mapCommand = new MapCommand();
 
         this.getCommand("group").setExecutor(groupCommand);
         this.getCommand("fortify").setExecutor(fortifyCommand);
@@ -100,6 +101,7 @@ public class CraftedKingdoms extends JavaPlugin {
         this.getCommand("snitch").setExecutor(snitchCommand);
         this.getCommand("recipes").setExecutor(recipesCommand);
         this.getCommand("crops").setExecutor(cropsCommand);
+        this.getCommand("map").setExecutor(mapCommand);
 
         this.getCommand("group").setTabCompleter(groupCommand);
         this.getCommand("fortify").setTabCompleter(fortifyCommand);

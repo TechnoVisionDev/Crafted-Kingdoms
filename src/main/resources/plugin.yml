@@ -30,3 +30,6 @@ commands:
     description: View crops that can grow in this biome
     usage: /crops
     aliases: [farming]
+  map:
+    description: Get link to server map page
+    usage: /map
