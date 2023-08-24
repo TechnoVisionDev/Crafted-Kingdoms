@@ -42,7 +42,7 @@ public class ShardHandler implements Listener {
         ItemStack dummySoulShard = new ItemStack(Material.ENDER_EYE, 1);
         ShapelessRecipe recipe = new ShapelessRecipe(key, dummySoulShard);
         recipe.addIngredient(new RecipeChoice.ExactChoice(EssenceHandler.ESSENCE));
-        recipe.addIngredient(Material.ENDER_PEARL);
+        recipe.addIngredient(Material.ENDER_EYE);
         Bukkit.addRecipe(recipe);
 
         // Schedule shard scanner to run every hour
@@ -131,17 +131,17 @@ public class ShardHandler implements Listener {
     public void onPrepareCraft(PrepareItemCraftEvent event) {
         ItemStack[] matrix = event.getInventory().getMatrix();
         ItemStack soulShard = null;
-        boolean hasEnderPearl = false;
+        boolean hasEssence = false;
         for (ItemStack item : matrix) {
             if (item != null) {
                 if (item.getType() == Material.ENDER_EYE && isSoulShard(item)) {
                     soulShard = item;
-                } else if (item.getType() == Material.ENDER_PEARL) {
-                    hasEnderPearl = true;
+                } else if (item.isSimilar(EssenceHandler.ESSENCE)) {
+                    hasEssence = true;
                 }
             }
         }
-        if (soulShard != null && hasEnderPearl) {
+        if (soulShard != null && hasEssence) {
             ItemStack result = soulShard.clone();
             addUpkeepHours(result, 42);
             event.getInventory().setResult(result);
