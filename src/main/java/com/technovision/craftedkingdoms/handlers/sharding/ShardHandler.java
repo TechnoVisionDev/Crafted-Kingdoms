@@ -274,7 +274,7 @@ public class ShardHandler implements Listener {
         lore.add(ChatColor.LIGHT_PURPLE + "Soul Shard");
         lore.add(ChatColor.GOLD + "Player: " + ChatColor.GRAY + killedPlayer.getName());
         lore.add(ChatColor.GOLD + "Health: " + ChatColor.GRAY + "100%");
-        lore.add(ChatColor.GOLD + "Exiled On: " + ChatColor.GRAY + dateFormat.format(new Date()));
+        lore.add(ChatColor.GOLD + "Captured On: " + ChatColor.GRAY + dateFormat.format(new Date()));
         lore.add(ChatColor.GOLD + "Killed By: " + ChatColor.GRAY + killer.getName());
         lore.add(ChatColor.GOLD + "Upkeep Cost Per Week: " + ChatColor.GRAY + "4 Essence");
         meta.setLore(lore);
