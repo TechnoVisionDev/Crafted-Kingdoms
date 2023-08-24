@@ -38,9 +38,9 @@ public class CropsCommand implements CommandExecutor, Listener {
         }
 
         String title = "Crops: " + biome.name();
-        Inventory gui = Bukkit.createInventory(null, getSuitableInventorySize(ItemHandler.recipes.size()), title);
+        Inventory gui = Bukkit.createInventory(null, getSuitableInventorySize(crops.size()), title);
         for (Map.Entry<Material, Double> crop : crops.entrySet()) {
-            ItemStack item = new ItemStack(crop.getKey());
+            ItemStack item = new ItemStack(getItemForm(crop.getKey()));
             ItemMeta meta = item.getItemMeta();
             meta.setDisplayName(ChatColor.DARK_GREEN + StringUtils.stringifyType(item.getType()));
             List<String> lore = new ArrayList<>();
@@ -66,5 +66,16 @@ public class CropsCommand implements CommandExecutor, Listener {
 
     private int getSuitableInventorySize(int size) {
         return (size + 8) / 9 * 9;  // Rounds up to the nearest multiple of 9
+    }
+
+    private Material getItemForm(Material type) {
+        if (type == Material.WHEAT) type = Material.WHEAT_SEEDS;
+        else if (type == Material.POTATOES) type = Material.POTATO;
+        else if (type == Material.CARROTS) type = Material.CARROT;
+        else if (type == Material.BEETROOTS) type = Material.BEETROOT;
+        else if (type == Material.MELON_STEM) type = Material.MELON_SEEDS;
+        else if (type == Material.PUMPKIN_STEM) type = Material.PUMPKIN_SEEDS;
+        else if (type == Material.COCOA) type = Material.COCOA_BEANS;
+        return type;
     }
 }
