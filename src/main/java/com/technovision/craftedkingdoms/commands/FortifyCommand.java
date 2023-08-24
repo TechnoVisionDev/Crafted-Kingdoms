@@ -11,7 +11,9 @@ import com.technovision.craftedkingdoms.util.MessageUtils;
 import com.technovision.craftedkingdoms.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,6 +21,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +47,68 @@ public class FortifyCommand extends CommandBase {
         commands.put("disable", "Disables fortify mode.");
         commands.put("inspect", "Toggle inspect mode");
         commands.put("materials", "Show the materials used for fortifying blocks.");
+        commands.put("acid", "Activates an acid block.");
+    }
+
+    public void acid_cmd() throws CKException {
+        Player player = getPlayer();
+        Block targetBlock = player.getTargetBlockExact(10);
+        if (targetBlock == null || targetBlock.getType() != Material.GOLD_BLOCK) {
+            throw new CKException("You must be looking at a reinforced gold block!");
+        }
+
+        Location acidLocation = targetBlock.getLocation();
+        FortifiedBlock acidBlock = CKGlobal.getFortifiedBlock(acidLocation);
+        if (acidBlock == null) {
+            throw new CKException("A block must be reinforced to act as an acid block");
+        }
+
+        Location griefLocation = targetBlock.getLocation().clone().add(0, 1, 0);
+        FortifiedBlock griefBlock = CKGlobal.getFortifiedBlock(griefLocation);
+        if (!griefBlock.getMaterial().equalsIgnoreCase(acidBlock.getMaterial())) {
+            throw new CKException("Acid blocks but be reinforced with the same material as the grief block!");
+        }
+
+        Resident resident = getResident();
+        if (!resident.isInGroup(acidBlock.getGroup())) {
+            throw new CKException("You are not a member of the group that owns that acid block!");
+        }
+
+        Date date = acidBlock.getDateFortified();
+        Instant dateInstant = date.toInstant();
+        Instant targetInstant = null;
+
+        Material acidMaterial = Material.valueOf(acidBlock.getMaterial());
+        if (acidMaterial == Material.STONE || acidMaterial == Material.COPPER_INGOT || acidMaterial == Material.NETHER_BRICK) {
+            targetInstant = dateInstant.plus(Duration.ofHours(4));
+        } else if (acidMaterial == Material.IRON_INGOT || acidMaterial == Material.GOLD_INGOT) {
+            targetInstant = dateInstant.plus(Duration.ofHours(6));
+        } else {
+            targetInstant = dateInstant.plus(Duration.ofHours(8));
+        }
+
+        // Check if now is after the targetInstant
+        if (Instant.now().isAfter(targetInstant)) {
+            griefBlock.delete();
+            acidBlock.delete();
+            acidBlock.reimburseCost(player);
+            griefLocation.getBlock().breakNaturally();
+            acidLocation.getBlock().breakNaturally();
+            MessageUtils.sendError(player, ChatColor.GRAY + "Your acid block has removed the reinforcement grief!");
+            return;
+        }
+
+        // Not ready yet
+        String timeRemaining = getTimeRemainingFormatted(targetInstant);
+        MessageUtils.send(player, ChatColor.GOLD + "This acid block will be ready in " + timeRemaining);
+    }
+
+    public String getTimeRemainingFormatted(Instant targetInstant) {
+        // Calculate the remaining duration
+        Duration remainingDuration = Duration.between(Instant.now(), targetInstant);
+        long hours = remainingDuration.toHours();
+        long minutes = remainingDuration.minusHours(hours).toMinutes();
+        return hours + "h " + minutes + "m";
     }
 
     public void enable_cmd() throws CKException {

@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -92,6 +93,7 @@ public class FortifiedBlock {
     private int reinforcements;
     private String material;
     private String group;
+    private Date dateFortified;
 
     public FortifiedBlock() { }
 
@@ -100,6 +102,7 @@ public class FortifiedBlock {
         this.blockCoord = new BlockCoord(block);
         this.reinforcements = calculateReinforcements(material);
         this.material = material.toString();
+        this.dateFortified = new Date();
     }
 
     public FortifiedBlock(String group, Location blockLocation, Material material) {
@@ -107,13 +110,15 @@ public class FortifiedBlock {
         this.blockCoord = new BlockCoord(blockLocation);
         this.reinforcements = calculateReinforcements(material);
         this.material = material.toString();
+        this.dateFortified = new Date();
     }
 
-    public FortifiedBlock(BlockCoord blockCoord, int reinforcements, String material, String group) {
+    public FortifiedBlock(BlockCoord blockCoord, int reinforcements, String material, String group, Date dateFortified) {
         this.blockCoord = blockCoord;
         this.reinforcements = reinforcements;
         this.material = material;
         this.group = group;
+        this.dateFortified = dateFortified;
     }
 
     @BsonIgnore
@@ -240,6 +245,10 @@ public class FortifiedBlock {
         return material;
     }
 
+    public Date getDateFortified() {
+        return dateFortified;
+    }
+
     /** Setters */
 
     public void setBlockCoord(BlockCoord blockCoord) {
@@ -256,6 +265,10 @@ public class FortifiedBlock {
 
     public void setMaterial(String material) {
         this.material = material;
+    }
+
+    public void setDateFortified(Date dateFortified) {
+        this.dateFortified = dateFortified;
     }
 
     @Override
