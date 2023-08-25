@@ -62,22 +62,33 @@ public class ItemHandler implements Listener {
         Bukkit.getServer().addRecipe(recipe);
         recipes.add(recipe);
 
+        // Campfire
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "campfire"), new ItemStack(Material.CAMPFIRE));
+        shapedRecipe.shape( " S ",
+                "S S",
+                "PPP");
+        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(crafted_stick));
+        shapedRecipe.setIngredient('P', new RecipeChoice.ExactChoice(refined_wood));
+        Bukkit.getServer().addRecipe(shapedRecipe);
+        recipes.add(shapedRecipe);
+
         // Furnace
-        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "furnace"), new ItemStack(Material.FURNACE));
+        shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "furnace"), new ItemStack(Material.FURNACE));
         shapedRecipe.shape( "SSS",
-                            "S S",
+                            "SLS",
                             "CCC");
-        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(refined_stone));
+        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
+        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(crushed_stone));
         shapedRecipe.setIngredient('C', Material.COAL_BLOCK);
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
         // Blast Furnace
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "blast_furnace"), new ItemStack(Material.BLAST_FURNACE));
-        shapedRecipe.shape( "SSS",
-                            "SFS",
-                            "III");
-        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(crushed_stone));
+        shapedRecipe.shape( "III",
+                            "IFI",
+                            "CCC");
+        shapedRecipe.setIngredient('C', new RecipeChoice.ExactChoice(compacted_stone));
         shapedRecipe.setIngredient('F', Material.FURNACE);
         shapedRecipe.setIngredient('I', new RecipeChoice.ExactChoice(steel_ingot));
         Bukkit.getServer().addRecipe(shapedRecipe);
@@ -85,10 +96,10 @@ public class ItemHandler implements Listener {
 
         // Smoker
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "smoker"), new ItemStack(Material.SMOKER));
-        shapedRecipe.shape( "LLL",
-                            "LFL",
+        shapedRecipe.shape( "HHH",
+                            "CFC",
                             "CCC");
-        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
+        shapedRecipe.setIngredient('H', new RecipeChoice.ExactChoice(hardened_wood));
         shapedRecipe.setIngredient('F', Material.FURNACE);
         shapedRecipe.setIngredient('C', new RecipeChoice.ExactChoice(clay_molding));
         Bukkit.getServer().addRecipe(shapedRecipe);
@@ -100,7 +111,7 @@ public class ItemHandler implements Listener {
                             " L ",
                             "MMM");
         shapedRecipe.setIngredient('B', Material.BLAZE_ROD);
-        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
+        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(hardened_wood));
         shapedRecipe.setIngredient('M', new RecipeChoice.ExactChoice(masonry_mortar));
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
@@ -143,6 +154,16 @@ public class ItemHandler implements Listener {
         shapedRecipe.setIngredient('M', new RecipeChoice.ExactChoice(masonry_mortar));
         shapedRecipe.setIngredient('D', new RecipeChoice.ExactChoice(decorative_jewels));
         shapedRecipe.setIngredient('O', Material.OBSIDIAN);
+        Bukkit.getServer().addRecipe(shapedRecipe);
+        recipes.add(shapedRecipe);
+
+        // Cartography Table
+        shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "cartography_table"), new ItemStack(Material.CARTOGRAPHY_TABLE));
+        shapedRecipe.shape( "SSS",
+                "LLL",
+                "LLL");
+        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
+        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(steel_ingot));
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
@@ -383,6 +404,17 @@ public class ItemHandler implements Listener {
                         isCraftedWithMaterial(event.getInventory().getMatrix(), Material.DIAMOND) &&
                         isCraftedWithMaterial(event.getInventory().getMatrix(), Material.OBSIDIAN)) {
                     cancelCrafting(event, "The vanilla enchanting table recipe is disabled!");
+                }
+            }
+            case CAMPFIRE -> {
+                if (isCraftedWithMaterial(event.getInventory().getMatrix(), Material.STICK)&&
+                        isCraftedWithMaterial(event.getInventory().getMatrix(), Material.COAL)) {
+                    cancelCrafting(event, "The vanilla campfire recipe is disabled!");
+                }
+            }
+            case CARTOGRAPHY_TABLE -> {
+                if (isCraftedWithMaterial(event.getInventory().getMatrix(), Material.PAPER)) {
+                    cancelCrafting(event, "The vanilla cartography table recipe is disabled!");
                 }
             }
             default -> { }
