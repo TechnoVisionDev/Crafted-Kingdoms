@@ -136,7 +136,11 @@ public class FarmingHandler implements Listener {
      */
     @EventHandler
     public void onCropGrow(BlockGrowEvent event) {
-        if (event.getNewState().getType() != Material.VINE) {
+        if (event.getNewState().getType() != Material.VINE &&
+                event.getNewState().getType() != Material.BUDDING_AMETHYST &&
+                event.getNewState().getType() != Material.SMALL_AMETHYST_BUD &&
+                event.getNewState().getType() != Material.MEDIUM_AMETHYST_BUD &&
+                event.getNewState().getType() != Material.LARGE_AMETHYST_BUD) {
             event.setCancelled(true);
         }
     }

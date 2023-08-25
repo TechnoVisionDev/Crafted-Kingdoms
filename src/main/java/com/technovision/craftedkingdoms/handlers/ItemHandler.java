@@ -246,11 +246,12 @@ public class ItemHandler implements Listener {
 
         decorative_jewels = createMaterial("§bDecorative Jewels", Material.AMETHYST_SHARD, 2);
         ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "decorative_jewels"), decorative_jewels);
-        shapedRecipe.shape( "GGG",
+        shapedRecipe.shape( "AGA",
                             "GDG",
-                            "GGG");
-        shapedRecipe.setIngredient('G', Material.GOLD_INGOT);
-        shapedRecipe.setIngredient('D', Material.DIAMOND);
+                            "AGA");
+        shapedRecipe.setIngredient('G', Material.GOLD_BLOCK);
+        shapedRecipe.setIngredient('D', Material.DIAMOND_BLOCK);
+        shapedRecipe.setIngredient('A', Material.AMETHYST_SHARD);
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
