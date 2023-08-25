@@ -169,8 +169,6 @@ public class ItemHandler implements Listener {
 
         // Nether Star
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "nether_star"), new ItemStack(Material.NETHER_STAR));
-        Bukkit.getServer().addRecipe(recipe);
-        recipes.add(recipe);
         shapedRecipe.shape( " W ",
                             "WDW",
                             " W ");
