@@ -15,10 +15,10 @@ commands:
     description: Manage your soul shards
     usage: /soulshard
     aliases: [shard, ss]
-  chat:
+  groupchat:
     description: Switch chat groups
-    usage: /chat
-    aliases: [c]
+    usage: /groupchat
+    aliases: [gc, chat, c]
   snitch:
     description: Manage your group snitches
     usage: /snitch

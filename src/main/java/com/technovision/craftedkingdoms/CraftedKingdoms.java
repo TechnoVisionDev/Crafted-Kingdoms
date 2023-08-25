@@ -90,7 +90,7 @@ public class CraftedKingdoms extends JavaPlugin {
         GroupCommand groupCommand = new GroupCommand(this);
         FortifyCommand fortifyCommand = new FortifyCommand(this);
         ShardCommand shardCommand = new ShardCommand(this);
-        ChatCommand chatCommand = new ChatCommand(this);
+        GroupChatCommand groupChatCommand = new GroupChatCommand();
         SnitchCommand snitchCommand = new SnitchCommand(this);
         RecipesCommand recipesCommand = new RecipesCommand();
         CropsCommand cropsCommand = new CropsCommand();
@@ -99,7 +99,7 @@ public class CraftedKingdoms extends JavaPlugin {
         this.getCommand("group").setExecutor(groupCommand);
         this.getCommand("fortify").setExecutor(fortifyCommand);
         this.getCommand("soulshard").setExecutor(shardCommand);
-        this.getCommand("chat").setExecutor(chatCommand);
+        this.getCommand("groupchat").setExecutor(groupChatCommand);
         this.getCommand("snitch").setExecutor(snitchCommand);
         this.getCommand("recipes").setExecutor(recipesCommand);
         this.getCommand("crops").setExecutor(cropsCommand);
@@ -108,7 +108,7 @@ public class CraftedKingdoms extends JavaPlugin {
         this.getCommand("group").setTabCompleter(groupCommand);
         this.getCommand("fortify").setTabCompleter(fortifyCommand);
         this.getCommand("soulshard").setTabCompleter(shardCommand);
-        this.getCommand("chat").setTabCompleter(chatCommand);
+        this.getCommand("groupchat").setTabCompleter(groupChatCommand);
         this.getCommand("snitch").setTabCompleter(snitchCommand);
     }
 
