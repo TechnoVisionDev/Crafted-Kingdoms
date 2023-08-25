@@ -168,12 +168,16 @@ public class ItemHandler implements Listener {
         recipes.add(shapedRecipe);
 
         // Nether Star
-        recipe = new ShapelessRecipe(new NamespacedKey(CraftedKingdoms.namespace, "nether_star"), new ItemStack(Material.NETHER_STAR));
-        for (int i = 0; i < 3; i++) {
-            recipe.addIngredient(Material.WITHER_SKELETON_SKULL);
-        }
+        shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "nether_star"), new ItemStack(Material.NETHER_STAR));
         Bukkit.getServer().addRecipe(recipe);
         recipes.add(recipe);
+        shapedRecipe.shape( " W ",
+                            "WDW",
+                            " W ");
+        shapedRecipe.setIngredient('D', new RecipeChoice.ExactChoice(decorative_jewels));
+        shapedRecipe.setIngredient('W', Material.WITHER_SKELETON_SKULL);
+        Bukkit.getServer().addRecipe(shapedRecipe);
+        recipes.add(shapedRecipe);
 
         // Saddle
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "saddle"), new ItemStack(Material.SADDLE));
