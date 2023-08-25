@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -94,6 +95,7 @@ public class SnitchCommand extends CommandBase {
             throw new CKException("Only jukebox snitches store logs!");
         }
         List<SnitchLog> logs = snitch.getLog();
+        Collections.reverse(logs);
 
         int page = 1;
         if (args.length == 3) {
