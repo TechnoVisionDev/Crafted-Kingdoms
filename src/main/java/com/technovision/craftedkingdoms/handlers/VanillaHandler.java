@@ -17,13 +17,15 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.raid.RaidTriggerEvent;
+import org.bukkit.event.world.AsyncStructureSpawnEvent;
 import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.generator.structure.Structure;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.util.*;
 
 /**
  * Event handlers that disable or modify core elements of vanilla Minecraft.
@@ -34,6 +36,28 @@ public class VanillaHandler implements Listener {
 
     private static final Random random = new Random();
     private static final World overworld = Bukkit.getWorld("world");
+
+    @EventHandler
+    public void onPlayerQuit(AsyncStructureSpawnEvent event) {
+        if (event.getStructure() == Structure.RUINED_PORTAL ||
+                event.getStructure() == Structure.RUINED_PORTAL_DESERT ||
+                event.getStructure() == Structure.RUINED_PORTAL_JUNGLE ||
+                event.getStructure() == Structure.RUINED_PORTAL_MOUNTAIN ||
+                event.getStructure() == Structure.RUINED_PORTAL_NETHER ||
+                event.getStructure() == Structure.RUINED_PORTAL_SWAMP ||
+                event.getStructure() == Structure.RUINED_PORTAL_OCEAN ||
+                event.getStructure() == Structure.VILLAGE_TAIGA ||
+                event.getStructure() == Structure.VILLAGE_SNOWY ||
+                event.getStructure() == Structure.VILLAGE_SAVANNA ||
+                event.getStructure() == Structure.VILLAGE_PLAINS ||
+                event.getStructure() == Structure.VILLAGE_DESERT ||
+                event.getStructure() == Structure.MANSION ||
+                event.getStructure() == Structure.IGLOO ||
+                event.getStructure() == Structure.SWAMP_HUT
+        ) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {

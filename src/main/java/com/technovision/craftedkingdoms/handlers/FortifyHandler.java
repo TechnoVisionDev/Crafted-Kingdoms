@@ -650,6 +650,12 @@ public class FortifyHandler implements Listener {
         }
 
         Material itemType = item.getType();
+        if (itemType == Material.BEDROCK) {
+            if (!player.isOp()) {
+                item.setAmount(0);
+                return;
+            }
+        }
         item.setAmount(item.getAmount() - 1);
         group.fortifyBlock(block, itemType);
 

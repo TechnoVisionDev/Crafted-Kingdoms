@@ -32,6 +32,7 @@ public class FortifiedBlock {
     public static final int IRON_INGOT = 250;
     public static final int DIAMOND = 1500;
     public static final int NETHERITE_INGOT = 2000;
+    public static final int BEDROCK = Integer.MAX_VALUE;
 
     // Nether Reinforcement Materials
     public static final int NETHER_BRICK = 50;
@@ -46,6 +47,7 @@ public class FortifiedBlock {
         OVERWORLD_MATERIALS.put(Material.IRON_INGOT, IRON_INGOT);
         OVERWORLD_MATERIALS.put(Material.DIAMOND, DIAMOND);
         OVERWORLD_MATERIALS.put(Material.NETHERITE_INGOT, NETHERITE_INGOT);
+        OVERWORLD_MATERIALS.put(Material.BEDROCK, BEDROCK);
     }
 
     public static Map<Material, Integer> NETHER_MATERIALS;
@@ -54,6 +56,7 @@ public class FortifiedBlock {
         NETHER_MATERIALS.put(Material.NETHER_BRICK, NETHER_BRICK);
         NETHER_MATERIALS.put(Material.GOLD_INGOT, GOLD_INGOT);
         NETHER_MATERIALS.put(Material.GILDED_BLACKSTONE, GILDED_BLACKSTONE);
+        NETHER_MATERIALS.put(Material.BEDROCK, BEDROCK);
     }
 
     public static Set<Material> INVALID_BLOCKS = Set.of(
