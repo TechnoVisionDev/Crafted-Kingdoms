@@ -11,12 +11,18 @@ import java.util.List;
  */
 public class FactoryRecipe {
 
+    private final String title;
     private final ItemStack result;
     private final List<ItemStack> ingredients;
 
-    public FactoryRecipe(ItemStack result, List<ItemStack> ingredients) {
+    public FactoryRecipe(String title, ItemStack result, List<ItemStack> ingredients) {
+        this.title = title;
         this.result = result;
         this.ingredients = ingredients;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public List<ItemStack> getIngredients() {

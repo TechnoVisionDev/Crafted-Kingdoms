@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -36,25 +37,25 @@ public class ExpFactoryHandler implements Listener {
 
     public ExpFactoryHandler() {
         // Tier 1 Recipes
-        slotToRecipe.put(1, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
+        slotToRecipe.put(1, new FactoryRecipe("4 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
                 new ItemStack(Material.ENDER_PEARL, 4),
                 new ItemStack(Material.HAY_BLOCK, 3),
                 new ItemStack(Material.GLASS_BOTTLE, 4),
                 new ItemStack(Material.CHARCOAL, 40)
         )));
-        slotToRecipe.put(3, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
+        slotToRecipe.put(3, new FactoryRecipe("4 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
                 new ItemStack(Material.CACTUS, 32),
                 new ItemStack(Material.NETHER_WART, 25),
                 new ItemStack(Material.GLASS_BOTTLE, 4),
                 new ItemStack(Material.CHARCOAL, 40)
         )));
-        slotToRecipe.put(5, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
+        slotToRecipe.put(5, new FactoryRecipe("4 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
                 new ItemStack(Material.CARROT, 64),
                 new ItemStack(Material.SOUL_SAND, 64),
                 new ItemStack(Material.GLASS_BOTTLE, 4),
                 new ItemStack(Material.CHARCOAL, 40)
         )));
-        slotToRecipe.put(7, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
+        slotToRecipe.put(7, new FactoryRecipe("4 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 4),List.of(
                 new ItemStack(Material.GLOWSTONE, 16),
                 new ItemStack(Material.POTATO, 64),
                 new ItemStack(Material.GLASS_BOTTLE, 4),
@@ -62,7 +63,7 @@ public class ExpFactoryHandler implements Listener {
         )));
 
         // Tier 2 Recipes
-        slotToRecipe.put(19, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
+        slotToRecipe.put(19, new FactoryRecipe("32 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
                 new ItemStack(Material.GLASS_BOTTLE, 32),
                 new ItemStack(Material.CARROT, 512),
                 new ItemStack(Material.CACTUS, 16),
@@ -70,7 +71,7 @@ public class ExpFactoryHandler implements Listener {
                 new ItemStack(Material.MELON, 4),
                 new ItemStack(Material.CHARCOAL, 1)
         )));
-        slotToRecipe.put(21, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
+        slotToRecipe.put(21, new FactoryRecipe("32 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
                 new ItemStack(Material.GLASS_BOTTLE, 32),
                 new ItemStack(Material.WHEAT, 256),
                 new ItemStack(Material.BAKED_POTATO, 256),
@@ -78,7 +79,7 @@ public class ExpFactoryHandler implements Listener {
                 new ItemStack(Material.PUMPKIN, 8),
                 new ItemStack(Material.CHARCOAL, 1)
         )));
-        slotToRecipe.put(23, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
+        slotToRecipe.put(23, new FactoryRecipe("32 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
                 new ItemStack(Material.GLASS_BOTTLE, 32),
                 new ItemStack(Material.CARROTS, 512),
                 new ItemStack(Material.BAKED_POTATO, 256),
@@ -86,7 +87,7 @@ public class ExpFactoryHandler implements Listener {
                 new ItemStack(Material.MELON, 4),
                 new ItemStack(Material.CHARCOAL, 1)
         )));
-        slotToRecipe.put(25, new FactoryRecipe(new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
+        slotToRecipe.put(25, new FactoryRecipe("32 Exp Bottles", new ItemStack(Material.EXPERIENCE_BOTTLE, 32),List.of(
                 new ItemStack(Material.GLASS_BOTTLE, 32),
                 new ItemStack(Material.WHEAT, 256),
                 new ItemStack(Material.CACTUS, 16),
@@ -144,6 +145,7 @@ public class ExpFactoryHandler implements Listener {
         if (event.getClickedInventory() == null || event.getCurrentItem() == null) return;
         if (event.getView().getTitle().equals(GUI_TITLE)) {
             event.setCancelled(true);
+            if (event.getClickedInventory().getType() == InventoryType.PLAYER) return;
 
             Player player = (Player) event.getWhoClicked();
             int clickedSlot = event.getSlot();
@@ -184,16 +186,15 @@ public class ExpFactoryHandler implements Listener {
     private void openXPFactory(Player player) {
         Inventory gui = Bukkit.createInventory(null, 27, GUI_TITLE);
         for (Map.Entry<Integer, FactoryRecipe> entry : slotToRecipe.entrySet()) {
-            int amount = entry.getValue().getResult().getAmount();
-            gui.setItem(entry.getKey(), createRecipeItem(amount + " Exp Bottles", entry.getValue()));
+            gui.setItem(entry.getKey(), createRecipeItem(entry.getValue()));
         }
         player.openInventory(gui);
     }
 
-    private ItemStack createRecipeItem(String title, FactoryRecipe recipe) {
+    private ItemStack createRecipeItem(FactoryRecipe recipe) {
         ItemStack item = recipe.getResult().clone();
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.YELLOW + title);
+        meta.setDisplayName(ChatColor.YELLOW + recipe.getTitle());
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + "--------------");
         for (ItemStack ingredient : recipe.getIngredients()) {
