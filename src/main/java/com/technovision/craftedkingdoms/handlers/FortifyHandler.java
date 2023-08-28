@@ -46,6 +46,11 @@ public class FortifyHandler implements Listener {
      */
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.getBlockPlaced().getType() == Material.SCULK_CATALYST) {
+            event.setCancelled(true);
+            MessageUtils.sendError(event.getPlayer(), "You can't place that block!");
+            return;
+        }
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         Player player = event.getPlayer();
