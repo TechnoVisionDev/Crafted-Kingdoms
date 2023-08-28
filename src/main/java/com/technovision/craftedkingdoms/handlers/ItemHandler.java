@@ -190,42 +190,52 @@ public class ItemHandler implements Listener {
 
     private static void initMaterials() {
         // Create T1 Materials
-        crafted_stick = createMaterial("§aCrafted Stick", Material.STICK, 1);
+        crafted_stick = createMaterial("§aCrafted Stick", Material.FLINT, 1);
+        setTextureCode(crafted_stick, 100019);
         createMaterialRecipe("crafted_stick", Material.STICK, crafted_stick);
 
-        refined_sugar = createMaterial("§aRefined Sugar", Material.SUGAR, 1);
+        refined_sugar = createMaterial("§aRefined Sugar", Material.FLINT, 1);
+        setTextureCode(refined_sugar, 100014);
         createMaterialRecipe("refined_sugar", Material.SUGAR, refined_sugar);
 
-        carved_leather = createMaterial("§aCarved Leather", Material.LEATHER, 1);
+        carved_leather = createMaterial("§aCarved Leather", Material.FLINT, 1);
+        setTextureCode(carved_leather, 100022);
         createMaterialRecipe("carved_leather", Material.LEATHER, carved_leather);
 
-        refined_sulfur = createMaterial("§aRefined Sulfur", Material.GUNPOWDER, 1);
+        refined_sulfur = createMaterial("§aRefined Sulfur", Material.FLINT, 1);
+        setTextureCode(refined_sulfur, 100021);
         createMaterialRecipe("refined_sulfur", Material.GUNPOWDER, refined_sulfur);
 
-        crafted_reeds = createMaterial("§aCrafted Reeds", Material.SUGAR_CANE, 1);
+        crafted_reeds = createMaterial("§aCrafted Reeds", Material.FLINT, 1);
+        setTextureCode(crafted_reeds, 100013);
         createMaterialRecipe("crafted_reeds", Material.SUGAR_CANE, crafted_reeds);
 
-        crafted_string = createMaterial("§aCrafted String", Material.STRING, 1);
+        crafted_string = createMaterial("§aCrafted String", Material.FLINT, 1);
+        setTextureCode(crafted_string, 100001);
         createMaterialRecipe("crafted_string", Material.STRING, crafted_string);
 
-        refined_stone = createMaterial("§aRefined Stone", Material.STONE_SLAB, 1);
+        refined_stone = createMaterial("§aRefined Stone", Material.FLINT, 1);
+        setTextureCode(refined_stone, 100023);
         RecipeChoice.MaterialChoice choices = new RecipeChoice.MaterialChoice(
                 Material.COBBLESTONE, Material.STONE, Material.GRANITE, Material.DIORITE,
                 Material.ANDESITE, Material.COBBLED_DEEPSLATE, Material.DEEPSLATE
         );
         createMaterialRecipe("refined_stone", choices, refined_stone);
 
-        refined_wood = createMaterial("§aRefined Wood", Material.OAK_SLAB, 1);
+        refined_wood = createMaterial("§aRefined Wood", Material.FLINT, 1);
+        setTextureCode(refined_wood, 100015);
         choices = new RecipeChoice.MaterialChoice(
                 Material.OAK_LOG, Material.ACACIA_LOG, Material.BIRCH_LOG, Material.CHERRY_LOG,
                 Material.DARK_OAK_LOG, Material.JUNGLE_LOG, Material.MANGROVE_LOG, Material.SPRUCE_LOG
         );
         createMaterialRecipe("refined_wood", choices, refined_wood);
 
-        forged_clay = createMaterial("§aForged Clay", Material.CLAY_BALL, 1);
+        forged_clay = createMaterial("§aForged Clay", Material.FLINT, 1);
+        setTextureCode(forged_clay, 100006);
         createMaterialRecipe("forged_clay", Material.CLAY_BALL, forged_clay);
 
-        refined_slime = createMaterial("§aRefined Slime", Material.LIME_DYE, 1);
+        refined_slime = createMaterial("§aRefined Slime", Material.FLINT, 1);
+        setTextureCode(refined_slime, 100007);
         ShapelessRecipe recipe = new ShapelessRecipe(new NamespacedKey(CraftedKingdoms.namespace, "refined_slime"), refined_slime);
         recipe.addIngredient(Material.SLIME_BALL);
         recipe.addIngredient(Material.SLIME_BALL);
@@ -233,20 +243,24 @@ public class ItemHandler implements Listener {
         recipes.add(recipe);
 
         // Create T2 Materials
-        milled_lumber = createMaterial("§bMilled Lumber", Material.OAK_STAIRS, 2);
+        milled_lumber = createMaterial("§bMilled Lumber", Material.FLINT, 2);
+        setTextureCode(milled_lumber, 100011);
         createMaterialRecipe("milled_lumber", refined_wood, milled_lumber);
 
-        crushed_stone = createMaterial("§bCrushed Stone", Material.STONE_STAIRS, 2);
+        crushed_stone = createMaterial("§bCrushed Stone", Material.FLINT, 2);
+        setTextureCode(crushed_stone, 100012);
         createMaterialRecipe("crushed_stone", refined_stone, crushed_stone);
 
-        crafted_leather = createMaterial("§bCrafted Leather", Material.GRASS, 2);
+        crafted_leather = createMaterial("§bCrafted Leather", Material.FLINT, 2);
+        setTextureCode(crafted_leather, 100008);
         recipe = new ShapelessRecipe(new NamespacedKey(CraftedKingdoms.namespace, "crafted_leather"), crafted_leather);
         recipe.addIngredient(new RecipeChoice.ExactChoice(crafted_string));
         recipe.addIngredient(new RecipeChoice.ExactChoice(carved_leather));
         Bukkit.getServer().addRecipe(recipe);
         recipes.add(recipe);
 
-        decorative_jewels = createMaterial("§bDecorative Jewels", Material.AMETHYST_SHARD, 2);
+        decorative_jewels = createMaterial("§bDecorative Jewels", Material.FLINT, 2);
+        setTextureCode(decorative_jewels, 100003);
         ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "decorative_jewels"), decorative_jewels);
         shapedRecipe.shape( "AGA",
                             "GDG",
@@ -257,7 +271,8 @@ public class ItemHandler implements Listener {
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
-        clay_molding = createMaterial("§bClay Molding", Material.BRICK_STAIRS, 2);
+        clay_molding = createMaterial("§bClay Molding", Material.FLINT, 2);
+        setTextureCode(clay_molding, 100002);
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "clay_molding"), clay_molding);
         shapedRecipe.shape( "CCC",
                             "RSR",
@@ -268,7 +283,8 @@ public class ItemHandler implements Listener {
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
-        sticky_resin = createMaterial("§bSticky Resin", Material.GREEN_DYE, 2);
+        sticky_resin = createMaterial("§bSticky Resin", Material.FLINT, 2);
+        setTextureCode(sticky_resin, 100016);
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "sticky_resin"), sticky_resin);
         shapedRecipe.shape( "RRR",
                             " S ",
@@ -279,7 +295,8 @@ public class ItemHandler implements Listener {
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
-        steel_ingot = createMaterial("§bSteel Ingot", Material.GRAY_DYE, 2);
+        steel_ingot = createMaterial("§bSteel Ingot", Material.FLINT, 2);
+        setTextureCode(steel_ingot, 100018);
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "steel_ingot"), steel_ingot);
         shapedRecipe.shape( "III",
                             "CCC",
@@ -291,13 +308,16 @@ public class ItemHandler implements Listener {
         recipes.add(shapedRecipe);
 
         // Create T3 Materials
-        compacted_stone = createMaterial("§dCompacted Stone", Material.STONE_BRICKS, 3);
+        compacted_stone = createMaterial("§dCompacted Stone", Material.FLINT, 3);
+        setTextureCode(compacted_stone, 100004);
         createMaterialRecipe("compacted_stone", crushed_stone, compacted_stone);
 
-        hardened_wood = createMaterial("§dHardened Wood", Material.OAK_WOOD, 3);
+        hardened_wood = createMaterial("§dHardened Wood", Material.FLINT, 3);
+        setTextureCode(hardened_wood, 100009);
         createMaterialRecipe("hardened_wood", milled_lumber, hardened_wood);
 
-        masonry_mortar = createMaterial("§dMasonry Mortar", Material.BRICKS, 3);
+        masonry_mortar = createMaterial("§dMasonry Mortar", Material.FLINT, 3);
+        setTextureCode(masonry_mortar, 100010);
         recipe = new ShapelessRecipe(new NamespacedKey(CraftedKingdoms.namespace, "masonry_mortar"), masonry_mortar);
         recipe.addIngredient(new RecipeChoice.ExactChoice(clay_molding));
         recipe.addIngredient(new RecipeChoice.ExactChoice(clay_molding));
@@ -305,6 +325,12 @@ public class ItemHandler implements Listener {
         recipe.addIngredient(new RecipeChoice.ExactChoice(sticky_resin));
         Bukkit.getServer().addRecipe(recipe);
         recipes.add(recipe);
+    }
+
+    private static void setTextureCode(ItemStack item, int code) {
+        ItemMeta meta = item.getItemMeta();
+        meta.setCustomModelData(code);
+        item.setItemMeta(meta);
     }
 
     private static ItemStack createMaterial(String displayName, Material material, int tier) {

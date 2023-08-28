@@ -3,7 +3,6 @@ package com.technovision.craftedkingdoms.handlers.sharding;
 import com.technovision.craftedkingdoms.CKGlobal;
 import com.technovision.craftedkingdoms.CraftedKingdoms;
 import com.technovision.craftedkingdoms.data.objects.Resident;
-import com.technovision.craftedkingdoms.data.objects.SoulShard;
 import com.technovision.craftedkingdoms.util.MessageUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -40,10 +39,10 @@ public class ShardHandler implements Listener {
     public ShardHandler() {
         // Created soulshard upkeep recipe
         NamespacedKey key = new NamespacedKey(CraftedKingdoms.plugin, "soulshard_upkeep");
-        ItemStack dummySoulShard = new ItemStack(Material.ENDER_EYE, 1);
+        ItemStack dummySoulShard = new ItemStack(Material.FLINT, 1);
         ShapelessRecipe recipe = new ShapelessRecipe(key, dummySoulShard);
         recipe.addIngredient(new RecipeChoice.ExactChoice(EssenceHandler.ESSENCE));
-        recipe.addIngredient(Material.ENDER_EYE);
+        recipe.addIngredient(Material.FLINT);
         Bukkit.addRecipe(recipe);
 
         // Schedule shard scanner to run every hour
@@ -135,7 +134,7 @@ public class ShardHandler implements Listener {
         boolean hasEssence = false;
         for (ItemStack item : matrix) {
             if (item != null) {
-                if (item.getType() == Material.ENDER_EYE && isSoulShard(item)) {
+                if (item.getType() == Material.FLINT && isSoulShard(item)) {
                     soulShard = item;
                 } else if (item.isSimilar(EssenceHandler.ESSENCE)) {
                     hasEssence = true;
@@ -179,7 +178,7 @@ public class ShardHandler implements Listener {
     }
 
     public static boolean isSoulShard(ItemStack item) {
-        if (item == null || !item.hasItemMeta() || item.getType() != Material.ENDER_EYE) {
+        if (item == null || !item.hasItemMeta() || item.getType() != Material.FLINT) {
             return false;
         }
         ItemMeta meta = item.getItemMeta();
@@ -253,7 +252,7 @@ public class ShardHandler implements Listener {
 
     public ItemStack createSoulShard(Player killer, Player killedPlayer) {
         // Create a new ItemStack of Material ENDER_PEARL (1 ender pearl)
-        ItemStack soulShard = new ItemStack(Material.ENDER_EYE, 1);
+        ItemStack soulShard = new ItemStack(Material.FLINT, 1);
         ItemMeta meta = soulShard.getItemMeta();
         meta.setDisplayName(ChatColor.AQUA + "" + ChatColor.ITALIC + killedPlayer.getName());
 
@@ -282,6 +281,7 @@ public class ShardHandler implements Listener {
         // Add an enchantment to the item
         meta.addEnchant(Enchantment.DURABILITY, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.setCustomModelData(100017);
         soulShard.setItemMeta(meta);
 
         // Return the soul shard item
@@ -300,17 +300,6 @@ public class ShardHandler implements Listener {
     }
 
     /** Handle soul shard movement */
-
-    @EventHandler
-    public void preventThrowingShard(PlayerInteractEvent event) {
-        ItemStack item = event.getItem();
-        if (item == null) return;
-        if (item.getType() == Material.ENDER_EYE) {
-            if (isSoulShard(item)) {
-                event.setCancelled(true);
-            }
-        }
-    }
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {

@@ -30,9 +30,10 @@ public class EssenceHandler implements Listener {
 
     public EssenceHandler() {
         // Create a new ItemStack of Material ENDER_PEARL (1 ender pearl)
-        ESSENCE = new ItemStack(Material.LIME_DYE, 1);
+        ESSENCE = new ItemStack(Material.FLINT, 1);
         ItemMeta meta = ESSENCE.getItemMeta();
         meta.setDisplayName(ChatColor.GREEN + "Essence");
+        meta.setCustomModelData(100005);
         ESSENCE.setItemMeta(meta);
 
         Bukkit.getScheduler().runTaskTimer(CraftedKingdoms.plugin, () -> {
