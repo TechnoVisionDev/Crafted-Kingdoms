@@ -57,7 +57,6 @@ public class FarmingHandler implements Listener {
                 addCrop(cropLocation, crop);
             }
         }
-        Database.CROPS.deleteMany(new Document());
 
         // Start crop scanner to run every 10 minutes
         Bukkit.getServer().getScheduler().runTaskTimer(
@@ -542,6 +541,7 @@ public class FarmingHandler implements Listener {
      * Saves all un-grown crops to database as documents.
      */
     public static void saveCropsToDatabase() {
+        Database.CROPS.deleteMany(new Document());
         for (Map.Entry<Chunk, Map<Location, Crop>> chunkEntry : FarmingHandler.PLANTED_CROPS.entrySet()) {
 
             Chunk chunk = chunkEntry.getKey();
