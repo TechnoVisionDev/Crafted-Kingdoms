@@ -28,7 +28,7 @@ public class FortifiedBlock {
 
     // Overworld Reinforcement Materials
     public static final int STONE = 25;
-    public static final int COPPER_INGOT = 50;
+    public static final int COPPER_INGOT = 25;
     public static final int IRON_INGOT = 250;
     public static final int DIAMOND = 1500;
     public static final int NETHERITE_INGOT = 2000;

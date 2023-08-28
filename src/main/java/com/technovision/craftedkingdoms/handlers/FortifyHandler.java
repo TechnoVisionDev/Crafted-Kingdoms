@@ -339,6 +339,7 @@ public class FortifyHandler implements Listener {
      */
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
+        event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL || block.getType() == Material.END_PORTAL_FRAME || block.getType() == Material.END_PORTAL);
         for (Block block : event.blockList()) {
             FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
             if (fortifiedBlock != null) {

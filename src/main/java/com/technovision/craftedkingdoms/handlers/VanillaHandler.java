@@ -67,10 +67,12 @@ public class VanillaHandler implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        String deathMessage = event.getDeathMessage();
+        Location loc = event.getEntity().getLocation();
+        String coords = String.format("%s(X=%s, Y=%s, Z=%s)", ChatColor.YELLOW, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        String deathMessage = event.getDeathMessage() + " " + coords;
 
         // Send the death message directly to the player
-        if (deathMessage != null && !deathMessage.isEmpty()) {
+        if (event.getDeathMessage() != null && !event.getDeathMessage().isEmpty()) {
             event.getEntity().sendMessage(ChatColor.GRAY + deathMessage);
         }
         // Prevent the death message from being broadcasted to all players
@@ -169,14 +171,15 @@ public class VanillaHandler implements Listener {
     }
 
     /**
-     * Disables villager trading.
+     * Disables villager & wandering trader trading.
      * @param event fires when player right clicks on villager.
      */
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() instanceof Villager) {
+        Entity clickedEntity = event.getRightClicked();
+        if (clickedEntity instanceof Villager || clickedEntity instanceof WanderingTrader) {
             event.setCancelled(true);
-            MessageUtils.sendError(event.getPlayer(), "Villager trading has been disabled!");
+            MessageUtils.sendError(event.getPlayer(), "NPC trading has been disabled!");
         }
     }
 
