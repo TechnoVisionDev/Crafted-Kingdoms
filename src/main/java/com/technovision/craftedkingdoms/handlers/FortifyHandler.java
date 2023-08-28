@@ -350,6 +350,36 @@ public class FortifyHandler implements Listener {
     }
 
     /**
+     * Prevent pistons from moving fortified blocks
+     * @param event Fires when piston moves block
+     */
+    @EventHandler
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        for (Block block : event.getBlocks()) {
+            FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
+            if (fortifiedBlock != null) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Prevent pistons from moving fortified blocks
+     * @param event Fires when piston moves block
+     */
+    @EventHandler
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        for (Block block : event.getBlocks()) {
+            FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
+            if (fortifiedBlock != null) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    /**
      * Prevent liquid flow from damaging fortified crops.
      * @param event Fires when liquid flows.
      */
