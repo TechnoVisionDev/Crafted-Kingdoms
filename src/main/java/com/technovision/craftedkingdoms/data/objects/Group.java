@@ -332,6 +332,15 @@ public class Group {
     }
 
     @BsonIgnore
+    public Set<UUID> getResidents() {
+        Set<UUID> residents = new HashSet<>(members);
+        residents.addAll(moderators);
+        residents.addAll(admins);
+        residents.add(ownerID);
+        return residents;
+    }
+
+    @BsonIgnore
     public boolean isResident(UUID playerID) {
         if (isMember(playerID)) return true;
         if (isModerator(playerID)) return true;

@@ -139,6 +139,17 @@ public class VanillaHandler implements Listener {
     }
 
     /**
+     * Disable the /me command
+     * @param event Fires when /me command is run.
+     */
+    @EventHandler
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().startsWith("/me")) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
      * Makes the overworld and nether ratio 1:1 for portal travel.
      * @param event fires when player travels through nether portal
      */

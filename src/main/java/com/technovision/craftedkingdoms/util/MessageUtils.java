@@ -51,11 +51,7 @@ public class MessageUtils {
 
     public static void sendGroup(Group group, String playerName, String message) {
         message = String.format("%s[%s] %s: %s%s", ChatColor.GRAY, group.getName(), playerName, ChatColor.WHITE, message);
-        Player owner = Bukkit.getPlayer(group.getOwnerID());
-        if (owner != null) {
-            send(owner, message);
-        }
-        for (UUID id : group.getMembers()) {
+        for (UUID id : group.getResidents()) {
             Player player = Bukkit.getPlayer(id);
             if (player != null) {
                 send(player, message);

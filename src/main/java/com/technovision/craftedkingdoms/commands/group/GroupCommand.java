@@ -28,6 +28,8 @@ public class GroupCommand extends CommandBase {
 
     private static final List<String> PERMISSIONS = Arrays.stream(Permissions.values()).map(Permissions::name).toList();
 
+    public static final HashMap<UUID, Long> cooldown = new HashMap<>();
+
     public GroupCommand(CraftedKingdoms plugin) {
         super(plugin);
     }
@@ -104,10 +106,15 @@ public class GroupCommand extends CommandBase {
         }
         String name = StringUtils.toSafeString(args[1], 30, "Your group name");
 
-        // TODO: Add 1 min cooldown to creating groups
+        // 1 min cooldown for creating groups
+        Player player = getPlayer();
+        Long time = cooldown.get(player.getUniqueId());
+        if (time != null && System.currentTimeMillis() - time < 1000 * 60) {
+            MessageUtils.sendError(player, "You must wait 1 minute to create a new group!");
+            return;
+        }
 
         // Check if group name is taken
-        Player player = getPlayer();
         if (CKGlobal.isGroup(name)) {
             throw new CKException("A group named "+ChatColor.YELLOW+args[1]+ChatColor.RED+" already exists!");
         }
@@ -133,6 +140,7 @@ public class GroupCommand extends CommandBase {
 
         // Create group locally and in database
         Group group = CKGlobal.createGroup(name, player, isPublic, password);
+        cooldown.put(player.getUniqueId(), System.currentTimeMillis());
 
         // Send success message & firework
         MessageUtils.send(player, " ");
