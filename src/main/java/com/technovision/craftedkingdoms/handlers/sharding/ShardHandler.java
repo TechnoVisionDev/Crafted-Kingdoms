@@ -101,32 +101,6 @@ public class ShardHandler implements Listener {
         }
     }
 
-    /**
-     * Makes pearled player respawn in nether.
-     * @param event Fires when pearled player respawns.
-     */
-    @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        Resident res = CKGlobal.getResident(player);
-        if (res.getSoulShard() != null) {
-            // Spawn at anchor if set
-            if (event.isAnchorSpawn()) return;
-
-            // Find safe random nether spawn
-            Location respawn = findSafeNetherRespawn(player);
-            if (respawn == null) {
-                // Try to find safe spawn again
-                respawn = findSafeNetherRespawn(player);
-                if (respawn == null) {
-                    MessageUtils.sendError(player, "Failed to find safe spawn point in Nether! Contact an admin!");
-                    return;
-                }
-            }
-            event.setRespawnLocation(respawn);
-        }
-    }
-
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent event) {
         ItemStack[] matrix = event.getInventory().getMatrix();
@@ -221,35 +195,6 @@ public class ShardHandler implements Listener {
         }
     }
 
-    public static Location findSafeNetherRespawn(Player player) {
-        World nether = player.getServer().getWorld("world_nether");
-        Random random = new Random();
-        for (int attempts = 0; attempts < 100; attempts++) {
-            int x = random.nextInt(10001) - 5000;
-            int z = random.nextInt(10001) - 5000;
-            int y = findSafeY(nether, x, z);
-            if (y != -1) {
-                return new Location(nether, x, y, z);
-            }
-        }
-        return null;
-    }
-
-    private static int findSafeY(World world, int x, int z) {
-        for (int y = 110; y > 30; y--) {
-            if (isSafeSpawn(world, x, y, z)) {
-                return y;
-            }
-        }
-        return -1;
-    }
-
-    private static boolean isSafeSpawn(World world, int x, int y, int z) {
-        return world.getBlockAt(x, y, z).getType().isSolid() &&
-                world.getBlockAt(x, y + 1, z).getType() == Material.AIR &&
-                world.getBlockAt(x, y + 2, z).getType() == Material.AIR;
-    }
-
     public ItemStack createSoulShard(Player killer, Player killedPlayer) {
         // Create a new ItemStack of Material ENDER_PEARL (1 ender pearl)
         ItemStack soulShard = new ItemStack(Material.FLINT, 1);
@@ -291,17 +236,6 @@ public class ShardHandler implements Listener {
     /** Restrict sharded players */
 
     @EventHandler
-    public void onPlayerUsePortal(PlayerPortalEvent event) {
-        Resident resident = CKGlobal.getResident(event.getPlayer());
-        if (resident.getSoulShard() != null) {
-            event.setCancelled(true);
-            MessageUtils.sendError(event.getPlayer(), "You can't leave the nether until your soul is freed!");
-        }
-    }
-
-    /** Handle soul shard movement */
-
-    @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         // Check if the entity being damaged is a player
         if (event.getEntity() instanceof Player) {
@@ -318,11 +252,13 @@ public class ShardHandler implements Listener {
                     if (res.getSoulShard() == null) return;
 
                     event.setCancelled(true);
-                    MessageUtils.sendError(damager, "You cannot PVP here while sharded!");
+                    MessageUtils.sendError(damager, "You cannot instigate PvP while sharded!");
                 }
             }
         }
     }
+
+    /** Handle soul shard movement */
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {

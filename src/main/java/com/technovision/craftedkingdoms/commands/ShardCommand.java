@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -28,9 +27,6 @@ import java.util.UUID;
  * @author TechnoVision
  */
 public class ShardCommand extends CommandBase {
-
-    public static final HashMap<UUID, Location> storedLocations = new HashMap<>();
-    public static final HashMap<UUID, Long> cooldown = new HashMap<>();
 
     public ShardCommand(CraftedKingdoms plugin) {
         super(plugin);
@@ -44,8 +40,6 @@ public class ShardCommand extends CommandBase {
         // Implemented
         commands.put("locate", "Locate your soul shard.");
         commands.put("free", "Free a soul shard.");
-        commands.put("summon", "Summon a prisoner from the Nether.");
-        commands.put("return", "Return a summoned player to the Nether.");
     }
 
     public void locate_cmd() throws CKException {
@@ -82,109 +76,6 @@ public class ShardCommand extends CommandBase {
             );
             MessageUtils.send(sender, msg);
         }
-    }
-
-    public void summon_cmd() throws CKException {
-        Player player = getPlayer();
-        ItemStack shard = player.getInventory().getItemInMainHand();
-        if (!ShardHandler.isSoulShard(shard)) {
-            MessageUtils.sendError(player, "You must be holding a soul shard in your hand!");
-            return;
-        }
-
-        Resident shardedResident = ShardHandler.getResidentFromShard(shard);
-        if (shardedResident == null) {
-            MessageUtils.sendError(player, "There is no player attached to this shard! Contact an admin!");
-            return;
-        }
-
-        Player shardedPlayer = Bukkit.getPlayer(shardedResident.getPlayerID());
-        if (shardedPlayer == null) {
-            MessageUtils.sendError(player, "That player is currently offline!");
-            return;
-        }
-
-        if (shardedPlayer.getWorld().getName().equalsIgnoreCase("world")) {
-            MessageUtils.sendError(player, "That player is already summoned! You must return them first!");
-            return;
-        }
-
-        Long time = cooldown.get(player.getUniqueId());
-        if (time != null && System.currentTimeMillis() - time < 1000 * 60) {
-            MessageUtils.sendError(player, "You must wait 1 minute to run this command again!");
-            return;
-        } else {
-            cooldown.put(player.getUniqueId(), System.currentTimeMillis());
-        }
-
-        if (storedLocations.get(shardedPlayer.getUniqueId()) == null) {
-            storedLocations.put(shardedPlayer.getUniqueId(), shardedPlayer.getLocation());
-        }
-
-        MessageUtils.send(shardedPlayer, ChatColor.LIGHT_PURPLE + "You have been summoned by your shard owner...");
-        MessageUtils.send(shardedPlayer, ChatColor.GRAY + "You will be teleported in 5 seconds!");
-
-        MessageUtils.send(player, ChatColor.LIGHT_PURPLE + "You have summoned the soul in this shard...");
-        MessageUtils.send(player, ChatColor.GRAY + "They will be teleported in 5 seconds!");
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CraftedKingdoms.plugin, () -> {
-            if (shardedPlayer.isOnline() && player.isOnline()) {
-                shardedPlayer.teleport(player.getLocation());
-            }
-        }, 20 * 5);
-    }
-
-    public void return_cmd() throws CKException {
-        Player player = getPlayer();
-        ItemStack shard = player.getInventory().getItemInMainHand();
-        if (!ShardHandler.isSoulShard(shard)) {
-            MessageUtils.sendError(player, "You must be holding a soul shard in your hand!");
-            return;
-        }
-
-        Resident shardedResident = ShardHandler.getResidentFromShard(shard);
-        if (shardedResident == null) {
-            MessageUtils.sendError(player, "There is no player attached to this shard! Contact an admin!");
-            return;
-        }
-
-        Player shardedPlayer = Bukkit.getPlayer(shardedResident.getPlayerID());
-        if (shardedPlayer == null) {
-            MessageUtils.sendError(player, "That player is currently offline!");
-            return;
-        }
-
-        if (shardedPlayer.getWorld().getName().equalsIgnoreCase("world_nether")) {
-            MessageUtils.sendError(player, "That player is already in the Nether!");
-            return;
-        }
-
-        Long time = cooldown.get(player.getUniqueId());
-        if (time != null && System.currentTimeMillis() - time < 1000 * 60) {
-            MessageUtils.sendError(player, "You must wait 1 minute to run this command again!");
-            return;
-        } else {
-            cooldown.put(player.getUniqueId(), System.currentTimeMillis());
-        }
-
-        Location storedLocation = storedLocations.get(shardedPlayer.getUniqueId());
-        if (storedLocation == null) {
-            storedLocation = ShardHandler.findSafeNetherRespawn(shardedPlayer);
-        }
-
-        MessageUtils.send(shardedPlayer, ChatColor.LIGHT_PURPLE + "You have been returned by your shard owner...");
-        MessageUtils.send(shardedPlayer, ChatColor.GRAY + "You will be teleported in 5 seconds!");
-
-        MessageUtils.send(player, ChatColor.LIGHT_PURPLE + "You have returned this soul to it's shard...");
-        MessageUtils.send(player, ChatColor.GRAY + "They will be teleported in 5 seconds!");
-
-        Location finalStoredLocation = storedLocation;
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CraftedKingdoms.plugin, () -> {
-            if (shardedPlayer.isOnline() && player.isOnline()) {
-                shardedPlayer.teleport(finalStoredLocation);
-                storedLocations.remove(shardedPlayer.getUniqueId());
-            }
-        }, 20 * 5);
     }
 
     public void free_cmd() throws CKException {
