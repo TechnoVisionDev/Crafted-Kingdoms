@@ -140,6 +140,9 @@ public class FortifyHandler implements Listener {
         if (BlockUtils.isDoor(block)) {
             block = BlockUtils.getBottomPartOfDoor(block);
         }
+        if (BlockUtils.isBed(block)) {
+            block = BlockUtils.getBedFoot(block);
+        }
 
         // Check if block is fortified
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
@@ -161,7 +164,9 @@ public class FortifyHandler implements Listener {
         if (res.getGroups().contains(fortifiedBlock.getGroup())) {
             if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.BLOCKS)) {
                 removeNametag(block.getLocation());
-                fortifiedBlock.reimburseCost(player);
+                if (!BiomeData.isCrop(block.getType())) {
+                    fortifiedBlock.reimburseCost(player);
+                }
                 fortifiedBlock.delete();
                 // Remove crops if necessary
                 Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
@@ -280,6 +285,9 @@ public class FortifyHandler implements Listener {
         // Get bottom half if block is a door
         if (BlockUtils.isDoor(clickedBlock)) {
             clickedBlock = BlockUtils.getBottomPartOfDoor(clickedBlock);
+        }
+        if (BlockUtils.isBed(clickedBlock)) {
+            clickedBlock = BlockUtils.getBedFoot(clickedBlock);
         }
 
         FortifiedBlock fortifiedBlock = CKGlobal.getFortifiedBlock(clickedBlock.getLocation());
@@ -619,10 +627,14 @@ public class FortifyHandler implements Listener {
     }
 
     private void handleBlockInteraction(Player player, Group group, ItemStack item, Block block) {
-        // Get bottom half if block is a door
+        // Get bottom half if block is a door or bed
         if (BlockUtils.isDoor(block)) {
             block = BlockUtils.getBottomPartOfDoor(block);
         }
+        if (BlockUtils.isBed(block)) {
+            block = BlockUtils.getBedFoot(block);
+        }
+
         // Check if block is already fortified
         FortifiedBlock alreadyFortifiedBlock = CKGlobal.getFortifiedBlock(block.getLocation());
         Material itemType = item.getType();
@@ -682,6 +694,9 @@ public class FortifyHandler implements Listener {
         // Get bottom half if block is a door
         if (BlockUtils.isDoor(block)) {
             block = BlockUtils.getBottomPartOfDoor(block);
+        }
+        if (BlockUtils.isBed(block)) {
+            block = BlockUtils.getBedFoot(block);
         }
 
         Material itemType = item.getType();

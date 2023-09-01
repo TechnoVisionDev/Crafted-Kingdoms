@@ -186,6 +186,16 @@ public class ItemHandler implements Listener {
         shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(crafted_leather));
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
+
+        // Slimeball
+        shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "slime_ball"), new ItemStack(Material.SLIME_BALL));
+        shapedRecipe.shape( "CCC",
+                "CMC",
+                "CCC");
+        shapedRecipe.setIngredient('C', Material.CACTUS);
+        shapedRecipe.setIngredient('M', Material.MAGMA_CREAM);
+        Bukkit.getServer().addRecipe(shapedRecipe);
+        recipes.add(shapedRecipe);
     }
 
     private static void initMaterials() {

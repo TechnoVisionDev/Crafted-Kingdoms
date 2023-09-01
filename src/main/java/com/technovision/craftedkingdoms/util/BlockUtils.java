@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
 
 public class BlockUtils {
 
@@ -26,8 +27,30 @@ public class BlockUtils {
         }
     }
 
+    /**
+     * Get the bottom half of a bed
+     *
+     * @param block A block that is part of a bed (either the top or bottom half).
+     * @return The bottom part of the bed.
+     */
+    public static Block getBedFoot(Block block) {
+        BlockData blockData = block.getBlockData();
+        if (blockData instanceof Bed bed) {
+            BlockFace facing = bed.getFacing();
+            if (bed.getPart() == Bed.Part.HEAD) {
+                return block.getRelative(facing.getOppositeFace());
+            }
+        }
+        return block;
+    }
+
     public static boolean isDoor(Block block) {
         Material type = block.getType();
         return type.name().endsWith("_DOOR");
+    }
+
+    public static boolean isBed(Block block) {
+        Material type = block.getType();
+        return type.name().endsWith("_BED");
     }
 }
