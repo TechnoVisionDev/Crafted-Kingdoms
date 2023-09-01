@@ -172,7 +172,6 @@ public class FortifyHandler implements Listener {
             if (BiomeData.isCrop(block.getType())) {
                 if (res.hasPermission(fortifiedBlock.getGroup(), Permissions.CROPS)) {
                     removeNametag(block.getLocation());
-                    fortifiedBlock.reimburseCost(player);
                     fortifiedBlock.delete();
                     // Remove crops if necessary
                     Location aboveCrop = block.getLocation().clone().add(0, 1, 0);
