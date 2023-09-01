@@ -158,11 +158,11 @@ public class ItemHandler implements Listener {
 
         // Cartography Table
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "cartography_table"), new ItemStack(Material.CARTOGRAPHY_TABLE));
-        shapedRecipe.shape( "SSS",
+        shapedRecipe.shape( "PPP",
                 "LLL",
                 "LLL");
         shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
-        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(steel_ingot));
+        shapedRecipe.setIngredient('P', Material.PAPER);
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
