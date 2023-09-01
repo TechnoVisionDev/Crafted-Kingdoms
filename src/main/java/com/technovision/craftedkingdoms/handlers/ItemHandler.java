@@ -75,10 +75,9 @@ public class ItemHandler implements Listener {
         // Furnace
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "furnace"), new ItemStack(Material.FURNACE));
         shapedRecipe.shape( "SSS",
-                            "SLS",
-                            "CCC");
-        shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
-        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(crushed_stone));
+                            "SCS",
+                            "SSS");
+        shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(refined_stone));
         shapedRecipe.setIngredient('C', Material.COAL_BLOCK);
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
@@ -86,9 +85,9 @@ public class ItemHandler implements Listener {
         // Blast Furnace
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "blast_furnace"), new ItemStack(Material.BLAST_FURNACE));
         shapedRecipe.shape( "III",
-                            "IFI",
+                            "CFC",
                             "CCC");
-        shapedRecipe.setIngredient('C', new RecipeChoice.ExactChoice(compacted_stone));
+        shapedRecipe.setIngredient('C', new RecipeChoice.ExactChoice(crushed_stone));
         shapedRecipe.setIngredient('F', Material.FURNACE);
         shapedRecipe.setIngredient('I', new RecipeChoice.ExactChoice(steel_ingot));
         Bukkit.getServer().addRecipe(shapedRecipe);
@@ -96,10 +95,10 @@ public class ItemHandler implements Listener {
 
         // Smoker
         shapedRecipe = new ShapedRecipe(new NamespacedKey(CraftedKingdoms.namespace, "smoker"), new ItemStack(Material.SMOKER));
-        shapedRecipe.shape( "HHH",
-                            "CFC",
-                            "CCC");
-        shapedRecipe.setIngredient('H', new RecipeChoice.ExactChoice(hardened_wood));
+        shapedRecipe.shape( "CCC",
+                            "HFH",
+                            "HHH");
+        shapedRecipe.setIngredient('H', new RecipeChoice.ExactChoice(milled_lumber));
         shapedRecipe.setIngredient('F', Material.FURNACE);
         shapedRecipe.setIngredient('C', new RecipeChoice.ExactChoice(clay_molding));
         Bukkit.getServer().addRecipe(shapedRecipe);
@@ -141,7 +140,7 @@ public class ItemHandler implements Listener {
                             "WWW",
                             "WWW");
         shapedRecipe.setIngredient('S', new RecipeChoice.ExactChoice(steel_ingot));
-        shapedRecipe.setIngredient('W', new RecipeChoice.ExactChoice(hardened_wood));
+        shapedRecipe.setIngredient('W', new RecipeChoice.ExactChoice(milled_lumber));
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
