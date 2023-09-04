@@ -385,8 +385,8 @@ public class FarmingHandler implements Listener {
                     for (int i = 0; i < elapsedCycles && i < 2; i++) {
                         FarmingHandler.growCrop(crop);
                     }
+                    crop.setTimePlanted(new Date((long) (currentTime - (currentTime - crop.getTimePlanted().getTime()) % growthTime)));
                 }
-                crop.setTimePlanted(new Date());
                 addCrop(location, crop);
             }
             else if (FarmingHandler.isReadyToGrow(crop)) {
@@ -532,7 +532,6 @@ public class FarmingHandler implements Listener {
                 case CHERRY_SAPLING -> treeType = TreeType.CHERRY;
             };
             block.setType(Material.AIR);
-            System.out.println(block.getLocation());
             block.getWorld().generateTree(block.getLocation(), treeType);
         }
     }
