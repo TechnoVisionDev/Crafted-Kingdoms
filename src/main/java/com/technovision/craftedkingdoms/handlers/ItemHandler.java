@@ -162,7 +162,7 @@ public class ItemHandler implements Listener {
                 "LLL",
                 "LLL");
         shapedRecipe.setIngredient('L', new RecipeChoice.ExactChoice(milled_lumber));
-        shapedRecipe.setIngredient('P', Material.PAPER);
+        shapedRecipe.setIngredient('P', new RecipeChoice.ExactChoice(crafted_leather));
         Bukkit.getServer().addRecipe(shapedRecipe);
         recipes.add(shapedRecipe);
 
