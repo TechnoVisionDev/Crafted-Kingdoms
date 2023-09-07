@@ -69,11 +69,14 @@ public class GroupCommand extends CommandBase {
 
         // Check if sender is owner
         Resident senderRes = getResident();
-        if (!senderRes.isInGroup(group.getName())) {
-            throw new CKException("You are not a member of that group!");
-        }
-        if (!group.isOwner(senderRes.getPlayerID())) {
-            throw new CKException("You must be the group owner to transfer ownership!");
+        Player player = getPlayer();
+        if (!player.isOp()) {
+            if (!senderRes.isInGroup(group.getName())) {
+                throw new CKException("You are not a member of that group!");
+            }
+            if (!group.isOwner(senderRes.getPlayerID())) {
+                throw new CKException("You must be the group owner to transfer ownership!");
+            }
         }
 
         // Get resident to transfer to from args
